@@ -76,3 +76,5 @@ def cli(metadata_file, metadata_url, operating_system, rootfs, verbose, quiet):
 
     builder.initialize()
     builder.run(operating_system, rootfs)
+    if not quiet:
+        print("Configuration files written to root filesystem '{}'".format(rootfs))
