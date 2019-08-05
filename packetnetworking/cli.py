@@ -54,8 +54,8 @@ def cli(metadata_file, metadata_url, operating_system, rootfs, verbose, quiet):
 
     if metadata_file and metadata_url:
         log.debug(
-            "Metadata file '{}' specified. Preferring over metadata url".format(
-                metadata_file
+            "Metadata file '{}' specified, preferring over metadata url.".format(
+                metadata_file.name
             )
         )
     if len(operating_system.split()) != 2:
