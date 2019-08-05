@@ -1,6 +1,9 @@
 import os
+import logging
 from textwrap import dedent
 from jinja2 import Template, StrictUndefined
+
+log = logging.getLogger()
 
 
 class NetworkBuilder:
@@ -37,7 +40,7 @@ class NetworkBuilder:
         if self.tasks is None:
             self.build()
         for name, template in self.tasks.items():
-            print("Processing task: '{}'".format(name))
+            log.debug("Processing task: '{}'".format(name))
             name = os.path.join(rootfs_path, name)
             if template is None:
                 if os.path.exists(name):
