@@ -12,7 +12,7 @@ setup(
     author_email="manny@packet.com, mason@packet.com",
     url="https://github.com/packethost/packet-networking/",
     packages=find_packages(),
-    install_requires=["click >=6.0,<7.0", "jinja2 >=2.9,<2.10", "requests"],
+    install_requires=["click >=6.0,<7.0", "jinja2 >=2.9,<2.10", "requests == 2.22.*"],
     extras_require={"test": test_reqs},
     tests_require=test_reqs,
     entry_points="""
