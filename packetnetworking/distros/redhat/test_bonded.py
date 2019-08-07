@@ -2,10 +2,16 @@ from ... import utils
 from textwrap import dedent
 
 
-def test_bonded_tasks(redhat_bonded_network):
-    """Checks the expected number of tasks are created"""
+def test_public_bonded_tasks(redhat_bonded_network):
+    """Checks the expected number of tasks are created for a public bond"""
     builder = redhat_bonded_network()
     assert len(builder.tasks) == 14
+
+
+def test_private_bonded_tasks(redhat_bonded_network):
+    """Checks the expected number of tasks are created for a private bond"""
+    builder = redhat_bonded_network(public=False)
+    assert len(builder.tasks) == 12
 
 
 def test_public_bonded_task_etc_sysconfig_network(redhat_bonded_network):
