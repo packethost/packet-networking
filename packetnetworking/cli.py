@@ -28,9 +28,16 @@ log = logging.getLogger("packetnetworking")
 @click.option(
     "--rootfs", type=click.Path(), required=True, help="Path to root filesystem"
 )
+@click.option(
+    "--resolvers",
+    envvar="PACKET_RESOLVERS",
+    help="Comma separated list of resolvers to be used (otherwise uses ones from /etc/resolv.conf)",
+)
 @click.option("-v", "--verbose", count=True, help="Provide more detailed output")
 @click.option("-q", "--quiet", is_flag=True, help="Silences all output")
-def cli(metadata_file, metadata_url, operating_system, rootfs, verbose, quiet):
+def cli(
+    metadata_file, metadata_url, operating_system, rootfs, resolvers, verbose, quiet
+):
     level = logging.WARNING
     if verbose:
         valid_levels = [logging.INFO, logging.DEBUG]
@@ -73,8 +80,12 @@ def cli(metadata_file, metadata_url, operating_system, rootfs, verbose, quiet):
         builder.set_metadata(json.load(metadata_file))
     else:
         builder.load_metadata(metadata_url)
-
     builder.initialize()
+    if resolvers:
+        resolvers = [x for x in resolvers.split(",") if x.strip()]
+        if resolvers:
+            builder.network.resolvers = resolvers
+
     builder.run(operating_system, rootfs)
     if not quiet:
         print("Configuration files written to root filesystem '{}'".format(rootfs))
