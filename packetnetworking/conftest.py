@@ -120,7 +120,7 @@ def metadata(fake, fake_address, patch_dict):
             addresses.append(fake_address(management=False))
             addresses.append(
                 fake_address(
-                    management=False,
+                    management=True,
                     address_family=6,
                     netmask="ffff:ffff:ffff:ffff:ffff:ffff:ffff:fffe",
                 )
