@@ -1,13 +1,5 @@
 from .metadata import Metadata
-from .utils import (
-    RecursiveDictAttributes,
-    RecursiveAttributes,
-    WhereList,
-    IPAddressList,
-    get_matched_interfaces,
-    get_interfaces,
-    resolvers,
-)
+from . import utils
 from .distros import get_distro_builder
 from collections import namedtuple
 import logging
@@ -90,19 +82,19 @@ class NetworkData(object):
         self.bonding = self.nw_metadata.bonding
 
     def build_interfaces(self):
-        self.interfaces = WhereList()
-        physical_ifaces = get_interfaces()
-        matched_ifaces = get_matched_interfaces(
+        self.interfaces = utils.WhereList()
+        physical_ifaces = utils.get_interfaces()
+        matched_ifaces = utils.get_matched_interfaces(
             self.nw_metadata.interfaces, physical_ifaces
         )
         if not matched_ifaces:
             log.debug("Physical Interfaces: {}".format(physical_ifaces))
             log.debug("Metadata Interfaces: {}".format(self.nw_metadata.interfaces))
             raise LookupError("No interfaces matched ones provided from metadata")
-        self.interfaces = RecursiveAttributes(matched_ifaces)
+        self.interfaces = utils.RecursiveAttributes(matched_ifaces)
 
     def build_bonds(self):
-        self.bonds = RecursiveDictAttributes({})
+        self.bonds = utils.RecursiveDictAttributes({})
         for iface in self.nw_metadata.interfaces:
             if iface.bond:
                 if iface.bond not in self.bonds:
@@ -111,7 +103,7 @@ class NetworkData(object):
                     self.bonds[iface.bond].append(iface)
 
     def build_addresses(self):
-        self.addresses = IPAddressList(self.nw_metadata.addresses)
+        self.addresses = utils.IPAddressList(self.nw_metadata.addresses)
 
     def build_resolvers(self):
-        self.resolvers = resolvers(self.resolvers)
+        self.resolvers = utils.resolvers(self.resolvers)
