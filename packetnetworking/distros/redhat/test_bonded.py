@@ -1,16 +1,38 @@
 from ... import utils
-from ...builder import OSInfo
-from .bonded import RedhatBondedNetwork
+from textwrap import dedent
 
-def test_bonded_tasks(mockit, redhatbuilder):
-    osinfo = OSInfo('centos', 7)
-    redhatbuilder.build(osinfo)
 
-    bonded_builders = 0
-    for builder in redhatbuilder.builders:
-        if isinstance(builder, RedhatBondedNetwork):
-            bonded_builders += 1
-            assert len(builder.tasks) == 14
+def test_bonded_tasks(mockit, redhat_bonded_network):
+    """Checks the expected number of tasks are created"""
+    builder = redhat_bonded_network()
+    assert len(builder.tasks) == 14
 
-    assert bonded_builders > 0
 
+def test_bonded_task_etc_sysconfig_network(mockit, redhat_bonded_network):
+    builder = redhat_bonded_network(public=True)
+    tasks = builder.render()
+    result = dedent(
+        """\
+        NETWORKING=yes
+        HOSTNAME={hostname}
+        GATEWAY={gateway}
+        GATEWAYDEV=bond0
+        NOZEROCONF=yes
+    """
+    ).format(hostname=builder.metadata.hostname, gateway=builder.ipv4pub.first.gateway)
+    assert tasks["etc/sysconfig/network"] == result
+
+
+def test_bonded_task_etc_sysconfig_private(mockit, redhat_bonded_network):
+    builder = redhat_bonded_network(public=False)
+    tasks = builder.render()
+    result = dedent(
+        """\
+        NETWORKING=yes
+        HOSTNAME={hostname}
+        GATEWAY={gateway}
+        GATEWAYDEV=bond0
+        NOZEROCONF=yes
+    """
+    ).format(hostname=builder.metadata.hostname, gateway=builder.ipv4priv.first.gateway)
+    assert tasks["etc/sysconfig/network"] == result
