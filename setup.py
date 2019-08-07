@@ -16,9 +16,9 @@ setup(
         "lxml >=3.5,<3.6",
         "requests",
     ],
+    tests_require=["pytest", "mock", "faker", "netaddr"],
     entry_points="""
         [console_scripts]
         packet-networking=packetnetworking.cli:cli
     """,
 )
-
