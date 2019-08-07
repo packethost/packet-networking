@@ -1,7 +1,6 @@
 import pytest
-import mock
 from ...builder import Builder, OSInfo
-from ... import builder, utils
+from ... import utils
 from .builder import RedhatBuilder
 from .bonded import RedhatBondedNetwork
 

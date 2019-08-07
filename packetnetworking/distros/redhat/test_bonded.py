@@ -1,4 +1,3 @@
-from ... import utils
 from textwrap import dedent
 
 
@@ -46,6 +45,7 @@ def test_private_bonded_task_etc_sysconfig_network(redhat_bonded_network):
     assert tasks["etc/sysconfig/network"] == result
 
 
+# pylama:ignore=E501
 def test_bonded_task_etc_modprobe_d_bonding(redhat_bonded_network):
     """Validates /etc/modprobe.d/bonding.conf has correct bonding mode"""
     builder = redhat_bonded_network()

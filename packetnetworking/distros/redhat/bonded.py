@@ -1,7 +1,9 @@
 from .. import NetworkBuilder
+from ...utils import generate_persistent_names
 import os
 
 
+# pylama:ignore=E501
 class RedhatBondedNetwork(NetworkBuilder):
     def build(self, osinfo):
         self.build_tasks(osinfo)

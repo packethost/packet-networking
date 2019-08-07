@@ -1,5 +1,4 @@
 from netaddr import IPNetwork
-import copy
 import mock
 import faker
 import pytest
@@ -12,6 +11,7 @@ def fake():
     return faker.Faker()
 
 
+# pylama:ignore=C901
 @pytest.fixture
 def patch_dict():
     def _patch_dict(orig, updates):

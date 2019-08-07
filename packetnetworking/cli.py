@@ -6,7 +6,7 @@ import packetnetworking
 
 log = logging.getLogger("packetnetworking")
 
-
+# pylama:ignore=C901
 @click.command()
 @click.option(
     "--metadata-file",
@@ -31,7 +31,10 @@ log = logging.getLogger("packetnetworking")
 @click.option(
     "--resolvers",
     envvar="PACKET_RESOLVERS",
-    help="Comma separated list of resolvers to be used (otherwise uses ones from /etc/resolv.conf)",
+    help=(
+        "Comma separated list of resolvers to be used "
+        + "(otherwise uses ones from /etc/resolv.conf)"
+    ),
 )
 @click.option("-v", "--verbose", count=True, help="Provide more detailed output")
 @click.option("-q", "--quiet", is_flag=True, help="Silences all output")

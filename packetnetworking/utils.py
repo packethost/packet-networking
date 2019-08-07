@@ -41,6 +41,7 @@ class WhereList(list):
         super().__init__(*items)
         self._always_lower = always_lower
 
+    # pylama:ignore=C901
     def where(self, cmp_lower=None, skip_missing=True, missing_default=None, **wheres):
         if cmp_lower is None:
             cmp_lower = self._always_lower
