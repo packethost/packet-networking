@@ -1,0 +1,20 @@
+matrix:
+  PYTHON_VERSION:
+    - 3.4
+    - 3.5
+    - 3.6
+    - 3.7
+
+pipeline:
+  fmt_and_lint:
+    image: python:3.5-alpine
+    commands:
+      - pip install black pylama
+      - black --check --diff .
+      - pylama packetnetworking setup.py
+
+  test:
+    image: python:${PYTHON_VERSION}
+    commands:
+      - pip install tox
+      - tox -e py$(echo ${PYTHON_VERSION} | sed 's|\.||')
