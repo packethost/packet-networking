@@ -2,6 +2,8 @@
 
 from setuptools import setup, find_packages
 
+test_reqs = ["pytest", "mock", "faker", "netaddr"]
+
 setup(
     name="packet-networking",
     version="1.0",
@@ -16,7 +18,8 @@ setup(
         "lxml >=3.5,<3.6",
         "requests",
     ],
-    tests_require=["pytest", "mock", "faker", "netaddr"],
+    extras_require={'test': test_reqs},
+    tests_require=test_reqs,
     entry_points="""
         [console_scripts]
         packet-networking=packetnetworking.cli:cli

@@ -97,3 +97,26 @@ Here is an example of the files created
 /tmp/rootfs/sbin
 /tmp/rootfs/sbin/ifup-pre-local
 ```
+
+## Running Tests
+
+```
+git clone git@github.com:packethost/packet-networking.git
+cd packet-networking/
+pip3 install -e .[test]
+py.test packetnetworking
+```
+
+**Example Output:**
+
+```
+# py.test packetnetworking
+===================================== test session starts ======================================
+platform linux -- Python 3.5.2, pytest-5.0.1, py-1.8.0, pluggy-0.12.0
+rootdir: /home/packet/packet-networking
+collected 3 items                                                                              
+
+packetnetworking/distros/redhat/test_bonded.py ...                                       [100%]
+
+=================================== 3 passed in 0.13 seconds ===================================
+```
