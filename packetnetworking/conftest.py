@@ -133,6 +133,13 @@ def metadata(fake, fake_address, patch_dict):
                     "hostname": fake.hostname(),
                     "id": fake.uuid4(),
                     "plan": random.choice(plan_slugs),
+                    "operating_system": {
+                        "slug": None,
+                        "distro": None,
+                        "version": None,
+                        "license_activation": {"state": "unlicensed"},
+                        "image_tag": None,
+                    },
                     "network": {
                         "bonding": {"mode": 4},
                         "interfaces": None,
