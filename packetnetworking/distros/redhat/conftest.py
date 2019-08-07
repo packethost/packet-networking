@@ -1,7 +1,7 @@
 import pytest
 import mock
 from ...builder import Builder, OSInfo
-from ... import utils
+from ... import builder, utils
 from .builder import RedhatBuilder
 from .bonded import RedhatBondedNetwork
 
@@ -10,7 +10,8 @@ from .bonded import RedhatBondedNetwork
 def redhatbuilder(mockit, fake, metadata, patch_dict):
     gen_metadata = metadata
 
-    def builder(metadata=None, public=True):
+    def _builder(metadata=None, public=True):
+        resolvers = ("1.2.3.4", "2.3.4.5")
         meta_interfaces = [
             {"name": "eth0", "mac": "00:0c:29:51:53:a1", "bond": "bond0"},
             {"name": "eth1", "mac": "00:0c:29:51:53:a2", "bond": "bond0"},
@@ -25,9 +26,11 @@ def redhatbuilder(mockit, fake, metadata, patch_dict):
         md = gen_metadata(_metadata, public=public)
         with mockit(utils.get_interfaces, return_value=phys_interfaces):
             builder_metadata = Builder(md).initialize()
+            builder_metadata.network.resolvers = resolvers
+
         return RedhatBuilder(builder_metadata)
 
-    return builder
+    return _builder
 
 
 @pytest.fixture

@@ -57,3 +57,38 @@ def test_bonded_task_etc_modprobe_d_bonding(redhat_bonded_network):
     """
     ).format(mode=builder.network.bonding.mode)
     assert tasks["etc/modprobe.d/bonding.conf"] == result
+
+
+def test_public_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
+    redhat_bonded_network
+):
+    """Validates /etc/sysconfig/network-scripts/ifcfg-bond0 for a public bond"""
+    builder = redhat_bonded_network(public=True)
+    tasks = builder.render()
+    result = dedent(
+        """\
+        DEVICE=bond0
+        NAME=bond0
+        IPADDR={ipv4pub.address}
+        NETMASK={ipv4pub.netmask}
+        GATEWAY={ipv4pub.gateway}
+        BOOTPROTO=none
+        ONBOOT=yes
+        USERCTL=no
+        TYPE=Bond
+        BONDING_OPTS="mode={bonding_mode} miimon=100 downdelay=200 updelay=200"
+
+        IPV6INIT=yes
+        IPV6ADDR={ipv6pub.address}/{ipv6pub.cidr}
+        IPV6_DEFAULTGW={ipv6pub.gateway}
+        DNS1={dns1}
+        DNS2={dns2}
+    """
+    ).format(
+        ipv4pub=builder.ipv4pub.first,
+        ipv6pub=builder.ipv6pub.first,
+        bonding_mode=builder.network.bonding.mode,
+        dns1=builder.network.resolvers[0],
+        dns2=builder.network.resolvers[1],
+    )
+    assert tasks["etc/sysconfig/network-scripts/ifcfg-bond0"] == result
