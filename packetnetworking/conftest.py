@@ -6,12 +6,35 @@ import pytest
 import random
 from .metadata import Metadata
 
+
 @pytest.fixture
 def fake():
     return faker.Faker()
 
+
 @pytest.fixture
-def patch_list(patch_dict):
+def patch_dict():
+    def _patch_dict(orig, updates):
+        for k, v in updates.items():
+            delete = str(k).startswith("-")
+            replace = str(k).startswith("!")
+            if delete or replace:
+                k = k[1:]
+            if delete:
+                del orig[k]
+                continue
+            if k not in orig or replace:
+                orig[k] = v
+            elif isinstance(orig[k], dict) and isinstance(v, dict):
+                _patch_dict(orig[k], v)
+            elif isinstance(orig[k], list) and (
+                isinstance(v, list) or isinstance(v, dict)
+            ):
+                _patch_list(orig[k], v)
+            else:
+                orig[k] = v
+        return orig
+
     def _patch_list(orig, updates):
         if isinstance(updates, list):
             updates = {i: updates[i] for i in range(len(updates))}
@@ -26,38 +49,17 @@ def patch_list(patch_dict):
             if k >= len(orig) or replace:
                 orig += [None] * (k - len(orig) + 1)
                 orig[k] = v
-            elif isinstance(orig[k], list) and (isinstance(v, list) or isinstance(v, dict)):
+            elif isinstance(orig[k], list) and (
+                isinstance(v, list) or isinstance(v, dict)
+            ):
                 _patch_list(orig[k], v)
             elif isinstance(orig[k], dict) and isinstance(v, dict):
-                patch_dict(orig[k], v)
-            else:
-                orig[k] = v
-        return orig
-    return _patch_list
-
-@pytest.fixture
-def patch_dict(patch_list):
-    def _patch_dict(orig, updates):
-        for k, v in updates.items():
-            delete = str(k).startswith("-")
-            replace = str(k).startswith("!")
-            if delete or replace:
-                k = k[1:]
-            if delete:
-                del orig[k]
-                continue
-            if k not in orig or replace:
-                orig[k] = v
-            elif isinstance(orig[k], dict) and isinstance(v, dict):
                 _patch_dict(orig[k], v)
-            elif isinstance(orig[k], list) and (isinstance(v, list) or isinstance(v, dict)):
-                patch_list(orig[k], v)
             else:
                 orig[k] = v
         return orig
+
     return _patch_dict
-
-
 
 
 @pytest.fixture
@@ -94,7 +96,9 @@ def fake_address(fake, patch_dict):
         if not address["address"]:
             address["address"] = str(network[gw_index + 1])
         return address
+
     return _fake_address
+
 
 plan_slugs = (
     "c1.small.x86",
@@ -114,11 +118,13 @@ def metadata(fake, fake_address, patch_dict):
         if public:
             addresses.append(fake_address())
             addresses.append(fake_address(management=False))
-            addresses.append(fake_address(
-                management=False,
-                address_family=6,
-                netmask="ffff:ffff:ffff:ffff:ffff:ffff:ffff:fffe",
-            ))
+            addresses.append(
+                fake_address(
+                    management=False,
+                    address_family=6,
+                    netmask="ffff:ffff:ffff:ffff:ffff:ffff:ffff:fffe",
+                )
+            )
         addresses.append(fake_address(public=False))
 
         return Metadata(
@@ -137,8 +143,12 @@ def metadata(fake, fake_address, patch_dict):
             )
         )
 
+    return _metadata
+
+
 @pytest.fixture
 def mockit():
     def _mockit(i, *args, **kwargs):
         return mock.patch(i.__module__ + "." + i.__name__, *args, **kwargs)
+
     return _mockit
