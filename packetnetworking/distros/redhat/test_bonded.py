@@ -38,3 +38,16 @@ def test_private_bonded_task_etc_sysconfig_network(redhat_bonded_network):
     """
     ).format(hostname=builder.metadata.hostname, gateway=builder.ipv4priv.first.gateway)
     assert tasks["etc/sysconfig/network"] == result
+
+
+def test_bonded_task_etc_modprobe_d_bonding(redhat_bonded_network):
+    """Validates /etc/modprobe.d/bonding.conf has correct bonding mode"""
+    builder = redhat_bonded_network()
+    tasks = builder.render()
+    result = dedent(
+        """\
+        alias bond0 bonding
+        options bond0 mode={mode} miimon=100 downdelay=200 updelay=200 xmit_hash_policy=layer3+4 lacp_rate=1
+    """
+    ).format(mode=builder.network.bonding.mode)
+    assert tasks["etc/modprobe.d/bonding.conf"] == result
