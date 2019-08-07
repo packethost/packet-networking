@@ -7,7 +7,7 @@ matrix:
 
 pipeline:
   fmt_and_lint:
-    image: python:3.5-alpine
+    image: python:3.6-alpine
     commands:
       - pip install black pylama
       - black --check --diff .
