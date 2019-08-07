@@ -36,15 +36,14 @@ class NetworkBuilder:
             "resolvers": self.network.resolvers,
         }
 
-    def run(self, rootfs_path):
+    def render(self):
         if self.tasks is None:
             self.build()
-        for name, template in self.tasks.items():
-            log.debug("Processing task: '{}'".format(name))
-            name = os.path.join(rootfs_path, name)
+        rendered_tasks = {}
+        for path, template in self.tasks.items():
+            log.debug("Rendering task: '{}'".format(path))
             if template is None:
-                if os.path.exists(name):
-                    os.remove(name)
+                rendered_tasks[path] = template
                 continue
 
             mode = None
@@ -59,13 +58,36 @@ class NetworkBuilder:
                 trim_blocks=True,
                 undefined=StrictUndefined,
             )
+            if mode is None:
+                rendered_tasks[path] = template.render(self.context())
+            else:
+                rendered_tasks[path] = {
+                    "mode": mode,
+                    "content": template.render(self.context()),
+                }
+        return rendered_tasks
 
-            name_dir = os.path.dirname(name)
+    def run(self, rootfs_path):
+        rendered_tasks = self.render()
+        for relpath, content in rendered_tasks.items():
+            log.debug("Processing task: '{}'".format(relpath))
+            abspath = os.path.join(rootfs_path, relpath)
+            if content is None:
+                if os.path.exists(abspath):
+                    os.remove(abspath)
+                continue
+
+            mode = None
+            if isinstance(content, dict):
+                mode = content.get("mode", None)
+                content = content.get("content")
+
+            name_dir = os.path.dirname(abspath)
             if name_dir and not os.path.exists(name_dir):
                 os.makedirs(name_dir, exist_ok=True)
 
-            with open(name, "w") as f:
-                f.write(template.render(self.context()))
+            with open(abspath, "w") as f:
+                f.write(content)
 
             if mode:
-                os.chmod(name, mode)
+                os.chmod(abspath, mode)
