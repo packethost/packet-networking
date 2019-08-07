@@ -52,17 +52,6 @@ def patch_dict(orig, updates):
     return orig
 
 
-plan_slugs = (
-    "c1.small.x86",
-    "c2.medium.x86",
-    "c3.medium.x86",
-    "g2.large.x86",
-    "m2.xlarge.x86",
-    "n2.xlarge.x86",
-    "x2.xlarge.x86",
-)
-
-
 def _fake_address(**opts):
     address = patch_dict(
         {
@@ -101,8 +90,28 @@ def _fake_address(**opts):
 def fake_address():
     return _fake_address
 
+plan_slugs = (
+    "c1.small.x86",
+    "c2.medium.x86",
+    "c3.medium.x86",
+    "g2.large.x86",
+    "m2.xlarge.x86",
+    "n2.xlarge.x86",
+    "x2.xlarge.x86",
+)
 
-def _metadata(options):
+def _metadata(options, public=True):
+    addresses = []
+    if public:
+        addresses.append(_fake_address())
+        addresses.append(_fake_address(management=False))
+        addresses.append(_fake_address(
+            management=False,
+            address_family=6,
+            netmask="ffff:ffff:ffff:ffff:ffff:ffff:ffff:fffe",
+        ))
+    addresses.append(_fake_address(public=False))
+
     return Metadata(
         patch_dict(
             {
@@ -112,16 +121,7 @@ def _metadata(options):
                 "network": {
                     "bonding": {"mode": 4},
                     "interfaces": None,
-                    "addresses": [
-                        _fake_address(),
-                        _fake_address(management=False),
-                        _fake_address(
-                            management=False,
-                            address_family=6,
-                            netmask="ffff:ffff:ffff:ffff:ffff:ffff:ffff:fffe",
-                        ),
-                        _fake_address(public=False),
-                    ],
+                    "addresses": addresses,
                 },
             },
             options,
