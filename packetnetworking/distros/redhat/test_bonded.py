@@ -1,4 +1,5 @@
 from textwrap import dedent
+import os
 
 
 def test_public_bonded_tasks(redhat_bonded_network):
@@ -195,3 +196,158 @@ def test_private_route_task_missing_for_private_only_bond(redhat_bonded_network)
     builder = redhat_bonded_network(public=False)
     tasks = builder.render()
     assert "etc/sysconfig/network-scripts/route-bond0" not in tasks
+
+
+def test_individual_interface_files_created(redhat_bonded_network):
+    """
+    For each interface, we should see the corresponding ifcfg file
+    located at /etc/sysconfig/network-scripts/ifcfg-*
+    """
+    builder = redhat_bonded_network(public=True)
+    tasks = builder.render()
+    for interface in builder.network.interfaces:
+        result = dedent(
+            """\
+            DEVICE={iface}
+            ONBOOT=yes
+            HWADDR={mac}
+            MASTER=bond0
+            SLAVE=yes
+            BOOTPROTO=none
+        """
+        ).format(iface=interface.name, mac=interface.mac)
+        assert tasks["etc/sysconfig/network-scripts/ifcfg-" + interface.name] == result
+
+
+def test_etc_resolvers_configured(redhat_bonded_network, fake):
+    """
+    Validates /etc/resolv.conf is configured correctly
+    """
+    builder = redhat_bonded_network()
+    resolver1 = fake.ipv4()
+    resolver2 = fake.ipv4()
+    builder.network.resolvers = (resolver1, resolver2)
+    tasks = builder.render()
+    result = dedent(
+        """\
+        nameserver {resolver1}
+        nameserver {resolver2}
+    """
+    ).format(resolver1=resolver1, resolver2=resolver2)
+    assert tasks["etc/resolv.conf"] == result
+
+
+def test_etc_hostname_configured(redhat_bonded_network):
+    """
+    Validates /etc/hostname is configured correctly
+    """
+    builder = redhat_bonded_network()
+    tasks = builder.render()
+    result = dedent(
+        """\
+        {hostname}
+    """
+    ).format(hostname=builder.metadata.hostname)
+    assert tasks["etc/hostname"] == result
+
+
+def test_etc_hosts_configured(redhat_bonded_network):
+    """
+    Validates /etc/hosts is configured correctly
+    """
+    builder = redhat_bonded_network()
+    tasks = builder.render()
+    result = dedent(
+        """\
+        127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+        ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+    """
+    )
+    assert tasks["etc/hosts"] == result
+
+
+def test_sbin_ifup_pre_local(redhat_bonded_network):
+    """
+    Validates /sbin/ifup-pre-local is created correctly
+    """
+    builder = redhat_bonded_network()
+    tasks = builder.render()
+    result = dedent(
+        """\
+        #!/bin/bash
+
+        set -o errexit -o nounset -o pipefail -o xtrace
+
+        iface=${{1#*-}}
+        case "$iface" in
+        bond0 | {interface0.name}) ip link set "$iface" address {interface0.mac} ;;
+                {interface1.name}) ip link set "$iface" address {interface1.mac} && sleep 4 ;;
+        *) echo "ignoring unknown interface $iface" && exit 0 ;;
+        esac
+    """
+    ).format(
+        interface0=builder.network.interfaces[0],
+        interface1=builder.network.interfaces[1],
+    )
+    assert tasks["sbin/ifup-pre-local"]["content"] == result
+    assert tasks["sbin/ifup-pre-local"]["mode"] == 0o755
+
+
+def test_network_manager_is_disabled(redhat_bonded_network):
+    """
+    When using certain operating systems, we want to disable Network Manager,
+    here we make sure those distros remove the necessary files
+    """
+    oses = ("centos",)
+    for os_name in oses:
+        builder = redhat_bonded_network(os={"distro": os_name})
+        tasks = builder.render()
+        for service in (
+            "dbus-org.freedesktop.NetworkManager",
+            "dbus-org.freedesktop.nm-dispatcher",
+            "multi-user.target.wants/NetworkManager",
+        ):
+            assert (
+                tasks[os.path.join("etc/systemd/system", service + ".service")] is None
+            )
+
+
+def test_network_manager_is_not_disabled(redhat_bonded_network):
+    """
+    When using certain operating systems, we want to keep Network Manager enabled,
+    here we make sure those distros don't have their Network Manager disabled.
+    """
+    oses = ("scientificcernslc", "redhatenterpriseserver")
+    for os_name in oses:
+        builder = redhat_bonded_network(os={"distro": os_name})
+        tasks = builder.render()
+        for service in (
+            "dbus-org.freedesktop.NetworkManager",
+            "dbus-org.freedesktop.nm-dispatcher",
+            "multi-user.target.wants/NetworkManager",
+        ):
+            assert os.path.join("etc/systemd/system", service + ".service") not in tasks
+
+
+def test_persistent_interface_names(redhat_bonded_network):
+    """
+    When using certain operating systems, we want to bypass driver interface name,
+    here we make sure the /etc/udev/rules.d/70-persistent-net.rules is generated.
+    """
+    builder = redhat_bonded_network(os={"distro": "redhatenterpriseserver"})
+    tasks = builder.render()
+    result = dedent(
+        """\
+        # This file was automatically generated by the packet.net installation environment.
+        #
+        # You can modify it, as long as you keep each rule on a single
+        # line, and change only the value of the NAME= key.
+
+        # PCI device (custom name provided by external tool to mimic Predictable Network Interface Names)
+        SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{{address}}=="{iface0.mac}", ATTR{{dev_id}}=="0x0", ATTR{{type}}=="1", KERNEL=="eth*", NAME="{iface0.name}"
+
+        # PCI device (custom name provided by external tool to mimic Predictable Network Interface Names)
+        SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{{address}}=="{iface1.mac}", ATTR{{dev_id}}=="0x0", ATTR{{type}}=="1", KERNEL=="eth*", NAME="{iface1.name}"
+    """
+    ).format(iface0=builder.network.interfaces[0], iface1=builder.network.interfaces[1])
+    assert tasks["etc/udev/rules.d/70-persistent-net.rules"] == result
