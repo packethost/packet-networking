@@ -2,7 +2,7 @@
 
 from setuptools import setup, find_packages
 
-test_reqs = ["pytest", "pytest-cov", "mock", "faker", "netaddr"]
+test_reqs = ["pytest", "pytest-cov", "mock", "faker", "netaddr", "tox"]
 
 setup(
     name="packet-networking",
