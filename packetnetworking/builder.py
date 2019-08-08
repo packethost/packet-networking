@@ -7,8 +7,6 @@ import requests
 
 log = logging.getLogger()
 
-OSInfo = namedtuple("OSInfo", ["name", "version"])
-
 
 class Builder(object):
     def __init__(self, metadata=None):
@@ -48,15 +46,14 @@ class Builder(object):
         self.initialized = True
         return self
 
-    def run(self, osinfo, rootfs_path):
+    def run(self, rootfs_path):
         if not self.initialized:
             raise Exception("Builder must be initialized before calling run")
 
-        osname, osversion = osinfo.split()
-        osinfo = OSInfo(osname.lower(), osversion)
-        DistroBuilder = self.get_builder(osinfo.name)
+        os = self.metadata.operating_system
+        DistroBuilder = self.get_builder(os.distro)
         builder = DistroBuilder(self)
-        builder.build(osinfo)
+        builder.build()
         builder.run(rootfs_path)
         return builder
 

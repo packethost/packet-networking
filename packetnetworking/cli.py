@@ -20,10 +20,7 @@ log = logging.getLogger("packetnetworking")
     help="URL to download metadata from",
 )
 @click.option(
-    "-o",
-    "--operating-system",
-    required=True,
-    help="Operating System and version (ex: centos 7)",
+    "-o", "--operating-system", help="Operating System and version (ex: centos 7)"
 )
 @click.option(
     "--rootfs", type=click.Path(), required=True, help="Path to root filesystem"
@@ -68,27 +65,42 @@ def cli(
                 metadata_file.name
             )
         )
-    if len(operating_system.split()) != 2:
-        if not quiet:
-            click.fail(
-                "Operating system '{}' must include both distro and version".format(
-                    operating_system
-                ),
-                file=sys.stderr,
-            )
-        click.exit(20)
 
     builder = packetnetworking.Builder()
     if metadata_file:
         builder.set_metadata(json.load(metadata_file))
     else:
         builder.load_metadata(metadata_url)
+
+    if operating_system:
+        if len(operating_system.split()) != 2:
+            if not quiet:
+                click.fail(
+                    "Operating system '{}' must include both distro and version".format(
+                        operating_system
+                    ),
+                    file=sys.stderr,
+                )
+            click.exit(20)
+        os_name, os_version = operating_system.split()
+        os = builder.metadata.operating_system
+        if os.distro != os_name or os.version != os_version:
+            os.orig_distro = os.distro
+            os.orig_version = os.version
+            os.distro = os_name
+            os.version = os_version
+            log.debug(
+                "Operating system mismatch. metadata='{os.orig_distro} {os.orig_version}', requested='{os.distro} {os.version}'".format(
+                    os=os
+                )
+            )
+
     builder.initialize()
     if resolvers:
         resolvers = [x for x in resolvers.split(",") if x.strip()]
         if resolvers:
             builder.network.resolvers = resolvers
 
-    builder.run(operating_system, rootfs)
+    builder.run(rootfs)
     if not quiet:
         print("Configuration files written to root filesystem '{}'".format(rootfs))

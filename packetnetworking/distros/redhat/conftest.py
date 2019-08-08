@@ -1,5 +1,5 @@
 import pytest
-from ...builder import Builder, OSInfo
+from ...builder import Builder
 from ... import utils
 from .builder import RedhatBuilder
 from .bonded import RedhatBondedNetwork
@@ -39,8 +39,7 @@ def redhat_bonded_network(redhatbuilder, patch_dict):
             {"slug": "centos_7", "distro": "centos", "version": "7"}, os or {}
         )
         builder = redhatbuilder({"operating_system": os}, public=public)
-        osinfo = OSInfo(os["distro"], os["version"])
-        builder.build(osinfo)
+        builder.build()
         for builder in builder.builders:
             if isinstance(builder, RedhatBondedNetwork):
                 return builder

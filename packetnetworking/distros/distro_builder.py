@@ -6,11 +6,11 @@ class DistroBuilder:
         self.metadata = metadata
         self.builders = []
 
-    def build(self, osinfo):
+    def build(self):
         for NetworkBuilder in self.network_builders:
             builder = NetworkBuilder(self.metadata)
             self.builders.append(builder)
-            builder.build(osinfo)
+            builder.build()
         return True
 
     def run(self, rootfs_path):

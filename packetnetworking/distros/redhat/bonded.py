@@ -5,10 +5,10 @@ import os
 
 # pylama:ignore=E501
 class RedhatBondedNetwork(NetworkBuilder):
-    def build(self, osinfo):
-        self.build_tasks(osinfo)
+    def build(self):
+        self.build_tasks()
 
-    def build_tasks(self, osinfo):
+    def build_tasks(self):
         self.tasks = {}
         self.tasks[
             "etc/sysconfig/network"
@@ -137,7 +137,10 @@ class RedhatBondedNetwork(NetworkBuilder):
 
         self.tasks["sbin/ifup-pre-local"] = {"template": ifup_pre_local, "mode": 0o755}
 
-        if osinfo.name not in ("scientificcernslc", "redhatenterpriseserver"):
+        if self.metadata.operating_system.distro not in (
+            "scientificcernslc",
+            "redhatenterpriseserver",
+        ):
             for service in (
                 "dbus-org.freedesktop.NetworkManager",
                 "dbus-org.freedesktop.nm-dispatcher",
