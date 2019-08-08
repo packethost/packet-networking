@@ -90,9 +90,11 @@ def cli(
             os.distro = os_name
             os.version = os_version
             log.debug(
-                "Operating system mismatch. metadata='{os.orig_distro} {os.orig_version}', requested='{os.distro} {os.version}'".format(
-                    os=os
-                )
+                (
+                    "Operating system mismatch. "
+                    + "metadata='{os.orig_distro} {os.orig_version}', "
+                    + "requested='{os.distro} {os.version}'"
+                ).format(os=os)
             )
 
     builder.initialize()

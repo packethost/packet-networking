@@ -1,7 +1,6 @@
 from .metadata import Metadata
 from . import utils
 from .distros import get_distro_builder
-from collections import namedtuple
 import logging
 import requests
 
