@@ -1,6 +1,4 @@
 from .. import NetworkBuilder
-from ...utils import generate_persistent_names
-import os
 
 
 # pylama:ignore=E501
