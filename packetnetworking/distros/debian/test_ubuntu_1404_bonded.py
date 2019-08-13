@@ -1,5 +1,4 @@
 from textwrap import dedent
-import os
 import pytest
 
 
@@ -182,6 +181,7 @@ def test_ubuntu_1404_etc_hosts_configured(ubuntu_1404_bonded_network):
     assert tasks["etc/hosts"] == result
 
 
+# pylama:ignore=E501
 def test_ubuntu_1404_persistent_interface_names(ubuntu_1404_bonded_network):
     """
     When using certain operating systems, we want to bypass driver interface name,
