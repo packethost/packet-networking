@@ -1,5 +1,4 @@
 from textwrap import dedent
-import os
 import pytest
 from jinja2.exceptions import UndefinedError
 
@@ -85,25 +84,6 @@ def test_suselinux_public_route_task_etc_sysconfig_network_routes(
     """
     ).format(ipv4pub=builder.ipv4pub.first, ipv4priv=builder.ipv4priv.first)
     assert tasks["etc/sysconfig/network/routes"] == result
-
-
-def test_suselinux_public_task_etc_sysconfig_network_ifcfg_enp0(
-    suselinux_bonded_network
-):
-    """
-    For each interface, we should see the corresponding ifcfg file
-    located at /etc/sysconfig/network/ifcfg-*
-    """
-    builder = suselinux_bonded_network(public=True)
-    tasks = builder.render()
-    interface = builder.network.interfaces[0]
-    result = dedent(
-        """\
-        STARTMODE='hotplug'
-        BOOTPROTO='none'
-    """
-    ).format(iface=interface.name, mac=interface.mac)
-    assert tasks["etc/sysconfig/network/ifcfg-" + interface.name] == result
 
 
 def test_suselinux_public_task_etc_sysconfig_network_ifcfg_enp0(
