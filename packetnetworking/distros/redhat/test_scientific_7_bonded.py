@@ -4,16 +4,18 @@ import pytest
 
 
 @pytest.fixture
-def centos_7_bonded_network(generic_redhat_bonded_network):
+def scientific_7_bonded_network(generic_redhat_bonded_network):
     def _builder(**kwargs):
-        return generic_redhat_bonded_network("centos", 7, **kwargs)
+        return generic_redhat_bonded_network("scientificcernslc", 7, **kwargs)
 
     return _builder
 
 
-def test_centos_7_public_bonded_task_etc_sysconfig_network(centos_7_bonded_network):
+def test_scientific_7_public_bonded_task_etc_sysconfig_network(
+    scientific_7_bonded_network
+):
     """Validates /etc/sysconfig/network for a public bond"""
-    builder = centos_7_bonded_network(public=True)
+    builder = scientific_7_bonded_network(public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -27,9 +29,11 @@ def test_centos_7_public_bonded_task_etc_sysconfig_network(centos_7_bonded_netwo
     assert tasks["etc/sysconfig/network"] == result
 
 
-def test_centos_7_private_bonded_task_etc_sysconfig_network(centos_7_bonded_network):
+def test_scientific_7_private_bonded_task_etc_sysconfig_network(
+    scientific_7_bonded_network
+):
     """Validates /etc/sysconfig/network for a private only bond"""
-    builder = centos_7_bonded_network(public=False)
+    builder = scientific_7_bonded_network(public=False)
     tasks = builder.render()
     result = dedent(
         """\
@@ -44,9 +48,9 @@ def test_centos_7_private_bonded_task_etc_sysconfig_network(centos_7_bonded_netw
 
 
 # pylama:ignore=E501
-def test_centos_7_bonded_task_etc_modprobe_d_bonding(centos_7_bonded_network):
+def test_scientific_7_bonded_task_etc_modprobe_d_bonding(scientific_7_bonded_network):
     """Validates /etc/modprobe.d/bonding.conf has correct bonding mode"""
-    builder = centos_7_bonded_network()
+    builder = scientific_7_bonded_network()
     tasks = builder.render()
     result = dedent(
         """\
@@ -57,11 +61,11 @@ def test_centos_7_bonded_task_etc_modprobe_d_bonding(centos_7_bonded_network):
     assert tasks["etc/modprobe.d/bonding.conf"] == result
 
 
-def test_centos_7_public_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
-    centos_7_bonded_network
+def test_scientific_7_public_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
+    scientific_7_bonded_network
 ):
     """Validates /etc/sysconfig/network-scripts/ifcfg-bond0 for a public bond"""
-    builder = centos_7_bonded_network(public=True)
+    builder = scientific_7_bonded_network(public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -92,14 +96,14 @@ def test_centos_7_public_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
     assert tasks["etc/sysconfig/network-scripts/ifcfg-bond0"] == result
 
 
-def test_centos_7_private_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
-    centos_7_bonded_network
+def test_scientific_7_private_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
+    scientific_7_bonded_network
 ):
     """
     When no public ip is assigned, we should see the private ip details in the
     /etc/sysconfig/network-scripts/ifcfg-bond0 interface file.
     """
-    builder = centos_7_bonded_network(public=False)
+    builder = scientific_7_bonded_network(public=False)
     tasks = builder.render()
     result = dedent(
         """\
@@ -126,15 +130,15 @@ def test_centos_7_private_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
     assert tasks["etc/sysconfig/network-scripts/ifcfg-bond0"] == result
 
 
-def test_centos_7_private_alias_task_etc_sysconfig_network_scripts_ifcfg_bond0_0(
-    centos_7_bonded_network
+def test_scientific_7_private_alias_task_etc_sysconfig_network_scripts_ifcfg_bond0_0(
+    scientific_7_bonded_network
 ):
     """
     When a public ip is assigned, the private ip address should become an
     alias, this validates /etc/sysconfig/network-scripts/ifcfg-bond0:0 alias
     has been created for the private ip
     """
-    builder = centos_7_bonded_network(public=True)
+    builder = scientific_7_bonded_network(public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -157,27 +161,27 @@ def test_centos_7_private_alias_task_etc_sysconfig_network_scripts_ifcfg_bond0_0
     assert tasks["etc/sysconfig/network-scripts/ifcfg-bond0:0"] == result
 
 
-def test_centos_7_private_alias_task_missing_for_private_only_bond(
-    centos_7_bonded_network
+def test_scientific_7_private_alias_task_missing_for_private_only_bond(
+    scientific_7_bonded_network
 ):
     """
     When no public ip is assigned, we should not see an alias created
     therefore /etc/sysconfig/network-scripts/ifcfg-bond0:0 should not exist.
     """
-    builder = centos_7_bonded_network(public=False)
+    builder = scientific_7_bonded_network(public=False)
     tasks = builder.render()
     assert "etc/sysconfig/network-scripts/ifcfg-bond0:0" not in tasks
 
 
-def test_centos_7_private_route_task_etc_sysconfig_network_scripts_route_bond0(
-    centos_7_bonded_network
+def test_scientific_7_private_route_task_etc_sysconfig_network_scripts_route_bond0(
+    scientific_7_bonded_network
 ):
     """
     When using a public ip, the private ip is assigned as an alias, this
     validates the /etc/sysconfig/network-scripts/route-bond0 route is created
     for the private subnet.
     """
-    builder = centos_7_bonded_network(public=True)
+    builder = scientific_7_bonded_network(public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -187,24 +191,24 @@ def test_centos_7_private_route_task_etc_sysconfig_network_scripts_route_bond0(
     assert tasks["etc/sysconfig/network-scripts/route-bond0"] == result
 
 
-def test_centos_7_private_route_task_missing_for_private_only_bond(
-    centos_7_bonded_network
+def test_scientific_7_private_route_task_missing_for_private_only_bond(
+    scientific_7_bonded_network
 ):
     """
     When no public ip is assigned, we should not see a route file created
     therefore /etc/sysconfig/network-scripts/route-bond0 should not exist.
     """
-    builder = centos_7_bonded_network(public=False)
+    builder = scientific_7_bonded_network(public=False)
     tasks = builder.render()
     assert "etc/sysconfig/network-scripts/route-bond0" not in tasks
 
 
-def test_centos_7_individual_interface_files_created(centos_7_bonded_network):
+def test_scientific_7_individual_interface_files_created(scientific_7_bonded_network):
     """
     For each interface, we should see the corresponding ifcfg file
     located at /etc/sysconfig/network-scripts/ifcfg-*
     """
-    builder = centos_7_bonded_network(public=True)
+    builder = scientific_7_bonded_network(public=True)
     tasks = builder.render()
     for interface in builder.network.interfaces:
         result = dedent(
@@ -220,11 +224,11 @@ def test_centos_7_individual_interface_files_created(centos_7_bonded_network):
         assert tasks["etc/sysconfig/network-scripts/ifcfg-" + interface.name] == result
 
 
-def test_centos_7_etc_resolvers_configured(centos_7_bonded_network, fake):
+def test_scientific_7_etc_resolvers_configured(scientific_7_bonded_network, fake):
     """
     Validates /etc/resolv.conf is configured correctly
     """
-    builder = centos_7_bonded_network()
+    builder = scientific_7_bonded_network()
     resolver1 = fake.ipv4()
     resolver2 = fake.ipv4()
     builder.network.resolvers = (resolver1, resolver2)
@@ -238,11 +242,11 @@ def test_centos_7_etc_resolvers_configured(centos_7_bonded_network, fake):
     assert tasks["etc/resolv.conf"] == result
 
 
-def test_centos_7_etc_hostname_configured(centos_7_bonded_network):
+def test_scientific_7_etc_hostname_configured(scientific_7_bonded_network):
     """
     Validates /etc/hostname is configured correctly
     """
-    builder = centos_7_bonded_network()
+    builder = scientific_7_bonded_network()
     tasks = builder.render()
     result = dedent(
         """\
@@ -252,11 +256,11 @@ def test_centos_7_etc_hostname_configured(centos_7_bonded_network):
     assert tasks["etc/hostname"] == result
 
 
-def test_centos_7_etc_hosts_configured(centos_7_bonded_network):
+def test_scientific_7_etc_hosts_configured(scientific_7_bonded_network):
     """
     Validates /etc/hosts is configured correctly
     """
-    builder = centos_7_bonded_network()
+    builder = scientific_7_bonded_network()
     tasks = builder.render()
     result = dedent(
         """\
@@ -267,11 +271,11 @@ def test_centos_7_etc_hosts_configured(centos_7_bonded_network):
     assert tasks["etc/hosts"] == result
 
 
-def test_centos_7_sbin_ifup_pre_local(centos_7_bonded_network):
+def test_scientific_7_sbin_ifup_pre_local(scientific_7_bonded_network):
     """
     Validates /sbin/ifup-pre-local is created correctly
     """
-    builder = centos_7_bonded_network()
+    builder = scientific_7_bonded_network()
     tasks = builder.render()
     result = dedent(
         """\
@@ -294,26 +298,40 @@ def test_centos_7_sbin_ifup_pre_local(centos_7_bonded_network):
     assert tasks["sbin/ifup-pre-local"]["mode"] == 0o755
 
 
-def test_centos_7_network_manager_is_disabled(centos_7_bonded_network):
+def test_scientific_7_network_manager_is_disabled(scientific_7_bonded_network):
     """
     When using certain operating systems, we want to disable Network Manager,
     here we make sure those distros remove the necessary files
     """
-    builder = centos_7_bonded_network()
+    builder = scientific_7_bonded_network()
     tasks = builder.render()
     for service in (
         "dbus-org.freedesktop.NetworkManager",
         "dbus-org.freedesktop.nm-dispatcher",
         "multi-user.target.wants/NetworkManager",
     ):
-        assert tasks[os.path.join("etc/systemd/system", service + ".service")] is None
+        assert os.path.join("etc/systemd/system", service + ".service") not in tasks
 
 
-def test_centos_7_persistent_interface_names_does_not_exist(centos_7_bonded_network):
+def test_scientific_7_persistent_interface_names(scientific_7_bonded_network):
     """
     When using certain operating systems, we want to bypass driver interface name,
     here we make sure the /etc/udev/rules.d/70-persistent-net.rules is generated.
     """
-    builder = centos_7_bonded_network()
+    builder = scientific_7_bonded_network()
     tasks = builder.render()
-    assert "etc/udev/rules.d/70-persistent-net.rules" not in tasks
+    result = dedent(
+        """\
+        # This file was automatically generated by the packet.net installation environment.
+        #
+        # You can modify it, as long as you keep each rule on a single
+        # line, and change only the value of the NAME= key.
+
+        # PCI device (custom name provided by external tool to mimic Predictable Network Interface Names)
+        SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{{address}}=="{iface0.mac}", ATTR{{dev_id}}=="0x0", ATTR{{type}}=="1", KERNEL=="eth*", NAME="{iface0.name}"
+
+        # PCI device (custom name provided by external tool to mimic Predictable Network Interface Names)
+        SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{{address}}=="{iface1.mac}", ATTR{{dev_id}}=="0x0", ATTR{{type}}=="1", KERNEL=="eth*", NAME="{iface1.name}"
+    """
+    ).format(iface0=builder.network.interfaces[0], iface1=builder.network.interfaces[1])
+    assert tasks["etc/udev/rules.d/70-persistent-net.rules"] == result
