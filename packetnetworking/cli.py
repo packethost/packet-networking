@@ -9,6 +9,7 @@ log = logging.getLogger("packetnetworking")
 # pylama:ignore=C901
 @click.command()
 @click.option(
+    "-M",
     "--metadata-file",
     type=click.File(),
     help="Load metadata from a file rather than a URL",
@@ -23,7 +24,7 @@ log = logging.getLogger("packetnetworking")
     "-o", "--operating-system", help="Operating System and version (ex: centos 7)"
 )
 @click.option(
-    "--rootfs", type=click.Path(), required=True, help="Path to root filesystem"
+    "-t", "--rootfs", type=click.Path(), required=True, help="Path to root filesystem"
 )
 @click.option(
     "--resolvers",
