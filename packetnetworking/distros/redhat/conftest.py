@@ -33,12 +33,15 @@ def redhatbuilder(mockit, fake, metadata, patch_dict):
 
 
 @pytest.fixture
-def redhat_bonded_network(redhatbuilder, patch_dict):
-    def _builder(public=True, os=None):
-        os = patch_dict(
-            {"slug": "centos_7", "distro": "centos", "version": "7"}, os or {}
+def generic_redhat_bonded_network(redhatbuilder, patch_dict):
+    def _builder(distro, version, public=True, metadata=None):
+        version = str(version)
+        slug = "{distro}_{version}".format(distro=distro, version=version)
+        metadata = patch_dict(
+            {"operating_system": {"slug": slug, "distro": distro, "version": version}},
+            metadata or {},
         )
-        builder = redhatbuilder({"operating_system": os}, public=public)
+        builder = redhatbuilder(metadata, public=public)
         builder.build()
         for builder in builder.builders:
             if isinstance(builder, RedhatBondedNetwork):
