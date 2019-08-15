@@ -1,6 +1,7 @@
 from .metadata import Metadata
 from . import utils
 from .distros import get_distro_builder
+from .hooks import trigger_hook
 import logging
 import requests
 
@@ -37,12 +38,16 @@ class Builder(object):
             raise LookupError("No builders found for distro '{}'".format(distro))
         return builder
 
+    def trigger(self, hook, *args, **kwargs):
+        return trigger_hook(hook, self, *args, **kwargs)
+
     def initialize(self):
         self.initialized = False
         if self.metadata is None:
             raise Exception("Metadata must be loaded before calling initialize")
         self.network.load(self.metadata.network)
         self.initialized = True
+        self.trigger("initialized")
         return self
 
     def run(self, rootfs_path):
