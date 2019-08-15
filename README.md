@@ -98,6 +98,41 @@ Here is an example of the files created
 /tmp/rootfs/sbin/ifup-pre-local
 ```
 
+## Customization (Hooks)
+
+In some instances, we need to modify the data before we process the builders.
+One of these instances are for plans which should only have a single interface,
+we want to make sure we only pass a single interface along to the builders.
+
+For this we have a **hook** system. You can define a class which inherits the
+`BuilderHook` class and define one or more hooks in that class.
+
+For the above example where we should only have a single interface, a hook
+can be created after initalization (`initialized`). You can view the full
+code at [hooks/single_interface_hook.py](packetnetworking/hooks/single_interface_hook.py).
+However, here is a snippet.
+
+```python
+class SingleInterfaceHook(BuilderHook):
+    plans = ["baremetal_1e", "x1.small.x86"]
+
+    def hook_initialized(self, builder):
+        if builder.metadata.plan.lower() in self.plans:
+            builder.network.interfaces = builder.network.interfaces[:1]
+```
+
+After defining a new hook, simply import it and add it to the `__all__` variable
+in [hooks/\_\_init\_\_.py](packetnetworking/hooks/__init__.py) and you're ready
+to go.
+
+Each time a hook is triggered, a new instance of the class will be created and
+the the corresponding `hook_*` function will be executed. The first argument
+passed to each hook function is the `Builder` instance. This contains the
+metadata and the initalized network details.
+
+Triggers can define additional arguments and keyword arguments that will be
+passed to each hook triggered.
+
 ## Running Tests
 
 ```
