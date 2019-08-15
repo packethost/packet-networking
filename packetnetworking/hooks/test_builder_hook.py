@@ -6,6 +6,5 @@ class FakeHook(BuilderHook):
 
 
 def test_builder_hook_not_implemented_doesnt_raise_exception(mocked_trigger):
-    builder = mocked_trigger("x1.small.x86", (FakeHook, "initialized"))
-    builder.initialize()
+    mocked_trigger("x1.small.x86", (FakeHook, "initialized"))
     # No exception should be raised
