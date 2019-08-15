@@ -98,7 +98,85 @@ Here is an example of the files created
 /tmp/rootfs/sbin/ifup-pre-local
 ```
 
-## Customization (Hooks)
+# Extending and manipulating data
+
+## Distro Builders
+
+Currently each distro family has their own distro builder. For instance, the
+[debian builder](packetnetworking/distros/debian) encompasses both Debian and
+Ubuntu distros. For the redhat family of distros, RedHat, CentOS and Scientific
+Linux are all under the [redhat builder](packetnetworking/distros/redhat).
+
+Each distro has a Distro Builder that defines which os's it supports along with
+the different Network Builder classes it can implement. Below is a snippet of the
+`DebianBuilder`
+
+```python
+class DebianBuilder(DistroBuilder):
+    distros = ["debian", "ubuntu"]
+    network_builders = [DebianBondedNetwork]
+```
+
+Here we can see both Debian and Ubuntu distros are supported, and the only
+supported network builder is a bonded configuration.
+
+## Network Builders
+
+At the moment, the only supported network configuration at packet is a bonded
+configuration. In the future will be able to add more network builders to support
+different network configurations.
+
+Here is a small snippet of the the [DebianBondedNetwork](packetnetworking/distros/debian/debian_bonded_networking.py),
+some lines have been removed for brevity.
+
+```python
+class DebianBondedNetwork(NetworkBuilder):
+    def build(self):
+        self.build_tasks()
+
+    def build_tasks(self):
+        self.tasks = {}
+        self.tasks[
+            "etc/network/interfaces"
+        ] = """\
+            auto lo
+            iface lo inet loopback
+
+            auto bond0
+            iface bond0 inet static
+                {% if ip4pub %}
+                address {{ ip4pub.address }}
+                netmask {{ ip4pub.netmask }}
+                gateway {{ ip4pub.gateway }}
+                {% else %}
+                address {{ ip4priv.address }}
+                netmask {{ ip4priv.netmask }}
+                gateway {{ ip4priv.gateway }}
+                {% endif %}
+        """
+
+        self.tasks[
+            "etc/resolv.conf"
+        ] = """\
+            {% for server in resolvers %}
+            nameserver {{ server }}
+            {% endfor %}
+        """
+
+        return self.tasks
+```
+
+Currently, since the bonded network is the only configuration, we can simply call
+`build_tasks` from the `build` method. However in future we could add some
+conditions to run the `build_tasks` method if necessary.
+
+`build_tasks` simple adds all the templates for each file to a dictionary that
+will later be processed by the [Network Builder](packetnetworking/distros/network_builder.py)'s
+`render` method. Render will render each template and return the updated task
+list. The render function is called from within the `run` method, which after
+receiving the rendered tasks, will actually write or delete the files.
+
+## Hooks
 
 In some instances, we need to modify the data before we process the builders.
 One of these instances are for plans which should only have a single interface,
