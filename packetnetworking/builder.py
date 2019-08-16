@@ -30,6 +30,9 @@ class Builder(object):
 
     def set_metadata(self, metadata):
         self.metadata = Metadata(metadata)
+        self.metadata.operating_system = self.metadata.get(
+            "operating_system", {"distro": None, "version": None}
+        )
         return self.metadata
 
     def get_builder(self, distro):
