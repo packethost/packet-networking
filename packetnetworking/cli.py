@@ -88,7 +88,7 @@ def cli(
         if os.distro != os_name or os.version != os_version:
             os.orig_distro = os.distro
             os.orig_version = os.version
-            os.distro = os_name
+            os.distro = os_name.lower()
             os.version = os_version
             log.debug(
                 (
