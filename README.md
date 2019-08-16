@@ -22,14 +22,15 @@ pip3 install packet-networking
 Usage: packet-networking [OPTIONS]
 
 Options:
-  --metadata-file FILENAME     Load metadata from a file rather than a URL
-  --metadata-url TEXT          URL to download metadata from
-  -o, --operating-system TEXT  Operating System and version (ex: centos 7)
-                               [required]
-  --rootfs PATH                Path to root filesystem  [required]
-  -v, --verbose                Provide more detailed output
-  -q, --quiet                  Silences all output
-  --help                       Show this message and exit.
+  -M, --metadata-file FILENAME  Load metadata from a file rather than a URL
+  --metadata-url TEXT           URL to download metadata from
+  -o, --operating-system TEXT   Operating System and version (ex: centos 7)
+  -t, --rootfs PATH             Path to root filesystem  [required]
+  --resolvers TEXT              Comma separated list of resolvers to be used
+                                (otherwise uses ones from /etc/resolv.conf)
+  -v, --verbose                 Provide more detailed output
+  -q, --quiet                   Silences all output
+  --help                        Show this message and exit.
 ```
 
 By default `--metadata-url` points to `http://metadata.packet.net/metadata`.
