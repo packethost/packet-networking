@@ -100,7 +100,7 @@ class NetworkData(object):
     def build_bonds(self):
         self.bonds = utils.RecursiveDictAttributes({})
         for iface in self.nw_metadata.interfaces:
-            if iface.bond:
+            if "bond" in iface and iface.bond:
                 if iface.bond not in self.bonds:
                     self.bonds[iface.bond] = [iface]
                 else:
