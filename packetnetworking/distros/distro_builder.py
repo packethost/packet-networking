@@ -23,7 +23,7 @@ class DistroBuilder:
 def get_distro_builder(distro):
     catch_all = None
     for builder in DistroBuilder.__subclasses__():
-        if isinstance(builder.distros, list) and distro in builder.distros:
+        if isinstance(builder.distros, list) and distro.lower() in builder.distros:
             return builder
         elif builder.distros == "*":
             catch_all = builder
