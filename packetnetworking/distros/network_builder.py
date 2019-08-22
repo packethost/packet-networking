@@ -40,6 +40,8 @@ class NetworkBuilder:
         if self.tasks is None:
             self.build()
         rendered_tasks = {}
+        if not self.tasks:
+            return rendered_tasks
         for path, template in self.tasks.items():
             log.debug("Rendering task: '{}'".format(path))
             if template is None:
