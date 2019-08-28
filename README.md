@@ -104,11 +104,11 @@ Here is an example of the files created
 ## Distro Builders
 
 Currently each distro family has their own distro builder. For instance, the
-[debian builder](packetnetworking/distros/debian) encompasses both Debian and
-Ubuntu distros. For the redhat family of distros, RedHat, CentOS and Scientific
-Linux are all under the [redhat builder](packetnetworking/distros/redhat).
+[Debian builder](packetnetworking/distros/debian) encompasses both Debian and
+Ubuntu distros. For the RedHat family of distros, RedHat, CentOS and Scientific
+Linux are all under the [RedHat builder](packetnetworking/distros/redhat).
 
-Each distro has a Distro Builder that defines which os's it supports along with
+Each distro has a Distro Builder that defines which OS's it supports along with
 the different Network Builder classes it can implement. Below is a snippet of the
 `DebianBuilder`
 
@@ -123,7 +123,7 @@ supported network builder is a bonded configuration.
 
 ## Network Builders
 
-At the moment, the only supported network configuration at packet is a bonded
+At the moment, the only supported network configuration at Packet is a bonded
 configuration. In the future will be able to add more network builders to support
 different network configurations.
 
@@ -207,7 +207,7 @@ to go.
 Each time a hook is triggered, a new instance of the class will be created and
 the the corresponding `hook_*` function will be executed. The first argument
 passed to each hook function is the `Builder` instance. This contains the
-metadata and the initalized network details.
+metadata and the initialized network details.
 
 Triggers can define additional arguments and keyword arguments that will be
 passed to each hook triggered.
