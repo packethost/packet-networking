@@ -6,7 +6,7 @@ from jinja2.exceptions import UndefinedError
 @pytest.fixture
 def suselinux_bonded_network(generic_suse_bonded_network):
     def _builder(**kwargs):
-        return generic_suse_bonded_network("suse", 7, **kwargs)
+        return generic_suse_bonded_network("suselinux", 7, **kwargs)
 
     return _builder
 
