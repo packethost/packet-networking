@@ -40,6 +40,8 @@ class NetworkBuilder:
         if self.tasks is None:
             self.build()
         rendered_tasks = {}
+        if not self.tasks:
+            return rendered_tasks
         for path, template in self.tasks.items():
             log.debug("Rendering task: '{}'".format(path))
             if template is None:
@@ -73,8 +75,13 @@ class NetworkBuilder:
             log.debug("Processing task: '{}'".format(relpath))
             abspath = os.path.join(rootfs_path, relpath)
             if content is None:
-                if os.path.exists(abspath):
+                if os.path.lexists(abspath):
+                    log.info("Removing '{}'".format(abspath))
                     os.remove(abspath)
+                else:
+                    log.debug(
+                        "Skipped removing '{}' Path doesn't exist".format(abspath)
+                    )
                 continue
 
             mode = None
@@ -83,9 +90,11 @@ class NetworkBuilder:
                 content = content.get("content")
 
             name_dir = os.path.dirname(abspath)
-            if name_dir and not os.path.exists(name_dir):
+            if name_dir and not os.path.lexists(name_dir):
+                log.debug("Making directory '{}'".format(name_dir))
                 os.makedirs(name_dir, exist_ok=True)
 
+            log.debug("Writing content to '{}'".format(abspath))
             with open(abspath, "w") as f:
                 f.write(content)
 
