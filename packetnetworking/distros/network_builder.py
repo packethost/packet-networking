@@ -76,7 +76,12 @@ class NetworkBuilder:
             abspath = os.path.join(rootfs_path, relpath)
             if content is None:
                 if os.path.exists(abspath):
+                    log.info("Removing '{}'".format(abspath))
                     os.remove(abspath)
+                else:
+                    log.debug(
+                        "Skipped removing '{}' Path doesn't exist".format(abspath)
+                    )
                 continue
 
             mode = None
@@ -86,8 +91,10 @@ class NetworkBuilder:
 
             name_dir = os.path.dirname(abspath)
             if name_dir and not os.path.exists(name_dir):
+                log.debug("Making directory '{}'".format(name_dir))
                 os.makedirs(name_dir, exist_ok=True)
 
+            log.debug("Writing content to '{}'".format(abspath))
             with open(abspath, "w") as f:
                 f.write(content)
 
