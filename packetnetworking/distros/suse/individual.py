@@ -2,31 +2,22 @@ from .. import NetworkBuilder
 
 
 # pylama:ignore=E501
-class SuseBondedNetwork(NetworkBuilder):
+class SuseIndividualNetwork(NetworkBuilder):
     def build(self):
-        if self.network.bonding.link_aggregation == "bonded":
+        if self.network.bonding.link_aggregation == "individual":
             self.build_tasks()
 
     def build_tasks(self):
         self.tasks = {}
 
-        self.tasks[
-            "etc/modprobe.d/bonding.conf"
-        ] = """\
-            alias bond0 bonding
-            options bond0 mode={{ net.bonding.mode }} miimon=100 downdelay=200 updelay=200 xmit_hash_policy=layer3+4 lacp_rate=1
-        """
+        iface0 = self.network.interfaces[0]
 
         self.tasks[
-            "etc/sysconfig/network/ifcfg-bond0"
+            "etc/sysconfig/network/ifcfg-" + iface0.name
         ] = """\
             STARTMODE='onboot'
             BOOTPROTO='static'
             IPADDR='{{ ip4pub.address }}/{{ ip4pub.cidr }}'
-            BONDING_MASTER='yes'
-            BONDING_SLAVE_0='{{ interfaces[0].name }}'
-            BONDING_SLAVE_1='{{ interfaces[1].name }}'
-            BONDING_MODULE_OPTS='mode={{ net.bonding.mode }} miimon=100'
             IPADDR1='{{ ip4priv.address }}'
             NETMASK1='{{ ip4priv.netmask }}'
             GATEWAY1='{{ ip4priv.gateway }}'
@@ -47,10 +38,12 @@ class SuseBondedNetwork(NetworkBuilder):
             STARTMODE='hotplug'
             BOOTPROTO='none'
         """
-        for i in range(len(self.network.interfaces)):
-            name = self.network.interfaces[i]["name"]
-            cfg = ifcfg.format(iface=name, i=i)
-            self.tasks["etc/sysconfig/network/ifcfg-" + name] = cfg
+        for i, iface in enumerate(self.network.interfaces):
+            if iface == iface0:
+                # skip interface since it is already configured above
+                continue
+            cfg = ifcfg.format(iface=iface.name, i=i)
+            self.tasks["etc/sysconfig/network/ifcfg-" + iface.name] = cfg
 
         self.tasks[
             "etc/resolv.conf"

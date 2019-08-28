@@ -3,6 +3,7 @@ from ...builder import Builder
 from ... import utils
 from .builder import SuseBuilder
 from .bonded import SuseBondedNetwork
+from .individual import SuseIndividualNetwork
 
 
 @pytest.fixture
@@ -45,6 +46,31 @@ def generic_suse_bonded_network(susebuilder, patch_dict):
         builder.build()
         for builder in builder.builders:
             if isinstance(builder, SuseBondedNetwork):
+                return builder
+
+    return _builder
+
+
+@pytest.fixture
+def generic_suse_individual_network(susebuilder, patch_dict):
+    def _builder(distro, version, public=True, metadata=None):
+        version = str(version)
+        slug = "{distro}_{version}".format(distro=distro, version=version)
+        metadata = patch_dict(
+            {
+                "network": {"bonding": {"link_aggregation": "individual"}},
+                "operating_system": {
+                    "slug": slug,
+                    "distro": distro,
+                    "version": version,
+                },
+            },
+            metadata or {},
+        )
+        builder = susebuilder(metadata, public=public)
+        builder.build()
+        for builder in builder.builders:
+            if isinstance(builder, SuseIndividualNetwork):
                 return builder
 
     return _builder
