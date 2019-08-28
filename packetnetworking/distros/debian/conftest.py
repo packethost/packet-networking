@@ -3,6 +3,7 @@ from ...builder import Builder
 from ... import utils
 from .builder import DebianBuilder
 from .bonded import DebianBondedNetwork
+from .individual import DebianIndividualNetwork
 
 
 @pytest.fixture
@@ -45,6 +46,31 @@ def generic_debian_bonded_network(debianbuilder, patch_dict):
         builder.build()
         for builder in builder.builders:
             if isinstance(builder, DebianBondedNetwork):
+                return builder
+
+    return _builder
+
+
+@pytest.fixture
+def generic_debian_individual_network(debianbuilder, patch_dict):
+    def _builder(distro, version, public=True, metadata=None):
+        version = str(version)
+        slug = "{distro}_{version}".format(distro=distro, version=version)
+        metadata = patch_dict(
+            {
+                "network": {"bonding": {"link_aggregation": "individual"}},
+                "operating_system": {
+                    "slug": slug,
+                    "distro": distro,
+                    "version": version,
+                },
+            },
+            metadata or {},
+        )
+        builder = debianbuilder(metadata, public=public)
+        builder.build()
+        for builder in builder.builders:
+            if isinstance(builder, DebianIndividualNetwork):
                 return builder
 
     return _builder

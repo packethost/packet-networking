@@ -141,7 +141,7 @@ def metadata(fake, fake_address, patch_dict):
                         "image_tag": None,
                     },
                     "network": {
-                        "bonding": {"mode": 4},
+                        "bonding": {"mode": 4, "link_aggregation": "bonded"},
                         "interfaces": None,
                         "addresses": addresses,
                     },

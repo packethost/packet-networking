@@ -4,13 +4,16 @@ import os
 
 
 # pylama:ignore=E501
-class RedhatBondedNetwork(NetworkBuilder):
+class RedhatIndividualNetwork(NetworkBuilder):
     def build(self):
-        if self.network.bonding.link_aggregation == "bonded":
+        if self.network.bonding.link_aggregation == "individual":
             self.build_tasks()
 
     def build_tasks(self):
         self.tasks = {}
+
+        iface0 = self.network.interfaces[0]
+
         self.tasks[
             "etc/sysconfig/network"
         ] = """\
@@ -21,22 +24,15 @@ class RedhatBondedNetwork(NetworkBuilder):
             {% else %}
             GATEWAY={{ ip4priv.gateway }}
             {% endif %}
-            GATEWAYDEV=bond0
+            GATEWAYDEV={{ iface0.name }}
             NOZEROCONF=yes
         """
 
         self.tasks[
-            "etc/modprobe.d/bonding.conf"
+            "etc/sysconfig/network-scripts/ifcfg-{iface0.name}".format(iface0=iface0)
         ] = """\
-            alias bond0 bonding
-            options bond0 mode={{ net.bonding.mode }} miimon=100 downdelay=200 updelay=200 xmit_hash_policy=layer3+4 lacp_rate=1
-        """
-
-        self.tasks[
-            "etc/sysconfig/network-scripts/ifcfg-bond0"
-        ] = """\
-            DEVICE=bond0
-            NAME=bond0
+            DEVICE={{ iface0.name }}
+            NAME={{ iface0.name }}
             {% if ip4pub %}
             IPADDR={{ ip4pub.address }}
             NETMASK={{ ip4pub.netmask }}
@@ -49,8 +45,6 @@ class RedhatBondedNetwork(NetworkBuilder):
             BOOTPROTO=none
             ONBOOT=yes
             USERCTL=no
-            TYPE=Bond
-            BONDING_OPTS="mode={{ net.bonding.mode }} miimon=100 downdelay=200 updelay=200"
 
             {% if ip6pub %}
             IPV6INIT=yes
@@ -64,10 +58,12 @@ class RedhatBondedNetwork(NetworkBuilder):
 
         if self.ipv4pub:
             self.tasks[
-                "etc/sysconfig/network-scripts/ifcfg-bond0:0"
+                "etc/sysconfig/network-scripts/ifcfg-{iface0.name}:0".format(
+                    iface0=iface0
+                )
             ] = """\
-                DEVICE=bond0:0
-                NAME=bond0:0
+                DEVICE={{ iface0.name }}:0
+                NAME={{ iface0.name }}:0
                 IPADDR={{ ip4priv.address }}
                 NETMASK={{ ip4priv.netmask }}
                 GATEWAY={{ ip4priv.gateway }}
@@ -79,26 +75,15 @@ class RedhatBondedNetwork(NetworkBuilder):
                 {% endfor %}
             """
 
-            # If no ip4pub is specified, the ip4priv is configured on the bond0 interface
+            # If no ip4pub is specified, the ip4priv is configured on the eth0 interface
             # so there is no need to add the custom route
             self.tasks[
-                "etc/sysconfig/network-scripts/route-bond0"
+                "etc/sysconfig/network-scripts/route-{iface0.name}".format(
+                    iface0=iface0
+                )
             ] = """\
-                10.0.0.0/8 via {{ ip4priv.gateway }} dev bond0:0
+                10.0.0.0/8 via {{ ip4priv.gateway }} dev {{ iface0.name }}:0
             """
-
-        ifcfg = """\
-            DEVICE={iface}
-            ONBOOT=yes
-            HWADDR={{{{ interfaces[{i}].mac }}}}
-            MASTER=bond0
-            SLAVE=yes
-            BOOTPROTO=none
-        """
-        for i in range(len(self.network.interfaces)):
-            name = self.network.interfaces[i]["name"]
-            cfg = ifcfg.format(iface=name, i=i)
-            self.tasks["etc/sysconfig/network-scripts/ifcfg-" + name] = cfg
 
         self.tasks[
             "etc/resolv.conf"
@@ -120,23 +105,6 @@ class RedhatBondedNetwork(NetworkBuilder):
             + "::1         localhost localhost.localdomain localhost6 "
             + "localhost6.localdomain6\n"
         )
-
-        ifup_pre_local = """\
-            #!/bin/bash
-
-            set -o errexit -o nounset -o pipefail -o xtrace
-
-            iface=${1#*-}
-            case "$iface" in
-            bond0 | {{interfaces[0].name}}) ip link set "$iface" address {{interfaces[0].mac}} ;;
-            {% for iface in interfaces[1:] %}
-                    {{iface.name}}) ip link set "$iface" address {{iface.mac}} && sleep 4 ;;
-            {% endfor %}
-            *) echo "ignoring unknown interface $iface" && exit 0 ;;
-            esac
-        """  # noqa
-
-        self.tasks["sbin/ifup-pre-local"] = {"template": ifup_pre_local, "mode": 0o755}
 
         if self.metadata.operating_system.distro not in (
             "scientificcernslc",

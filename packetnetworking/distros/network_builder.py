@@ -28,6 +28,7 @@ class NetworkBuilder:
         return {
             "hostname": self.metadata.hostname,
             "interfaces": self.network.interfaces,
+            "iface0": self.network.interfaces[0],
             "ip4priv": self.ipv4priv.first,
             "ip4pub": self.ipv4pub.first,
             "ip6pub": self.ipv6pub.first,
