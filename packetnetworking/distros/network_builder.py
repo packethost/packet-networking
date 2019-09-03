@@ -101,3 +101,4 @@ class NetworkBuilder:
 
             if mode:
                 os.chmod(abspath, mode)
+        return rendered_tasks

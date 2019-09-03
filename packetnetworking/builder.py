@@ -61,8 +61,7 @@ class Builder(object):
         DistroBuilder = self.get_builder(os.distro)
         builder = DistroBuilder(self)
         builder.build()
-        builder.run(rootfs_path)
-        return builder
+        return builder.run(rootfs_path)
 
 
 class NetworkData(object):
@@ -84,8 +83,8 @@ class NetworkData(object):
 
     def build_bonding(self):
         self.bonding = self.nw_metadata.bonding
-        self.bonding["link_aggregation"] = self.bonding.get(
-            "link_aggregation", "bonded"
+        self.bonding["link_aggregation"] = (
+            self.bonding.get("link_aggregation") or "bonded"
         )
 
     def build_interfaces(self):

@@ -76,13 +76,13 @@ def cli(
     if operating_system:
         if len(operating_system.split()) != 2:
             if not quiet:
-                click.fail(
+                click.echo(
                     "Operating system '{}' must include both distro and version".format(
                         operating_system
                     ),
                     file=sys.stderr,
                 )
-            click.exit(20)
+            sys.exit(20)
         os_name, os_version = operating_system.split()
         os = builder.metadata.operating_system
         if os.distro != os_name or os.version != os_version:
@@ -104,6 +104,10 @@ def cli(
         if resolvers:
             builder.network.resolvers = resolvers
 
-    builder.run(rootfs)
+    complete = builder.run(rootfs)
+    if complete is None:
+        if not quiet:
+            click.echo("No tasks processed", file=sys.stderr)
+        sys.exit(30)
     if not quiet:
         print("Configuration files written to root filesystem '{}'".format(rootfs))
