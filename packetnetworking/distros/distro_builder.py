@@ -15,8 +15,12 @@ class DistroBuilder:
 
     def run(self, rootfs_path):
         if self.builders:
+            tasks_found = False
             for builder in self.builders:
-                builder.run(rootfs_path)
+                if builder.run(rootfs_path):
+                    tasks_found = True
+            if not tasks_found:
+                return None
             return True
 
 

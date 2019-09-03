@@ -61,8 +61,7 @@ class Builder(object):
         DistroBuilder = self.get_builder(os.distro)
         builder = DistroBuilder(self)
         builder.build()
-        builder.run(rootfs_path)
-        return builder
+        return builder.run(rootfs_path)
 
 
 class NetworkData(object):
