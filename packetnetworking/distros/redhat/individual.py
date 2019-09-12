@@ -109,6 +109,7 @@ class RedhatIndividualNetwork(NetworkBuilder):
         if self.metadata.operating_system.distro not in (
             "scientificcernslc",
             "redhatenterpriseserver",
+            "redhatenterprise",
         ):
             for service in (
                 "dbus-org.freedesktop.NetworkManager",
