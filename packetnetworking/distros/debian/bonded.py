@@ -98,6 +98,6 @@ class DebianBondedNetwork(NetworkBuilder):
             ff02::2	ip6-allrouters
         """
 
-        if self.metadata.operating_system.version == "14.04":
+        if self.metadata.operating_system.version in ["14.04", "19.04"]:
             self.tasks.update(generate_persistent_names())
         return self.tasks
