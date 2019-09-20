@@ -35,6 +35,7 @@ class NetworkBuilder:
             "net": self.network,
             "osinfo": self.metadata.operating_system,
             "resolvers": self.network.resolvers,
+            "routes": self.network.routes,
         }
 
     def render(self):

@@ -86,6 +86,26 @@ def test_suselinux_public_route_task_etc_sysconfig_network_routes(
     assert tasks["etc/sysconfig/network/routes"] == result
 
 
+# pylama:ignore=E501
+def test_suselinux_public_route_task_etc_sysconfig_network_routes_with_custom_ip_space_routes(
+    suselinux_bonded_network
+):
+    """
+    Validates /etc/sysconfig/network/routes is configured correctly
+    """
+    routes = {"private_ip_space": ["192.168.5.0/24", "172.16.0.0/12"]}
+    builder = suselinux_bonded_network(public=True, metadata=routes)
+    tasks = builder.render()
+    result = dedent(
+        """\
+        default     {ipv4pub.gateway}
+        192.168.5.0/24  {ipv4priv.gateway}
+        172.16.0.0/12  {ipv4priv.gateway}
+    """
+    ).format(ipv4pub=builder.ipv4pub.first, ipv4priv=builder.ipv4priv.first)
+    assert tasks["etc/sysconfig/network/routes"] == result
+
+
 def test_suselinux_public_task_etc_sysconfig_network_ifcfg_enp0(
     suselinux_bonded_network
 ):

@@ -118,6 +118,118 @@ def test_ubuntu_1604_private_bonded_task_etc_network_interfaces(
     assert tasks["etc/network/interfaces"] == result
 
 
+# pylama:ignore=E501
+def test_ubuntu_1604_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
+    ubuntu_1604_bonded_network
+):
+    """Validates /etc/network/interfaces for a public bond"""
+    routes = {"private_ip_space": ["192.168.5.0/24", "172.16.0.0/12"]}
+    builder = ubuntu_1604_bonded_network(public=True, metadata=routes)
+    tasks = builder.render()
+    result = dedent(
+        """\
+        auto lo
+        iface lo inet loopback
+
+        auto bond0
+        iface bond0 inet static
+            address {ipv4pub.address}
+            netmask {ipv4pub.netmask}
+            gateway {ipv4pub.gateway}
+            bond-downdelay 200
+            bond-miimon 100
+            bond-mode {bonding_mode}
+            bond-updelay 200
+            bond-xmit_hash_policy layer3+4
+            bond-lacp-rate 1
+            bond-slaves {iface0.name} {iface1.name}
+            dns-nameservers {dns1} {dns2}
+        iface bond0 inet6 static
+            address {ipv6pub.address}
+            netmask {ipv6pub.cidr}
+            gateway {ipv6pub.gateway}
+
+        auto bond0:0
+        iface bond0:0 inet static
+            address {ipv4priv.address}
+            netmask {ipv4priv.netmask}
+            post-up route add -net 192.168.5.0/24 gw {ipv4priv.gateway}
+            post-down route del -net 192.168.5.0/24 gw {ipv4priv.gateway}
+            post-up route add -net 172.16.0.0/12 gw {ipv4priv.gateway}
+            post-down route del -net 172.16.0.0/12 gw {ipv4priv.gateway}
+
+        auto {iface0.name}
+        iface {iface0.name} inet manual
+            bond-master bond0
+
+        auto {iface1.name}
+        iface {iface1.name} inet manual
+            pre-up sleep 4
+            bond-master bond0
+    """
+    ).format(
+        ipv4pub=builder.ipv4pub.first,
+        ipv6pub=builder.ipv6pub.first,
+        ipv4priv=builder.ipv4priv.first,
+        iface0=builder.network.interfaces[0],
+        iface1=builder.network.interfaces[1],
+        bonding_mode=builder.network.bonding.mode,
+        dns1=builder.network.resolvers[0],
+        dns2=builder.network.resolvers[1],
+    )
+    assert tasks["etc/network/interfaces"] == result
+
+
+def test_ubuntu_1604_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
+    ubuntu_1604_bonded_network
+):
+    """
+    When no public ip is assigned, we should see the private ip details in the
+    /etc/network/interfaces file.
+    """
+    routes = {"private_ip_space": ["192.168.5.0/24", "172.16.0.0/12"]}
+    builder = ubuntu_1604_bonded_network(public=False, metadata=routes)
+    tasks = builder.render()
+    result = dedent(
+        """\
+        auto lo
+        iface lo inet loopback
+
+        auto bond0
+        iface bond0 inet static
+            address {ipv4priv.address}
+            netmask {ipv4priv.netmask}
+            gateway {ipv4priv.gateway}
+            bond-downdelay 200
+            bond-miimon 100
+            bond-mode {bonding_mode}
+            bond-updelay 200
+            bond-xmit_hash_policy layer3+4
+            bond-lacp-rate 1
+            bond-slaves {iface0.name} {iface1.name}
+            dns-nameservers {dns1} {dns2}
+
+
+        auto {iface0.name}
+        iface {iface0.name} inet manual
+            bond-master bond0
+
+        auto {iface1.name}
+        iface {iface1.name} inet manual
+            pre-up sleep 4
+            bond-master bond0
+    """
+    ).format(
+        ipv4priv=builder.ipv4priv.first,
+        iface0=builder.network.interfaces[0],
+        iface1=builder.network.interfaces[1],
+        bonding_mode=builder.network.bonding.mode,
+        dns1=builder.network.resolvers[0],
+        dns2=builder.network.resolvers[1],
+    )
+    assert tasks["etc/network/interfaces"] == result
+
+
 def test_ubuntu_1604_task_etc_modules(ubuntu_1604_bonded_network):
     """Validates /etc/modules for a public bond"""
     builder = ubuntu_1604_bonded_network(public=True)

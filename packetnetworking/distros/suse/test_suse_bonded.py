@@ -35,6 +35,7 @@ def test_suse_bonded_task_etc_modprobe_d_bonding(suse_bonded_network):
     assert tasks["etc/modprobe.d/bonding.conf"] == result
 
 
+# pylama:ignore=E501
 def test_suse_public_bonded_task_etc_sysconfig_network_ifcfg_bond0(suse_bonded_network):
     """Validates /etc/sysconfig/network/ifcfg-bond0 for a public bond"""
     builder = suse_bonded_network(public=True)
@@ -77,6 +78,25 @@ def test_suse_public_route_task_etc_sysconfig_network_routes(suse_bonded_network
         """\
         default     {ipv4pub.gateway}
         10.0.0.0/8  {ipv4priv.gateway}
+    """
+    ).format(ipv4pub=builder.ipv4pub.first, ipv4priv=builder.ipv4priv.first)
+    assert tasks["etc/sysconfig/network/routes"] == result
+
+
+def test_suse_public_route_task_etc_sysconfig_network_routes_with_custom_ip_space_routes(
+    suse_bonded_network
+):
+    """
+    Validates /etc/sysconfig/network/routes is configured correctly
+    """
+    routes = {"private_ip_space": ["192.168.5.0/24", "172.16.0.0/12"]}
+    builder = suse_bonded_network(public=True, metadata=routes)
+    tasks = builder.render()
+    result = dedent(
+        """\
+        default     {ipv4pub.gateway}
+        192.168.5.0/24  {ipv4priv.gateway}
+        172.16.0.0/12  {ipv4priv.gateway}
     """
     ).format(ipv4pub=builder.ipv4pub.first, ipv4priv=builder.ipv4priv.first)
     assert tasks["etc/sysconfig/network/routes"] == result
