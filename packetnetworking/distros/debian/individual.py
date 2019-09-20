@@ -42,8 +42,10 @@ class DebianIndividualNetwork(NetworkBuilder):
             iface {{ iface0.name }}:0 inet static
                 address {{ ip4priv.address }}
                 netmask {{ ip4priv.netmask }}
-                post-up route add -net 10.0.0.0/8 gw {{ ip4priv.gateway }}
-                post-down route del -net 10.0.0.0/8 gw {{ ip4priv.gateway }}
+                {% for route in routes %}
+                post-up route add -net {{ route }} gw {{ ip4priv.gateway }}
+                post-down route del -net {{ route }} gw {{ ip4priv.gateway }}
+                {% endfor %}
             {% endif %}
         """
 
