@@ -185,6 +185,26 @@ def test_rhel_7_private_route_task_etc_sysconfig_network_scripts_route_bond0(
     assert tasks["etc/sysconfig/network-scripts/route-bond0"] == result
 
 
+def test_rhel_7_private_route_task_etc_sysconfig_network_scripts_route_bond0_with_custom_facility_ip_space_routes(
+    rhel_7_bonded_network
+):
+    """
+    When using a public ip, the private ip is assigned as an alias, this
+    validates the /etc/sysconfig/network-scripts/route-bond0 route is created
+    for the private subnet.
+    """
+    routes = {"private_ip_space": ["192.168.5.0/24", "172.16.0.0/12"]}
+    builder = rhel_7_bonded_network(public=True, metadata=routes)
+    tasks = builder.render()
+    result = dedent(
+        """\
+        192.168.5.0/24 via {ipv4priv.gateway} dev bond0:0
+        172.16.0.0/12 via {ipv4priv.gateway} dev bond0:0
+    """
+    ).format(ipv4priv=builder.ipv4priv.first)
+    assert tasks["etc/sysconfig/network-scripts/route-bond0"] == result
+
+
 def test_rhel_7_private_route_task_missing_for_private_only_bond(rhel_7_bonded_network):
     """
     When no public ip is assigned, we should not see a route file created

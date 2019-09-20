@@ -84,7 +84,9 @@ class RedhatBondedNetwork(NetworkBuilder):
             self.tasks[
                 "etc/sysconfig/network-scripts/route-bond0"
             ] = """\
-                10.0.0.0/8 via {{ ip4priv.gateway }} dev bond0:0
+                {% for route in routes %}
+                {{ route }} via {{ ip4priv.gateway }} dev bond0:0
+                {% endfor %}
             """
 
         ifcfg = """\

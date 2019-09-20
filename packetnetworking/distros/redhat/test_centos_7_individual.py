@@ -156,6 +156,26 @@ def test_centos_7_private_route_task_etc_sysconfig_network_scripts_route_enp0(
     assert tasks["etc/sysconfig/network-scripts/route-enp0"] == result
 
 
+def test_centos_7_private_route_task_etc_sysconfig_network_scripts_route_enp0_with_custom_facility_ip_space_routes(
+    centos_7_individual_network
+):
+    """
+    When using a public ip, the private ip is assigned as an alias, this
+    validates the /etc/sysconfig/network-scripts/route-enp0 route is created
+    for the private subnet.
+    """
+    routes = {"private_ip_space": ["192.168.5.0/24", "172.16.0.0/12"]}
+    builder = centos_7_individual_network(public=True, metadata=routes)
+    tasks = builder.render()
+    result = dedent(
+        """\
+        192.168.5.0/24 via {ipv4priv.gateway} dev enp0:0
+        172.16.0.0/12 via {ipv4priv.gateway} dev enp0:0
+    """
+    ).format(ipv4priv=builder.ipv4priv.first)
+    assert tasks["etc/sysconfig/network-scripts/route-enp0"] == result
+
+
 def test_centos_7_private_route_task_missing_for_private_only_enp(
     centos_7_individual_network
 ):

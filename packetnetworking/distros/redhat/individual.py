@@ -82,7 +82,9 @@ class RedhatIndividualNetwork(NetworkBuilder):
                     iface0=iface0
                 )
             ] = """\
-                10.0.0.0/8 via {{ ip4priv.gateway }} dev {{ iface0.name }}:0
+                {% for route in routes %}
+                {{ route }} via {{ ip4priv.gateway }} dev {{ iface0.name }}:0
+                {% endfor %}
             """
 
         self.tasks[
