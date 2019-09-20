@@ -156,6 +156,7 @@ def test_scientific_7_private_route_task_etc_sysconfig_network_scripts_route_enp
     assert tasks["etc/sysconfig/network-scripts/route-enp0"] == result
 
 
+# pylama:ignore=E501
 def test_scientific_7_private_route_task_etc_sysconfig_network_scripts_route_enp0_with_custom_facility_ip_space_routes(
     scientific_7_individual_network
 ):

@@ -35,6 +35,7 @@ def test_suse_bonded_task_etc_modprobe_d_bonding(suse_bonded_network):
     assert tasks["etc/modprobe.d/bonding.conf"] == result
 
 
+# pylama:ignore=E501
 def test_suse_public_bonded_task_etc_sysconfig_network_ifcfg_bond0(suse_bonded_network):
     """Validates /etc/sysconfig/network/ifcfg-bond0 for a public bond"""
     builder = suse_bonded_network(public=True)

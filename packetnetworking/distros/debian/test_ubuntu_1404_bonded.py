@@ -118,6 +118,7 @@ def test_ubuntu_1404_private_bonded_task_etc_network_interfaces(
     assert tasks["etc/network/interfaces"] == result
 
 
+# pylama:ignore=E501
 def test_ubuntu_1404_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
     ubuntu_1404_bonded_network
 ):

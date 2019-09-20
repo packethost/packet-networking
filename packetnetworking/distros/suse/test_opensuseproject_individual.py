@@ -21,6 +21,7 @@ def test_opensuseproject_private_only_throws_error(opensuseproject_individual_ne
         builder.render()
 
 
+# pylama:ignore=E501
 def test_opensuseproject_public_individual_task_etc_sysconfig_network_ifcfg_enp0(
     opensuseproject_individual_network
 ):

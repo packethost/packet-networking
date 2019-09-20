@@ -57,6 +57,7 @@ def test_debian_10_public_bonded_task_etc_network_interfaces(debian_10_bonded_ne
     assert tasks["etc/network/interfaces"] == result
 
 
+# pylama:ignore=E501
 def test_debian_10_private_bonded_task_etc_network_interfaces(debian_10_bonded_network):
     """
     When no public ip is assigned, we should see the private ip details in the

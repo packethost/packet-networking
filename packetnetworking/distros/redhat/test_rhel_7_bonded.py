@@ -185,6 +185,7 @@ def test_rhel_7_private_route_task_etc_sysconfig_network_scripts_route_bond0(
     assert tasks["etc/sysconfig/network-scripts/route-bond0"] == result
 
 
+# pylama:ignore=E501
 def test_rhel_7_private_route_task_etc_sysconfig_network_scripts_route_bond0_with_custom_facility_ip_space_routes(
     rhel_7_bonded_network
 ):

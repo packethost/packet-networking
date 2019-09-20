@@ -63,6 +63,7 @@ def test_suse_public_route_task_etc_sysconfig_network_routes(suse_individual_net
     assert tasks["etc/sysconfig/network/routes"] == result
 
 
+# pylama:ignore=E501
 def test_suse_public_route_task_etc_sysconfig_network_routes_with_custom_ip_space_routes(
     suse_individual_network
 ):

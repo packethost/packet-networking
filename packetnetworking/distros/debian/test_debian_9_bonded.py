@@ -94,6 +94,7 @@ def test_debian_9_private_bonded_task_etc_network_interfaces(debian_9_bonded_net
     assert tasks["etc/network/interfaces"] == result
 
 
+# pylama:ignore=E501
 def test_debian_9_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
     debian_9_bonded_network
 ):
