@@ -31,8 +31,8 @@ class SuseIndividualNetwork(NetworkBuilder):
             "etc/sysconfig/network/routes"
         ] = """\
             default     {{ ip4pub.gateway }}
-            {% for route in routes %}
-            {{ route }}  {{ ip4priv.gateway }}
+            {% for subnet in private_subnets %}
+            {{ subnet }}  {{ ip4priv.gateway }}
             {% endfor %}
         """
 

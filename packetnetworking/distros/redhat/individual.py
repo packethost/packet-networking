@@ -82,8 +82,8 @@ class RedhatIndividualNetwork(NetworkBuilder):
                     iface0=iface0
                 )
             ] = """\
-                {% for route in routes %}
-                {{ route }} via {{ ip4priv.gateway }} dev {{ iface0.name }}:0
+                {% for subnet in private_subnets %}
+                {{ subnet }} via {{ ip4priv.gateway }} dev {{ iface0.name }}:0
                 {% endfor %}
             """
 

@@ -123,8 +123,8 @@ def test_ubuntu_1604_public_bonded_task_etc_network_interfaces_with_custom_priva
     ubuntu_1604_bonded_network
 ):
     """Validates /etc/network/interfaces for a public bond"""
-    routes = {"private_ip_space": ["192.168.5.0/24", "172.16.0.0/12"]}
-    builder = ubuntu_1604_bonded_network(public=True, metadata=routes)
+    subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
+    builder = ubuntu_1604_bonded_network(public=True, metadata=subnets)
     tasks = builder.render()
     result = dedent(
         """\
@@ -187,8 +187,8 @@ def test_ubuntu_1604_private_bonded_task_etc_network_interfaces_with_custom_priv
     When no public ip is assigned, we should see the private ip details in the
     /etc/network/interfaces file.
     """
-    routes = {"private_ip_space": ["192.168.5.0/24", "172.16.0.0/12"]}
-    builder = ubuntu_1604_bonded_network(public=False, metadata=routes)
+    subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
+    builder = ubuntu_1604_bonded_network(public=False, metadata=subnets)
     tasks = builder.render()
     result = dedent(
         """\

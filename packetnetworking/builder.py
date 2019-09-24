@@ -13,7 +13,7 @@ class Builder(object):
         self.metadata = None
         self.initialized = False
 
-        self.network = NetworkData(default_routes=["10.0.0.0/8"])
+        self.network = NetworkData(default_private_subnets=["10.0.0.0/8"])
 
         if metadata:
             self.set_metadata(metadata)
@@ -48,9 +48,9 @@ class Builder(object):
         self.initialized = False
         if self.metadata is None:
             raise Exception("Metadata must be loaded before calling initialize")
-        metadata_routes = self.metadata.get("private_ip_space")
-        if metadata_routes is not None:
-            self.network.routes = metadata_routes
+        metadata_private_subnets = self.metadata.get("private_subnets")
+        if metadata_private_subnets is not None:
+            self.network.private_subnets = metadata_private_subnets
         self.network.load(self.metadata.network)
         self.initialized = True
         self.trigger("initialized")
@@ -68,14 +68,14 @@ class Builder(object):
 
 
 class NetworkData(object):
-    def __init__(self, default_resolvers=None, default_routes=None):
+    def __init__(self, default_resolvers=None, default_private_subnets=None):
         self.nw_metadata = None
         self.bonding = None
         self.interfaces = None
         self.bonds = None
         self.addresses = None
         self.resolvers = default_resolvers
-        self.routes = default_routes
+        self.private_subnets = default_private_subnets
 
     def load(self, nw_metadata):
         self.nw_metadata = nw_metadata
