@@ -51,9 +51,9 @@ class DebianBondedNetwork(NetworkBuilder):
             iface bond0:0 inet static
                 address {{ ip4priv.address }}
                 netmask {{ ip4priv.netmask }}
-                {% for route in routes %}
-                post-up route add -net {{ route }} gw {{ ip4priv.gateway }}
-                post-down route del -net {{ route }} gw {{ ip4priv.gateway }}
+                {% for subnet in private_subnets %}
+                post-up route add -net {{ subnet }} gw {{ ip4priv.gateway }}
+                post-down route del -net {{ subnet }} gw {{ ip4priv.gateway }}
                 {% endfor %}
             {% endif %}
             {% if osinfo.distro == 'ubuntu' %}

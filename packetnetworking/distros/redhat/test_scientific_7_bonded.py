@@ -192,7 +192,7 @@ def test_scientific_7_private_route_task_etc_sysconfig_network_scripts_route_bon
 
 
 # pylama:ignore=E501
-def test_scientific_7_private_route_task_etc_sysconfig_network_scripts_route_bond0_with_custom_facility_ip_space_routes(
+def test_scientific_7_private_route_task_etc_sysconfig_network_scripts_route_bond0_with_custom_private_subnets(
     scientific_7_bonded_network
 ):
     """
@@ -200,8 +200,8 @@ def test_scientific_7_private_route_task_etc_sysconfig_network_scripts_route_bon
     validates the /etc/sysconfig/network-scripts/route-bond0 route is created
     for the private subnet.
     """
-    routes = {"private_ip_space": ["192.168.5.0/24", "172.16.0.0/12"]}
-    builder = scientific_7_bonded_network(public=True, metadata=routes)
+    subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
+    builder = scientific_7_bonded_network(public=True, metadata=subnets)
     tasks = builder.render()
     result = dedent(
         """\

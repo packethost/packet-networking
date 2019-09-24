@@ -66,14 +66,14 @@ def test_opensuseproject_public_route_task_etc_sysconfig_network_routes(
     assert tasks["etc/sysconfig/network/routes"] == result
 
 
-def test_opensuseproject_public_route_task_etc_sysconfig_network_routes_with_custom_ip_space_routes(
+def test_opensuseproject_public_route_task_etc_sysconfig_network_routes_with_private_subnet_routes(
     opensuseproject_individual_network
 ):
     """
     Validates /etc/sysconfig/network/routes is configured correctly
     """
-    routes = {"private_ip_space": ["192.168.5.0/24", "172.16.0.0/12"]}
-    builder = opensuseproject_individual_network(public=True, metadata=routes)
+    subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
+    builder = opensuseproject_individual_network(public=True, metadata=subnets)
     tasks = builder.render()
     result = dedent(
         """\

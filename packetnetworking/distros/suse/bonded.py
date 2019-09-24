@@ -40,8 +40,8 @@ class SuseBondedNetwork(NetworkBuilder):
             "etc/sysconfig/network/routes"
         ] = """\
             default     {{ ip4pub.gateway }}
-            {% for route in routes %}
-            {{ route }}  {{ ip4priv.gateway }}
+            {% for subnets in private_subnets %}
+            {{ subnets }}  {{ ip4priv.gateway }}
             {% endfor %}
         """
 
