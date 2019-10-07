@@ -195,7 +195,8 @@ def test_debian_7_task_etc_modules(debian_7_bonded_network):
         bonding
     """
     )
-    assert tasks["etc/modules"] == result
+    assert tasks["etc/modules"]["file_mode"] == "a"
+    assert tasks["etc/modules"]["content"] == result
 
 
 def test_debian_7_etc_resolvers_configured(debian_7_bonded_network, fake):

@@ -239,7 +239,8 @@ def test_ubuntu_1804_task_etc_modules(ubuntu_1804_bonded_network):
         bonding
     """
     )
-    assert tasks["etc/modules"] == result
+    assert tasks["etc/modules"]["file_mode"] == "a"
+    assert tasks["etc/modules"]["content"] == result
 
 
 def test_ubuntu_1804_etc_resolvers_configured(ubuntu_1804_bonded_network, fake):

@@ -50,8 +50,10 @@ class NetworkBuilder:
                 rendered_tasks[path] = template
                 continue
 
+            file_mode = None
             mode = None
             if isinstance(template, dict):
+                file_mode = template.get("file_mode")
                 mode = template.get("mode", None)
                 template = template.get("template")
 
@@ -62,13 +64,14 @@ class NetworkBuilder:
                 trim_blocks=True,
                 undefined=StrictUndefined,
             )
-            if mode is None:
-                rendered_tasks[path] = template.render(self.context())
-            else:
+            if file_mode or mode:
                 rendered_tasks[path] = {
+                    "file_mode": file_mode,
                     "mode": mode,
                     "content": template.render(self.context()),
                 }
+            else:
+                rendered_tasks[path] = template.render(self.context())
         return rendered_tasks
 
     def run(self, rootfs_path):
@@ -86,8 +89,10 @@ class NetworkBuilder:
                     )
                 continue
 
+            file_mode = "w"
             mode = None
             if isinstance(content, dict):
+                file_mode = content.get("file_mode") or file_mode
                 mode = content.get("mode", None)
                 content = content.get("content")
 
@@ -97,7 +102,7 @@ class NetworkBuilder:
                 os.makedirs(name_dir, exist_ok=True)
 
             log.debug("Writing content to '{}'".format(abspath))
-            with open(abspath, "w") as f:
+            with open(abspath, file_mode) as f:
                 f.write(content)
 
             if mode:

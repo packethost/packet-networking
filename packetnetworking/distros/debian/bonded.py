@@ -69,11 +69,12 @@ class DebianBondedNetwork(NetworkBuilder):
             {% endif %}
         """
 
-        self.tasks[
-            "etc/modules"
-        ] = """\
+        self.tasks["etc/modules"] = {
+            "file_mode": "a",
+            "template": """\
             bonding
-        """
+        """,
+        }
 
         self.tasks[
             "etc/resolv.conf"
