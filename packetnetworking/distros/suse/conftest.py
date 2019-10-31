@@ -44,9 +44,12 @@ def generic_suse_bonded_network(susebuilder, patch_dict):
         )
         builder = susebuilder(metadata, public=public)
         builder.build()
-        for builder in builder.builders:
-            if isinstance(builder, SuseBondedNetwork):
-                return builder
+        builder.builders = [
+            builder
+            for builder in builder.builders
+            if isinstance(builder, SuseBondedNetwork)
+        ]
+        return builder
 
     return _builder
 
@@ -69,8 +72,11 @@ def generic_suse_individual_network(susebuilder, patch_dict):
         )
         builder = susebuilder(metadata, public=public)
         builder.build()
-        for builder in builder.builders:
-            if isinstance(builder, SuseIndividualNetwork):
-                return builder
+        builder.builders = [
+            builder
+            for builder in builder.builders
+            if isinstance(builder, SuseIndividualNetwork)
+        ]
+        return builder
 
     return _builder

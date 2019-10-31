@@ -1,0 +1,11 @@
+DEVICE={{ iface0.name }}:0
+NAME={{ iface0.name }}:0
+IPADDR={{ ip4priv.address }}
+NETMASK={{ ip4priv.netmask }}
+GATEWAY={{ ip4priv.gateway }}
+BOOTPROTO=none
+ONBOOT=yes
+USERCTL=no
+{% for dns in resolvers %}
+DNS{{ loop.index }}={{ dns }}
+{% endfor %}

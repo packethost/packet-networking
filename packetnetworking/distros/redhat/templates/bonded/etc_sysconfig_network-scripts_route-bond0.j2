@@ -1,0 +1,3 @@
+{% for subnet in private_subnets %}
+{{ subnet }} via {{ ip4priv.gateway }} dev bond0:0
+{% endfor %}

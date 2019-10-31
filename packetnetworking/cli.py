@@ -104,8 +104,8 @@ def cli(
         if resolvers:
             builder.network.resolvers = resolvers
 
-    complete = builder.run(rootfs)
-    if complete is None:
+    tasks = builder.run(rootfs)
+    if not tasks:
         if not quiet:
             click.echo("No tasks processed", file=sys.stderr)
         sys.exit(30)

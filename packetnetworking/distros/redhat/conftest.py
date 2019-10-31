@@ -44,9 +44,12 @@ def generic_redhat_bonded_network(redhatbuilder, patch_dict):
         )
         builder = redhatbuilder(metadata, public=public)
         builder.build()
-        for builder in builder.builders:
-            if isinstance(builder, RedhatBondedNetwork):
-                return builder
+        builder.builders = [
+            builder
+            for builder in builder.builders
+            if isinstance(builder, RedhatBondedNetwork)
+        ]
+        return builder
 
     return _builder
 
@@ -69,8 +72,11 @@ def generic_redhat_individual_network(redhatbuilder, patch_dict):
         )
         builder = redhatbuilder(metadata, public=public)
         builder.build()
-        for builder in builder.builders:
-            if isinstance(builder, RedhatIndividualNetwork):
-                return builder
+        builder.builders = [
+            builder
+            for builder in builder.builders
+            if isinstance(builder, RedhatIndividualNetwork)
+        ]
+        return builder
 
     return _builder

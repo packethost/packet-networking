@@ -14,99 +14,29 @@ class RedhatIndividualNetwork(NetworkBuilder):
 
         iface0 = self.network.interfaces[0]
 
-        self.tasks[
-            "etc/sysconfig/network"
-        ] = """\
-            NETWORKING=yes
-            HOSTNAME={{ hostname }}
-            {% if ip4pub %}
-            GATEWAY={{ ip4pub.gateway }}
-            {% else %}
-            GATEWAY={{ ip4priv.gateway }}
-            {% endif %}
-            GATEWAYDEV={{ iface0.name }}
-            NOZEROCONF=yes
-        """
-
-        self.tasks[
-            "etc/sysconfig/network-scripts/ifcfg-{iface0.name}".format(iface0=iface0)
-        ] = """\
-            DEVICE={{ iface0.name }}
-            NAME={{ iface0.name }}
-            {% if ip4pub %}
-            IPADDR={{ ip4pub.address }}
-            NETMASK={{ ip4pub.netmask }}
-            GATEWAY={{ ip4pub.gateway }}
-            {% else %}
-            IPADDR={{ ip4priv.address }}
-            NETMASK={{ ip4priv.netmask }}
-            GATEWAY={{ ip4priv.gateway }}
-            {% endif %}
-            BOOTPROTO=none
-            ONBOOT=yes
-            USERCTL=no
-
-            {% if ip6pub %}
-            IPV6INIT=yes
-            IPV6ADDR={{ ip6pub.address }}/{{ ip6pub.cidr }}
-            IPV6_DEFAULTGW={{ ip6pub.gateway }}
-            {% endif %}
-            {% for dns in resolvers %}
-            DNS{{ loop.index }}={{ dns }}
-            {% endfor %}
-        """
+        self.task_template(
+            "etc/sysconfig/network", "individual/etc_sysconfig_network.j2"
+        )
+        self.task_template(
+            "etc/sysconfig/network-scripts/ifcfg-{iface0.name}".format(iface0=iface0),
+            "individual/etc_sysconfig_network-scripts_ifcfg-iface0.j2",
+        )
 
         if self.ipv4pub:
-            self.tasks[
+            # Only needed when a public ip is used, otherwise private ip is
+            # already set and no special routes are needed.
+            self.task_template(
                 "etc/sysconfig/network-scripts/ifcfg-{iface0.name}:0".format(
                     iface0=iface0
-                )
-            ] = """\
-                DEVICE={{ iface0.name }}:0
-                NAME={{ iface0.name }}:0
-                IPADDR={{ ip4priv.address }}
-                NETMASK={{ ip4priv.netmask }}
-                GATEWAY={{ ip4priv.gateway }}
-                BOOTPROTO=none
-                ONBOOT=yes
-                USERCTL=no
-                {% for dns in resolvers %}
-                DNS{{ loop.index }}={{ dns }}
-                {% endfor %}
-            """
-
-            # If no ip4pub is specified, the ip4priv is configured on the eth0 interface
-            # so there is no need to add the custom route
-            self.tasks[
+                ),
+                "individual/etc_sysconfig_network-scripts_ifcfg-iface0_0.j2",
+            )
+            self.task_template(
                 "etc/sysconfig/network-scripts/route-{iface0.name}".format(
                     iface0=iface0
-                )
-            ] = """\
-                {% for subnet in private_subnets %}
-                {{ subnet }} via {{ ip4priv.gateway }} dev {{ iface0.name }}:0
-                {% endfor %}
-            """
-
-        self.tasks[
-            "etc/resolv.conf"
-        ] = """\
-            {% for server in resolvers %}
-            nameserver {{ server }}
-            {% endfor %}
-        """
-
-        self.tasks[
-            "etc/hostname"
-        ] = """\
-            {{ hostname }}
-        """
-
-        self.tasks["etc/hosts"] = (
-            "127.0.0.1   localhost localhost.localdomain localhost4 "
-            + "localhost4.localdomain4\n"
-            + "::1         localhost localhost.localdomain localhost6 "
-            + "localhost6.localdomain6\n"
-        )
+                ),
+                "individual/etc_sysconfig_network-scripts_route-iface0.j2",
+            )
 
         if self.metadata.operating_system.distro not in (
             "scientificcernslc",

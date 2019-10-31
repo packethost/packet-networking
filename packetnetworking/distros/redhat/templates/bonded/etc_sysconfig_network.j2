@@ -1,0 +1,9 @@
+NETWORKING=yes
+HOSTNAME={{ hostname }}
+{% if ip4pub %}
+GATEWAY={{ ip4pub.gateway }}
+{% else %}
+GATEWAY={{ ip4priv.gateway }}
+{% endif %}
+GATEWAYDEV=bond0
+NOZEROCONF=yes
