@@ -1,0 +1,23 @@
+DEVICE={{ iface0.name }}
+NAME={{ iface0.name }}
+{% if ip4pub %}
+IPADDR={{ ip4pub.address }}
+NETMASK={{ ip4pub.netmask }}
+GATEWAY={{ ip4pub.gateway }}
+{% else %}
+IPADDR={{ ip4priv.address }}
+NETMASK={{ ip4priv.netmask }}
+GATEWAY={{ ip4priv.gateway }}
+{% endif %}
+BOOTPROTO=none
+ONBOOT=yes
+USERCTL=no
+
+{% if ip6pub %}
+IPV6INIT=yes
+IPV6ADDR={{ ip6pub.address }}/{{ ip6pub.cidr }}
+IPV6_DEFAULTGW={{ ip6pub.gateway }}
+{% endif %}
+{% for dns in resolvers %}
+DNS{{ loop.index }}={{ dns }}
+{% endfor %}

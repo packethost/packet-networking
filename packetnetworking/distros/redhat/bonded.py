@@ -11,134 +11,39 @@ class RedhatBondedNetwork(NetworkBuilder):
 
     def build_tasks(self):
         self.tasks = {}
-        self.tasks[
-            "etc/sysconfig/network"
-        ] = """\
-            NETWORKING=yes
-            HOSTNAME={{ hostname }}
-            {% if ip4pub %}
-            GATEWAY={{ ip4pub.gateway }}
-            {% else %}
-            GATEWAY={{ ip4priv.gateway }}
-            {% endif %}
-            GATEWAYDEV=bond0
-            NOZEROCONF=yes
-        """
 
-        self.tasks[
-            "etc/modprobe.d/bonding.conf"
-        ] = """\
-            alias bond0 bonding
-            options bond0 mode={{ net.bonding.mode }} miimon=100 downdelay=200 updelay=200 xmit_hash_policy=layer3+4 lacp_rate=1
-        """
-
-        self.tasks[
-            "etc/sysconfig/network-scripts/ifcfg-bond0"
-        ] = """\
-            DEVICE=bond0
-            NAME=bond0
-            {% if ip4pub %}
-            IPADDR={{ ip4pub.address }}
-            NETMASK={{ ip4pub.netmask }}
-            GATEWAY={{ ip4pub.gateway }}
-            {% else %}
-            IPADDR={{ ip4priv.address }}
-            NETMASK={{ ip4priv.netmask }}
-            GATEWAY={{ ip4priv.gateway }}
-            {% endif %}
-            BOOTPROTO=none
-            ONBOOT=yes
-            USERCTL=no
-            TYPE=Bond
-            BONDING_OPTS="mode={{ net.bonding.mode }} miimon=100 downdelay=200 updelay=200"
-
-            {% if ip6pub %}
-            IPV6INIT=yes
-            IPV6ADDR={{ ip6pub.address }}/{{ ip6pub.cidr }}
-            IPV6_DEFAULTGW={{ ip6pub.gateway }}
-            {% endif %}
-            {% for dns in resolvers %}
-            DNS{{ loop.index }}={{ dns }}
-            {% endfor %}
-        """
-
-        if self.ipv4pub:
-            self.tasks[
-                "etc/sysconfig/network-scripts/ifcfg-bond0:0"
-            ] = """\
-                DEVICE=bond0:0
-                NAME=bond0:0
-                IPADDR={{ ip4priv.address }}
-                NETMASK={{ ip4priv.netmask }}
-                GATEWAY={{ ip4priv.gateway }}
-                BOOTPROTO=none
-                ONBOOT=yes
-                USERCTL=no
-                {% for dns in resolvers %}
-                DNS{{ loop.index }}={{ dns }}
-                {% endfor %}
-            """
-
-            # If no ip4pub is specified, the ip4priv is configured on the bond0 interface
-            # so there is no need to add the custom route
-            self.tasks[
-                "etc/sysconfig/network-scripts/route-bond0"
-            ] = """\
-                {% for subnet in private_subnets %}
-                {{ subnet }} via {{ ip4priv.gateway }} dev bond0:0
-                {% endfor %}
-            """
-
-        ifcfg = """\
-            DEVICE={iface}
-            ONBOOT=yes
-            HWADDR={{{{ interfaces[{i}].mac }}}}
-            MASTER=bond0
-            SLAVE=yes
-            BOOTPROTO=none
-        """
-        for i in range(len(self.network.interfaces)):
-            name = self.network.interfaces[i]["name"]
-            cfg = ifcfg.format(iface=name, i=i)
-            self.tasks["etc/sysconfig/network-scripts/ifcfg-" + name] = cfg
-
-        self.tasks[
-            "etc/resolv.conf"
-        ] = """\
-            {% for server in resolvers %}
-            nameserver {{ server }}
-            {% endfor %}
-        """
-
-        self.tasks[
-            "etc/hostname"
-        ] = """\
-            {{ hostname }}
-        """
-
-        self.tasks["etc/hosts"] = (
-            "127.0.0.1   localhost localhost.localdomain localhost4 "
-            + "localhost4.localdomain4\n"
-            + "::1         localhost localhost.localdomain localhost6 "
-            + "localhost6.localdomain6\n"
+        self.task_template("etc/sysconfig/network", "bonded/etc_sysconfig_network.j2")
+        self.task_template(
+            "etc/modprobe.d/bonding.conf", "bonded/etc_modprobe.d_bonding.conf.j2"
+        )
+        self.task_template(
+            "etc/sysconfig/network-scripts/ifcfg-bond0",
+            "bonded/etc_sysconfig_network-scripts_ifcfg-bond0.j2",
         )
 
-        ifup_pre_local = """\
-            #!/bin/bash
+        if self.ipv4pub:
+            # Only needed when a public ip is used, otherwise private ip is
+            # already set and no special routes are needed.
+            self.task_template(
+                "etc/sysconfig/network-scripts/ifcfg-bond0:0",
+                "bonded/etc_sysconfig_network-scripts_ifcfg-bond0_0.j2",
+            )
+            self.task_template(
+                "etc/sysconfig/network-scripts/route-bond0",
+                "bonded/etc_sysconfig_network-scripts_route-bond0.j2",
+            )
 
-            set -o errexit -o nounset -o pipefail -o xtrace
+        for i in range(len(self.network.interfaces)):
+            name = self.network.interfaces[i]["name"]
+            self.task_template(
+                "etc/sysconfig/network-scripts/ifcfg-" + name,
+                "bonded/etc_sysconfig_network-scripts_ifcfg-template.j2",
+                fmt={"iface": name, "i": i},
+            )
 
-            iface=${1#*-}
-            case "$iface" in
-            bond0 | {{interfaces[0].name}}) ip link set "$iface" address {{interfaces[0].mac}} ;;
-            {% for iface in interfaces[1:] %}
-                    {{iface.name}}) ip link set "$iface" address {{iface.mac}} && sleep 4 ;;
-            {% endfor %}
-            *) echo "ignoring unknown interface $iface" && exit 0 ;;
-            esac
-        """  # noqa
-
-        self.tasks["sbin/ifup-pre-local"] = {"template": ifup_pre_local, "mode": 0o755}
+        self.task_template(
+            "sbin/ifup-pre-local", "bonded/sbin_ifup-pre-local.j2", mode=0o755
+        )
 
         if self.metadata.operating_system.distro not in (
             "scientificcernslc",

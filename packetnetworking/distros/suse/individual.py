@@ -12,59 +12,22 @@ class SuseIndividualNetwork(NetworkBuilder):
 
         iface0 = self.network.interfaces[0]
 
-        self.tasks[
-            "etc/sysconfig/network/ifcfg-" + iface0.name
-        ] = """\
-            STARTMODE='onboot'
-            BOOTPROTO='static'
-            IPADDR='{{ ip4pub.address }}/{{ ip4pub.cidr }}'
-            IPADDR1='{{ ip4priv.address }}'
-            NETMASK1='{{ ip4priv.netmask }}'
-            GATEWAY1='{{ ip4priv.gateway }}'
-            LABEL1='0'
-            IPADDR2='{{ ip6pub.address }}/{{ ip6pub.cidr }}'
-            GATEWAY2='{{ ip6pub.gateway }}'
-            LABEL2='1'
-        """
+        self.task_template(
+            "etc/sysconfig/network/ifcfg-" + iface0.name,
+            "individual/etc_sysconfig_network_ifcfg-iface0.j2",
+        )
+        self.task_template(
+            "etc/sysconfig/network/routes", "individual/etc_sysconfig_network_routes.j2"
+        )
 
-        self.tasks[
-            "etc/sysconfig/network/routes"
-        ] = """\
-            default     {{ ip4pub.gateway }}
-            {% for subnet in private_subnets %}
-            {{ subnet }}  {{ ip4priv.gateway }}
-            {% endfor %}
-        """
-
-        ifcfg = """\
-            STARTMODE='hotplug'
-            BOOTPROTO='none'
-        """
         for i, iface in enumerate(self.network.interfaces):
             if iface == iface0:
                 # skip interface since it is already configured above
                 continue
-            cfg = ifcfg.format(iface=iface.name, i=i)
-            self.tasks["etc/sysconfig/network/ifcfg-" + iface.name] = cfg
+            self.task_template(
+                "etc/sysconfig/network/ifcfg-" + iface.name,
+                "individual/etc_sysconfig_network_ifcfg-template.j2",
+                fmt={"iface": iface.name, "i": i},
+            )
 
-        self.tasks[
-            "etc/resolv.conf"
-        ] = """\
-            {% for server in resolvers %}
-            nameserver {{ server }}
-            {% endfor %}
-        """
-
-        self.tasks[
-            "etc/hostname"
-        ] = """\
-            {{ hostname }}
-        """
-
-        self.tasks[
-            "etc/hosts"
-        ] = """\
-            127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
-            ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
-        """
         return self.tasks

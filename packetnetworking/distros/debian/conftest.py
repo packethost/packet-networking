@@ -44,9 +44,12 @@ def generic_debian_bonded_network(debianbuilder, patch_dict):
         )
         builder = debianbuilder(metadata, public=public)
         builder.build()
-        for builder in builder.builders:
-            if isinstance(builder, DebianBondedNetwork):
-                return builder
+        builder.builders = [
+            builder
+            for builder in builder.builders
+            if isinstance(builder, DebianBondedNetwork)
+        ]
+        return builder
 
     return _builder
 
@@ -69,8 +72,11 @@ def generic_debian_individual_network(debianbuilder, patch_dict):
         )
         builder = debianbuilder(metadata, public=public)
         builder.build()
-        for builder in builder.builders:
-            if isinstance(builder, DebianIndividualNetwork):
-                return builder
+        builder.builders = [
+            builder
+            for builder in builder.builders
+            if isinstance(builder, DebianIndividualNetwork)
+        ]
+        return builder
 
     return _builder

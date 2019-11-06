@@ -1,8 +1,12 @@
-import re
-import sys
 import json
-import click
+import os
+import re
 import subprocess
+import sys
+
+import click
+
+package_dir = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
 
 
 class DictAttributes(dict):
@@ -130,6 +134,23 @@ class IPAddressList(WhereList):
 
     def where(self, *args, **kwargs):
         return IPAddressList(super().where(*args, **kwargs))
+
+
+class Tasks(object):
+    def task(self, task, content, write_mode=None, mode=None, fmt=None):
+        self.tasks[task] = {
+            "file_mode": write_mode,
+            "mode": mode,
+            "template": content,
+            "fmt": fmt,
+        }
+        return self.tasks[task]
+
+    def task_template(self, task, path, write_mode=None, mode=None, fmt=None):
+        path = os.path.join(package_dir, self.templates_base, path)
+        t = self.task(task, None, write_mode, mode, fmt)
+        t["template_path"] = path
+        return t
 
 
 def jfind(j, fn):

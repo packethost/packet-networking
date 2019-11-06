@@ -1,0 +1,54 @@
+auto lo
+iface lo inet loopback
+
+auto bond0
+iface bond0 inet static
+    {% if ip4pub %}
+    address {{ ip4pub.address }}
+    netmask {{ ip4pub.netmask }}
+    gateway {{ ip4pub.gateway }}
+    {% else %}
+    address {{ ip4priv.address }}
+    netmask {{ ip4priv.netmask }}
+    gateway {{ ip4priv.gateway }}
+    {% endif %}
+    bond-downdelay 200
+    bond-miimon 100
+    bond-mode {{ net.bonding.mode }}
+    bond-updelay 200
+    bond-xmit_hash_policy layer3+4
+    {% if osinfo.distro == 'ubuntu' and net.bonding.mode == 4 %}
+    bond-lacp-rate 1
+    {% endif %}
+    bond-slaves{% for iface in interfaces %} {{ iface.name }}{% endfor %}
+
+    dns-nameservers{% for dns in resolvers %} {{ dns }}{% endfor %}
+
+{% if ip6pub %}
+iface bond0 inet6 static
+    address {{ ip6pub.address }}
+    netmask {{ ip6pub.cidr }}
+    gateway {{ ip6pub.gateway }}
+{% endif %}
+
+{% if ip4pub %}
+auto bond0:0
+iface bond0:0 inet static
+    address {{ ip4priv.address }}
+    netmask {{ ip4priv.netmask }}
+    {% for subnet in private_subnets %}
+    post-up route add -net {{ subnet }} gw {{ ip4priv.gateway }}
+    post-down route del -net {{ subnet }} gw {{ ip4priv.gateway }}
+    {% endfor %}
+{% endif %}
+{% if osinfo.distro == 'ubuntu' %}
+{% for iface in interfaces %}
+
+auto {{ iface.name }}
+iface {{ iface.name }} inet manual
+{% if iface.name != interfaces[0].name %}
+    pre-up sleep 4
+{% endif %}
+    bond-master bond0
+{% endfor %}
+{% endif %}

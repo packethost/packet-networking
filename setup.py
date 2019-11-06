@@ -1,6 +1,24 @@
 #!/usr/bin/env python3
 
+import os
 from setuptools import setup, find_packages
+
+package_dir = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "packetnetworking"
+)
+
+
+def find_templates():
+    files = []
+    for (path, directories, filenames) in os.walk(package_dir):
+        if "templates" not in path.split(os.path.sep):
+            continue
+        for file in filenames:
+            if not file.endswith(".j2"):
+                continue
+            files.append(os.path.relpath(os.path.join(path, file), package_dir))
+    return files
+
 
 test_reqs = ["pytest", "pytest-cov", "mock", "faker", "netaddr", "tox"]
 
@@ -17,6 +35,7 @@ setup(
         "jinja2 >=2.9,<2.10",
         "requests >=2.21.0,<2.23",
     ],
+    package_data={"packetnetworking": find_templates()},
     extras_require={"test": test_reqs},
     tests_require=test_reqs,
     entry_points="""

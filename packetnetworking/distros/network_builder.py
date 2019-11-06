@@ -1,12 +1,7 @@
-import os
-import logging
-from textwrap import dedent
-from jinja2 import Template, StrictUndefined
-
-log = logging.getLogger()
+from ..utils import Tasks
 
 
-class NetworkBuilder:
+class NetworkBuilder(Tasks):
     def __init__(self, metadata):
         self.metadata = metadata
         self.network = self.metadata.network
@@ -23,88 +18,3 @@ class NetworkBuilder:
     @property
     def ipv4priv(self):
         return self.network.addresses.management.private.ipv4
-
-    def context(self):
-        return {
-            "hostname": self.metadata.hostname,
-            "interfaces": self.network.interfaces,
-            "iface0": self.network.interfaces[0],
-            "ip4priv": self.ipv4priv.first,
-            "ip4pub": self.ipv4pub.first,
-            "ip6pub": self.ipv6pub.first,
-            "net": self.network,
-            "osinfo": self.metadata.operating_system,
-            "resolvers": self.network.resolvers,
-            "private_subnets": self.network.private_subnets,
-        }
-
-    def render(self):
-        if self.tasks is None:
-            self.build()
-        rendered_tasks = {}
-        if not self.tasks:
-            return rendered_tasks
-        for path, template in self.tasks.items():
-            log.debug("Rendering task: '{}'".format(path))
-            if template is None:
-                rendered_tasks[path] = template
-                continue
-
-            file_mode = None
-            mode = None
-            if isinstance(template, dict):
-                file_mode = template.get("file_mode")
-                mode = template.get("mode", None)
-                template = template.get("template")
-
-            template = Template(
-                dedent(template),
-                keep_trailing_newline=True,
-                lstrip_blocks=True,
-                trim_blocks=True,
-                undefined=StrictUndefined,
-            )
-            if file_mode or mode:
-                rendered_tasks[path] = {
-                    "file_mode": file_mode,
-                    "mode": mode,
-                    "content": template.render(self.context()),
-                }
-            else:
-                rendered_tasks[path] = template.render(self.context())
-        return rendered_tasks
-
-    def run(self, rootfs_path):
-        rendered_tasks = self.render()
-        for relpath, content in rendered_tasks.items():
-            log.debug("Processing task: '{}'".format(relpath))
-            abspath = os.path.join(rootfs_path, relpath)
-            if content is None:
-                if os.path.lexists(abspath):
-                    log.info("Removing '{}'".format(abspath))
-                    os.remove(abspath)
-                else:
-                    log.debug(
-                        "Skipped removing '{}' Path doesn't exist".format(abspath)
-                    )
-                continue
-
-            file_mode = "w"
-            mode = None
-            if isinstance(content, dict):
-                file_mode = content.get("file_mode") or file_mode
-                mode = content.get("mode", None)
-                content = content.get("content")
-
-            name_dir = os.path.dirname(abspath)
-            if name_dir and not os.path.lexists(name_dir):
-                log.debug("Making directory '{}'".format(name_dir))
-                os.makedirs(name_dir, exist_ok=True)
-
-            log.debug("Writing content to '{}'".format(abspath))
-            with open(abspath, file_mode) as f:
-                f.write(content)
-
-            if mode:
-                os.chmod(abspath, mode)
-        return rendered_tasks

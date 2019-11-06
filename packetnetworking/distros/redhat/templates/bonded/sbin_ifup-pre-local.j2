@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -o errexit -o nounset -o pipefail -o xtrace
+
+iface=${1#*-}
+case "$iface" in
+bond0 | {{interfaces[0].name}}) ip link set "$iface" address {{interfaces[0].mac}} ;;
+{% for iface in interfaces[1:] %}
+        {{iface.name}}) ip link set "$iface" address {{iface.mac}} && sleep 4 ;;
+{% endfor %}
+*) echo "ignoring unknown interface $iface" && exit 0 ;;
+esac
