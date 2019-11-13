@@ -105,8 +105,12 @@ def test_distro_builder_returns_dict_with_tasks(
     with mock.patch.object(distro, "render", return_value={"task": None}):
         with mock.patch("os.path.lexists") as mock_lexists:
             with mock.patch("os.remove") as mock_remove:
-                mock_lexists.return_value = True
-                mock_remove.return_value = True
+                with mock.patch.object(
+                    fake_distro, "has_network_tasks", new_callable=mock.PropertyMock
+                ) as mock_hnt:
+                    mock_lexists.return_value = True
+                    mock_remove.return_value = True
+                    mock_hnt.return_value = True
                 assert isinstance(distro.run("/path/to/rootfs"), dict)
 
 
@@ -119,11 +123,15 @@ def test_distro_builder_returns_dict_without_tasks(
     with mock.patch.object(distro, "render", return_value=None):
         with mock.patch("os.path.lexists") as mock_lexists:
             with mock.patch("os.remove") as mock_remove:
-                mock_lexists.return_value = True
-                mock_remove.return_value = True
-                resp = distro.run("/path/to/rootfs")
-                assert isinstance(resp, dict)
-                assert len(resp) == 0
+                with mock.patch.object(
+                    fake_distro, "has_network_tasks", new_callable=mock.PropertyMock
+                ) as mock_hnt:
+                    mock_lexists.return_value = True
+                    mock_remove.return_value = True
+                    mock_hnt.return_value = True
+                    resp = distro.run("/path/to/rootfs")
+                    assert isinstance(resp, dict)
+                    assert len(resp) == 0
 
 
 def test_distro_builder_has_correct_ipv_responses(
@@ -182,13 +190,39 @@ def test_distro_builder_context_as_expected(fake_distro_builder_with_metadata):
     assert context == wanted_context
 
 
+def test_distro_builder_render_calls_has_network_tasks(
+    fake_distro_builder_with_metadata
+):
+    fake_distro = fake_distro_builder_with_metadata()
+    fake_distro.tasks = {
+        "path/to/file": """
+        hostname = {{ hostname }}
+    """
+    }
+    with mock.patch.object(
+        fake_distro.__class__,
+        "has_network_tasks",
+        return_value=True,
+        new_callable=mock.PropertyMock,
+    ) as mock_has_network_tasks:
+        fake_distro.render()
+
+    mock_has_network_tasks.assert_called()
+
+
 def test_distro_builder_render_does_nothing_with_delete_tasks(
     fake_distro_builder_with_metadata
 ):
     fake_distro = fake_distro_builder_with_metadata()
     fake_distro.tasks = {"path/to/file": None}
 
-    rendered_tasks = fake_distro.render()
+    with mock.patch.object(
+        fake_distro.__class__,
+        "has_network_tasks",
+        return_value=True,
+        new_callable=mock.PropertyMock,
+    ):
+        rendered_tasks = fake_distro.render()
     assert rendered_tasks["path/to/file"] is None
 
 
@@ -199,7 +233,13 @@ def test_distro_builder_render_renders_string_tasks(fake_distro_builder_with_met
         hostname = {{ hostname }}
     """
     }
-    rendered_tasks = fake_distro.render()
+    with mock.patch.object(
+        fake_distro.__class__,
+        "has_network_tasks",
+        return_value=True,
+        new_callable=mock.PropertyMock,
+    ):
+        rendered_tasks = fake_distro.render()
 
     wanted_content = "\nhostname = {hostname}\n".format(**fake_distro.context())
     assert rendered_tasks["path/to/file"] == wanted_content
@@ -215,7 +255,13 @@ def test_distro_builder_render_renders_dict_tasks(fake_distro_builder_with_metad
             """,
         }
     }
-    rendered_tasks = fake_distro.render()
+    with mock.patch.object(
+        fake_distro.__class__,
+        "has_network_tasks",
+        return_value=True,
+        new_callable=mock.PropertyMock,
+    ):
+        rendered_tasks = fake_distro.render()
 
     wanted_mode = 0o755
     wanted_content = "\nhostname = {hostname}\n".format(**fake_distro.context())
@@ -229,9 +275,15 @@ def test_distro_builder_run_deletes_file(fake_distro_builder_with_metadata):
 
     with mock.patch("os.path.lexists") as mock_lexists:
         with mock.patch("os.remove") as mock_remove:
-            mock_lexists.return_value = True
-            mock_remove.return_value = True
-            fake_distro.run("/path/to/rootfs")
+            with mock.patch.object(
+                fake_distro.__class__,
+                "has_network_tasks",
+                new_callable=mock.PropertyMock,
+            ) as mock_hnt:
+                mock_lexists.return_value = True
+                mock_remove.return_value = True
+                mock_hnt.return_value = True
+                fake_distro.run("/path/to/rootfs")
 
     mock_lexists.assert_called_with("/path/to/rootfs/path/to/file")
     mock_remove.assert_called_with("/path/to/rootfs/path/to/file")
@@ -245,9 +297,15 @@ def test_distro_builder_run_skips_deleting_missing_file(
 
     with mock.patch("os.path.lexists") as mock_lexists:
         with mock.patch("os.remove") as mock_remove:
-            mock_lexists.return_value = False
-            mock_remove.return_value = True
-            fake_distro.run("/path/to/rootfs")
+            with mock.patch.object(
+                fake_distro.__class__,
+                "has_network_tasks",
+                new_callable=mock.PropertyMock,
+            ) as mock_hnt:
+                mock_lexists.return_value = False
+                mock_remove.return_value = True
+                mock_hnt.return_value = True
+                fake_distro.run("/path/to/rootfs")
 
     mock_lexists.assert_called_with("/path/to/rootfs/path/to/file")
     mock_remove.assert_not_called()
@@ -265,9 +323,15 @@ def test_distro_builder_creates_file(fake_distro_builder_with_metadata):
         with mock.patch("os.makedirs") as mock_makedirs:
             open_ = mock.mock_open()
             with mock.patch("builtins.open", open_) as mock_open:
-                mock_lexists.return_value = False
-                mock_makedirs.return_value = True
-                fake_distro.run("/path/to/rootfs")
+                with mock.patch.object(
+                    fake_distro.__class__,
+                    "has_network_tasks",
+                    new_callable=mock.PropertyMock,
+                ) as mock_hnt:
+                    mock_lexists.return_value = False
+                    mock_makedirs.return_value = True
+                    mock_hnt.return_value = True
+                    fake_distro.run("/path/to/rootfs")
 
     mock_lexists.assert_called_with("/path/to/rootfs/path/to")
     mock_makedirs.assert_called_with("/path/to/rootfs/path/to", exist_ok=True)
@@ -293,10 +357,16 @@ def test_distro_builder_creates_file_with_mode(fake_distro_builder_with_metadata
             open_ = mock.mock_open()
             with mock.patch("builtins.open", open_) as mock_open:
                 with mock.patch("os.chmod") as mock_chmod:
-                    mock_lexists.return_value = False
-                    mock_makedirs.return_value = True
-                    mock_chmod.return_value = True
-                    fake_distro.run("/path/to/rootfs")
+                    with mock.patch.object(
+                        fake_distro.__class__,
+                        "has_network_tasks",
+                        new_callable=mock.PropertyMock,
+                    ) as mock_hnt:
+                        mock_lexists.return_value = False
+                        mock_makedirs.return_value = True
+                        mock_chmod.return_value = True
+                        mock_hnt.return_value = True
+                        fake_distro.run("/path/to/rootfs")
 
     mock_lexists.assert_called_with("/path/to/rootfs/path/to")
     mock_makedirs.assert_called_with("/path/to/rootfs/path/to", exist_ok=True)
