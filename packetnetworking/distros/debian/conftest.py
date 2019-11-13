@@ -33,13 +33,20 @@ def debianbuilder(mockit, fake, metadata, patch_dict):
     return _builder
 
 
-@pytest.fixture
-def generic_debian_bonded_network(debianbuilder, patch_dict):
+@pytest.fixture(params=["bonded", "mlag_ha"])
+def generic_debian_bonded_network(debianbuilder, patch_dict, request):
     def _builder(distro, version, public=True, metadata=None):
         version = str(version)
         slug = "{distro}_{version}".format(distro=distro, version=version)
         metadata = patch_dict(
-            {"operating_system": {"slug": slug, "distro": distro, "version": version}},
+            {
+                "network": {"bonding": {"link_aggregation": request.param}},
+                "operating_system": {
+                    "slug": slug,
+                    "distro": distro,
+                    "version": version,
+                },
+            },
             metadata or {},
         )
         builder = debianbuilder(metadata, public=public)
