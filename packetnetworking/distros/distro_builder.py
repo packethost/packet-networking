@@ -46,13 +46,26 @@ class DistroBuilder(Tasks):
         to be applied.
         """
         self.build_tasks()
+        log.debug(
+            "Discovered {:d} {} tasks".format(
+                len(self.tasks or {}), self.__class__.__name__
+            )
+        )
+        found_tasks = False
         for NetworkBuilder in self.network_builders:
             builder = NetworkBuilder(self.metadata)
             if not hasattr(builder, "templates_base"):
                 builder.templates_base = self.templates_base
             self.builders.append(builder)
             builder.build()
-        return True
+            if builder.tasks:
+                log.debug(
+                    "Discovered {:d} tasks from {}".format(
+                        len(builder.tasks), NetworkBuilder.__name__
+                    )
+                )
+                found_tasks = True
+        return self.tasks or found_tasks
 
     def build_tasks(self):
         pass
@@ -70,6 +83,14 @@ class DistroBuilder(Tasks):
             "resolvers": self.network.resolvers,
             "private_subnets": self.network.private_subnets,
         }
+
+    @property
+    def has_network_tasks(self):
+        if self.builders:
+            for builder in self.builders:
+                if builder.tasks:
+                    return True
+        return False
 
     @property
     def all_tasks(self):
@@ -92,6 +113,9 @@ class DistroBuilder(Tasks):
         """
         if self.tasks is None:
             self.build()
+        if not self.has_network_tasks:
+            log.error("No network builder tasks discovered")
+            return {}
         rendered_tasks = {}
         if not self.all_tasks:
             return {}
@@ -177,7 +201,12 @@ def get_distro_builder(distro):
     catch_all = None
     for builder in DistroBuilder.__subclasses__():
         if isinstance(builder.distros, list) and distro.lower() in builder.distros:
+            log.debug("Using builder: {}".format(builder.__name__))
             return builder
         elif builder.distros == "*":
             catch_all = builder
+    if catch_all:
+        log.debug("Using catch-all builder: {}".format(catch_all.__name__))
+    else:
+        log.debug("No builder found for '{}' distro".format(distro))
     return catch_all

@@ -33,13 +33,20 @@ def redhatbuilder(mockit, fake, metadata, patch_dict):
     return _builder
 
 
-@pytest.fixture
-def generic_redhat_bonded_network(redhatbuilder, patch_dict):
+@pytest.fixture(params=["bonded", "mlag_ha"])
+def generic_redhat_bonded_network(redhatbuilder, patch_dict, request):
     def _builder(distro, version, public=True, metadata=None):
         version = str(version)
         slug = "{distro}_{version}".format(distro=distro, version=version)
         metadata = patch_dict(
-            {"operating_system": {"slug": slug, "distro": distro, "version": version}},
+            {
+                "network": {"bonding": {"link_aggregation": request.param}},
+                "operating_system": {
+                    "slug": slug,
+                    "distro": distro,
+                    "version": version,
+                },
+            },
             metadata or {},
         )
         builder = redhatbuilder(metadata, public=public)
