@@ -6,7 +6,9 @@ import pytest
 @pytest.fixture
 def rhel_7_individual_network(generic_redhat_individual_network):
     def _builder(**kwargs):
-        return generic_redhat_individual_network("redhatenterpriseserver", "7", **kwargs)
+        return generic_redhat_individual_network(
+            "redhatenterpriseserver", "7", **kwargs
+        )
 
     return _builder
 
