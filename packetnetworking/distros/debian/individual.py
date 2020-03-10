@@ -15,6 +15,6 @@ class DebianIndividualNetwork(NetworkBuilder):
             "etc/network/interfaces", "individual/etc_network_interfaces.j2"
         )
 
-        if self.metadata.operating_system.version in ["14.04", "19.04"]:
+        if self.metadata.operating_system.version in ["14.04", "19.04", "19.10"]:
             self.tasks.update(generate_persistent_names())
         return self.tasks
