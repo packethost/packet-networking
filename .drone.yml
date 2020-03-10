@@ -4,10 +4,11 @@ matrix:
     - 3.5
     - 3.6
     - 3.7
+    - 3.8
 
 pipeline:
   fmt_and_lint:
-    image: python:3.6-alpine
+    image: python:3.8-alpine
     commands:
       - pip install black==19.3b0 pylama
       - black --check --diff .
