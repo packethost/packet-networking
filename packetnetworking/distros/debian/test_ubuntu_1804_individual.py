@@ -5,7 +5,7 @@ import pytest
 @pytest.fixture
 def ubuntu_1804_individual_network(generic_debian_individual_network):
     def _builder(**kwargs):
-        return generic_debian_individual_network("ubuntu", 18.04, **kwargs)
+        return generic_debian_individual_network("ubuntu", "18.04", **kwargs)
 
     return _builder
 

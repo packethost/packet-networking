@@ -5,7 +5,7 @@ import pytest
 @pytest.fixture
 def ubuntu_1404_bonded_network(generic_debian_bonded_network):
     def _builder(**kwargs):
-        return generic_debian_bonded_network("ubuntu", 14.04, **kwargs)
+        return generic_debian_bonded_network("ubuntu", "14.04", **kwargs)
 
     return _builder
 

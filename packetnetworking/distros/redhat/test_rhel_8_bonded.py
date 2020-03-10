@@ -6,7 +6,7 @@ import pytest
 @pytest.fixture
 def rhel_8_bonded_network(generic_redhat_bonded_network):
     def _builder(**kwargs):
-        return generic_redhat_bonded_network("redhatenterprise", 8, **kwargs)
+        return generic_redhat_bonded_network("redhatenterprise", "8", **kwargs)
 
     return _builder
 
