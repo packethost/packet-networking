@@ -5,7 +5,7 @@ import pytest
 @pytest.fixture
 def debian_7_individual_network(generic_debian_individual_network):
     def _builder(**kwargs):
-        return generic_debian_individual_network("debian", 7, **kwargs)
+        return generic_debian_individual_network("debian", "7", **kwargs)
 
     return _builder
 

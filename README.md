@@ -1,5 +1,7 @@
 # Packet Networking
 
+[![Build Status](https://drone.packet.net/api/badges/packethost/packet-networking/status.svg)](https://drone.packet.net/packethost/packet-networking)
+
 This is a tool to replace the `network.py` file in [OSIE](https://github.com/packethost/osie) by breaking out the
 network configurations into sub packages.
 
@@ -43,7 +45,7 @@ Additionally, if `--metadata-file` is specified, it will override the
 ```
 # packet-networking --metadata-file /tmp/metadata.json -o 'centos 7' --rootfs /tmp/rootfs -vvv
 DEBUG:packetnetworking:Metadata file '/tmp/metadata.json' specified, preferring over metadata url.
-name=ens33 driver=e1000     
+name=ens33 driver=e1000
 name=veth1cb3c99 driver=veth
 name=vethe927707 driver=veth
 name=virbr0-nic driver=tun
@@ -52,7 +54,7 @@ name=vethab8fe13 driver=veth
 name=br-9ffe68216dc5 driver=bridge
 name=veth2dd8fc1 driver=veth
 name=docker0 driver=bridge
-name=ens33 driver=e1000     
+name=ens33 driver=e1000
 name=veth1cb3c99 driver=veth
 name=vethe927707 driver=veth
 name=virbr0-nic driver=tun
@@ -228,7 +230,7 @@ py.test packetnetworking
 ===================================== test session starts ======================================
 platform linux -- Python 3.5.2, pytest-5.0.1, py-1.8.0, pluggy-0.12.0
 rootdir: /home/packet/packet-networking
-collected 3 items                                                                              
+collected 3 items
 
 packetnetworking/distros/redhat/test_bonded.py ...                                       [100%]
 

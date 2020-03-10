@@ -3,19 +3,19 @@ import pytest
 
 
 @pytest.fixture
-def debian_9_individual_network(generic_debian_individual_network):
+def ubuntu_1910_individual_network(generic_debian_individual_network):
     def _builder(**kwargs):
-        return generic_debian_individual_network("debian", "9", **kwargs)
+        return generic_debian_individual_network("ubuntu", "19.10", **kwargs)
 
     return _builder
 
 
-def test_debian_9_public_individual_task_etc_network_interfaces(
-    debian_9_individual_network
+def test_ubuntu_1910_public_individual_task_etc_network_interfaces(
+    ubuntu_1910_individual_network
 ):
     """Validates /etc/network/interfaces for a public bond"""
 
-    builder = debian_9_individual_network(public=True)
+    builder = ubuntu_1910_individual_network(public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -51,14 +51,14 @@ def test_debian_9_public_individual_task_etc_network_interfaces(
     assert tasks["etc/network/interfaces"] == result
 
 
-def test_debian_9_private_individual_task_etc_network_interfaces(
-    debian_9_individual_network
+def test_ubuntu_1910_private_individual_task_etc_network_interfaces(
+    ubuntu_1910_individual_network
 ):
     """
     When no public ip is assigned, we should see the private ip details in the
     /etc/network/interfaces file.
     """
-    builder = debian_9_individual_network(public=False)
+    builder = ubuntu_1910_individual_network(public=False)
     tasks = builder.render()
     result = dedent(
         """\
@@ -83,12 +83,12 @@ def test_debian_9_private_individual_task_etc_network_interfaces(
 
 
 # pylama:ignore=E501
-def test_debian_9_public_individual_task_etc_network_interfaces_with_custom_private_ip_space(
-    debian_9_individual_network
+def test_ubuntu_1910_public_individual_task_etc_network_interfaces_with_custom_private_ip_space(
+    ubuntu_1910_individual_network
 ):
     """Validates /etc/network/interfaces for a public bond"""
     subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
-    builder = debian_9_individual_network(public=True, metadata=subnets)
+    builder = ubuntu_1910_individual_network(public=True, metadata=subnets)
     tasks = builder.render()
     result = dedent(
         """\
@@ -126,15 +126,15 @@ def test_debian_9_public_individual_task_etc_network_interfaces_with_custom_priv
     assert tasks["etc/network/interfaces"] == result
 
 
-def test_debian_9_private_individual_task_etc_network_interfaces_with_custom_private_ip_space(
-    debian_9_individual_network
+def test_ubuntu_1910_private_individual_task_etc_network_interfaces_with_custom_private_ip_space(
+    ubuntu_1910_individual_network
 ):
     """
     When no public ip is assigned, we should see the private ip details in the
     /etc/network/interfaces file.
     """
     subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
-    builder = debian_9_individual_network(public=False, metadata=subnets)
+    builder = ubuntu_1910_individual_network(public=False, metadata=subnets)
     tasks = builder.render()
     result = dedent(
         """\
@@ -158,11 +158,11 @@ def test_debian_9_private_individual_task_etc_network_interfaces_with_custom_pri
     assert tasks["etc/network/interfaces"] == result
 
 
-def test_debian_9_etc_resolvers_configured(debian_9_individual_network, fake):
+def test_ubuntu_1910_etc_resolvers_configured(ubuntu_1910_individual_network, fake):
     """
     Validates /etc/resolv.conf is configured correctly
     """
-    builder = debian_9_individual_network()
+    builder = ubuntu_1910_individual_network()
     resolver1 = fake.ipv4()
     resolver2 = fake.ipv4()
     builder.network.resolvers = (resolver1, resolver2)
@@ -176,11 +176,11 @@ def test_debian_9_etc_resolvers_configured(debian_9_individual_network, fake):
     assert tasks["etc/resolv.conf"] == result
 
 
-def test_debian_9_etc_hostname_configured(debian_9_individual_network):
+def test_ubuntu_1910_etc_hostname_configured(ubuntu_1910_individual_network):
     """
     Validates /etc/hostname is configured correctly
     """
-    builder = debian_9_individual_network()
+    builder = ubuntu_1910_individual_network()
     tasks = builder.render()
     result = dedent(
         """\
@@ -190,11 +190,11 @@ def test_debian_9_etc_hostname_configured(debian_9_individual_network):
     assert tasks["etc/hostname"] == result
 
 
-def test_debian_9_etc_hosts_configured(debian_9_individual_network):
+def test_ubuntu_1910_etc_hosts_configured(ubuntu_1910_individual_network):
     """
     Validates /etc/hosts is configured correctly
     """
-    builder = debian_9_individual_network()
+    builder = ubuntu_1910_individual_network()
     tasks = builder.render()
     result = dedent(
         """\
@@ -209,11 +209,26 @@ def test_debian_9_etc_hosts_configured(debian_9_individual_network):
     assert tasks["etc/hosts"] == result
 
 
-def test_debian_9_no_persistent_interface_names(debian_9_individual_network):
+# pylama:ignore=E501
+def test_ubuntu_1910_persistent_interface_names(ubuntu_1910_individual_network):
     """
     When using certain operating systems, we want to bypass driver interface name,
     here we make sure the /etc/udev/rules.d/70-persistent-net.rules is generated.
     """
-    builder = debian_9_individual_network()
+    builder = ubuntu_1910_individual_network()
     tasks = builder.render()
-    assert "etc/udev/rules.d/70-persistent-net.rules" not in tasks
+    result = dedent(
+        """\
+        # This file was automatically generated by the packet.net installation environment.
+        #
+        # You can modify it, as long as you keep each rule on a single
+        # line, and change only the value of the NAME= key.
+
+        # PCI device (custom name provided by external tool to mimic Predictable Network Interface Names)
+        SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{{address}}=="{iface0.mac}", ATTR{{dev_id}}=="0x0", ATTR{{type}}=="1", KERNEL=="e*", NAME="{iface0.name}"
+
+        # PCI device (custom name provided by external tool to mimic Predictable Network Interface Names)
+        SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{{address}}=="{iface1.mac}", ATTR{{dev_id}}=="0x0", ATTR{{type}}=="1", KERNEL=="e*", NAME="{iface1.name}"
+    """
+    ).format(iface0=builder.network.interfaces[0], iface1=builder.network.interfaces[1])
+    assert tasks["etc/udev/rules.d/70-persistent-net.rules"] == result

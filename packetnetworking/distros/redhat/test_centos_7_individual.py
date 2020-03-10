@@ -6,7 +6,7 @@ import pytest
 @pytest.fixture
 def centos_7_individual_network(generic_redhat_individual_network):
     def _builder(**kwargs):
-        return generic_redhat_individual_network("centos", 7, **kwargs)
+        return generic_redhat_individual_network("centos", "7", **kwargs)
 
     return _builder
 

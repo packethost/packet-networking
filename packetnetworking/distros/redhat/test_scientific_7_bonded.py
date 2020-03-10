@@ -6,7 +6,7 @@ import pytest
 @pytest.fixture
 def scientific_7_bonded_network(generic_redhat_bonded_network):
     def _builder(**kwargs):
-        return generic_redhat_bonded_network("scientificcernslc", 7, **kwargs)
+        return generic_redhat_bonded_network("scientificcernslc", "7", **kwargs)
 
     return _builder
 
@@ -349,10 +349,10 @@ def test_scientific_7_persistent_interface_names(scientific_7_bonded_network):
         # line, and change only the value of the NAME= key.
 
         # PCI device (custom name provided by external tool to mimic Predictable Network Interface Names)
-        SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{{address}}=="{iface0.mac}", ATTR{{dev_id}}=="0x0", ATTR{{type}}=="1", KERNEL=="eth*", NAME="{iface0.name}"
+        SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{{address}}=="{iface0.mac}", ATTR{{dev_id}}=="0x0", ATTR{{type}}=="1", KERNEL=="e*", NAME="{iface0.name}"
 
         # PCI device (custom name provided by external tool to mimic Predictable Network Interface Names)
-        SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{{address}}=="{iface1.mac}", ATTR{{dev_id}}=="0x0", ATTR{{type}}=="1", KERNEL=="eth*", NAME="{iface1.name}"
+        SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{{address}}=="{iface1.mac}", ATTR{{dev_id}}=="0x0", ATTR{{type}}=="1", KERNEL=="e*", NAME="{iface1.name}"
     """
     ).format(iface0=builder.network.interfaces[0], iface1=builder.network.interfaces[1])
     assert tasks["etc/udev/rules.d/70-persistent-net.rules"] == result

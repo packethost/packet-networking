@@ -3,17 +3,19 @@ import pytest
 
 
 @pytest.fixture
-def debian_8_bonded_network(generic_debian_bonded_network):
+def ubuntu_1910_bonded_network(generic_debian_bonded_network):
     def _builder(**kwargs):
-        return generic_debian_bonded_network("debian", "8", **kwargs)
+        return generic_debian_bonded_network("ubuntu", "19.10", **kwargs)
 
     return _builder
 
 
-def test_debian_8_public_bonded_task_etc_network_interfaces(debian_8_bonded_network):
+def test_ubuntu_1910_public_bonded_task_etc_network_interfaces(
+    ubuntu_1910_bonded_network
+):
     """Validates /etc/network/interfaces for a public bond"""
 
-    builder = debian_8_bonded_network(public=True)
+    builder = ubuntu_1910_bonded_network(public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -30,6 +32,7 @@ def test_debian_8_public_bonded_task_etc_network_interfaces(debian_8_bonded_netw
             bond-mode {bonding_mode}
             bond-updelay 200
             bond-xmit_hash_policy layer3+4
+            bond-lacp-rate 1
             bond-slaves {iface0.name} {iface1.name}
             dns-nameservers {dns1} {dns2}
         iface bond0 inet6 static
@@ -43,6 +46,15 @@ def test_debian_8_public_bonded_task_etc_network_interfaces(debian_8_bonded_netw
             netmask {ipv4priv.netmask}
             post-up route add -net 10.0.0.0/8 gw {ipv4priv.gateway}
             post-down route del -net 10.0.0.0/8 gw {ipv4priv.gateway}
+
+        auto {iface0.name}
+        iface {iface0.name} inet manual
+            bond-master bond0
+
+        auto {iface1.name}
+        iface {iface1.name} inet manual
+            pre-up sleep 4
+            bond-master bond0
     """
     ).format(
         ipv4pub=builder.ipv4pub.first,
@@ -57,12 +69,14 @@ def test_debian_8_public_bonded_task_etc_network_interfaces(debian_8_bonded_netw
     assert tasks["etc/network/interfaces"] == result
 
 
-def test_debian_8_private_bonded_task_etc_network_interfaces(debian_8_bonded_network):
+def test_ubuntu_1910_private_bonded_task_etc_network_interfaces(
+    ubuntu_1910_bonded_network
+):
     """
     When no public ip is assigned, we should see the private ip details in the
     /etc/network/interfaces file.
     """
-    builder = debian_8_bonded_network(public=False)
+    builder = ubuntu_1910_bonded_network(public=False)
     tasks = builder.render()
     result = dedent(
         """\
@@ -79,9 +93,19 @@ def test_debian_8_private_bonded_task_etc_network_interfaces(debian_8_bonded_net
             bond-mode {bonding_mode}
             bond-updelay 200
             bond-xmit_hash_policy layer3+4
+            bond-lacp-rate 1
             bond-slaves {iface0.name} {iface1.name}
             dns-nameservers {dns1} {dns2}
 
+
+        auto {iface0.name}
+        iface {iface0.name} inet manual
+            bond-master bond0
+
+        auto {iface1.name}
+        iface {iface1.name} inet manual
+            pre-up sleep 4
+            bond-master bond0
     """
     ).format(
         ipv4priv=builder.ipv4priv.first,
@@ -95,12 +119,12 @@ def test_debian_8_private_bonded_task_etc_network_interfaces(debian_8_bonded_net
 
 
 # pylama:ignore=E501
-def test_debian_8_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
-    debian_8_bonded_network
+def test_ubuntu_1910_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
+    ubuntu_1910_bonded_network
 ):
     """Validates /etc/network/interfaces for a public bond"""
     subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
-    builder = debian_8_bonded_network(public=True, metadata=subnets)
+    builder = ubuntu_1910_bonded_network(public=True, metadata=subnets)
     tasks = builder.render()
     result = dedent(
         """\
@@ -117,6 +141,7 @@ def test_debian_8_public_bonded_task_etc_network_interfaces_with_custom_private_
             bond-mode {bonding_mode}
             bond-updelay 200
             bond-xmit_hash_policy layer3+4
+            bond-lacp-rate 1
             bond-slaves {iface0.name} {iface1.name}
             dns-nameservers {dns1} {dns2}
         iface bond0 inet6 static
@@ -132,6 +157,15 @@ def test_debian_8_public_bonded_task_etc_network_interfaces_with_custom_private_
             post-down route del -net 192.168.5.0/24 gw {ipv4priv.gateway}
             post-up route add -net 172.16.0.0/12 gw {ipv4priv.gateway}
             post-down route del -net 172.16.0.0/12 gw {ipv4priv.gateway}
+
+        auto {iface0.name}
+        iface {iface0.name} inet manual
+            bond-master bond0
+
+        auto {iface1.name}
+        iface {iface1.name} inet manual
+            pre-up sleep 4
+            bond-master bond0
     """
     ).format(
         ipv4pub=builder.ipv4pub.first,
@@ -146,15 +180,15 @@ def test_debian_8_public_bonded_task_etc_network_interfaces_with_custom_private_
     assert tasks["etc/network/interfaces"] == result
 
 
-def test_debian_8_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
-    debian_8_bonded_network
+def test_ubuntu_1910_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
+    ubuntu_1910_bonded_network
 ):
     """
     When no public ip is assigned, we should see the private ip details in the
     /etc/network/interfaces file.
     """
     subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
-    builder = debian_8_bonded_network(public=False, metadata=subnets)
+    builder = ubuntu_1910_bonded_network(public=False, metadata=subnets)
     tasks = builder.render()
     result = dedent(
         """\
@@ -171,9 +205,19 @@ def test_debian_8_private_bonded_task_etc_network_interfaces_with_custom_private
             bond-mode {bonding_mode}
             bond-updelay 200
             bond-xmit_hash_policy layer3+4
+            bond-lacp-rate 1
             bond-slaves {iface0.name} {iface1.name}
             dns-nameservers {dns1} {dns2}
 
+
+        auto {iface0.name}
+        iface {iface0.name} inet manual
+            bond-master bond0
+
+        auto {iface1.name}
+        iface {iface1.name} inet manual
+            pre-up sleep 4
+            bond-master bond0
     """
     ).format(
         ipv4priv=builder.ipv4priv.first,
@@ -186,9 +230,9 @@ def test_debian_8_private_bonded_task_etc_network_interfaces_with_custom_private
     assert tasks["etc/network/interfaces"] == result
 
 
-def test_debian_8_task_etc_modules(debian_8_bonded_network):
+def test_ubuntu_1910_task_etc_modules(ubuntu_1910_bonded_network):
     """Validates /etc/modules for a public bond"""
-    builder = debian_8_bonded_network(public=True)
+    builder = ubuntu_1910_bonded_network(public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -199,11 +243,11 @@ def test_debian_8_task_etc_modules(debian_8_bonded_network):
     assert tasks["etc/modules"]["content"] == result
 
 
-def test_debian_8_etc_resolvers_configured(debian_8_bonded_network, fake):
+def test_ubuntu_1910_etc_resolvers_configured(ubuntu_1910_bonded_network, fake):
     """
     Validates /etc/resolv.conf is configured correctly
     """
-    builder = debian_8_bonded_network()
+    builder = ubuntu_1910_bonded_network()
     resolver1 = fake.ipv4()
     resolver2 = fake.ipv4()
     builder.network.resolvers = (resolver1, resolver2)
@@ -217,11 +261,11 @@ def test_debian_8_etc_resolvers_configured(debian_8_bonded_network, fake):
     assert tasks["etc/resolv.conf"] == result
 
 
-def test_debian_8_etc_hostname_configured(debian_8_bonded_network):
+def test_ubuntu_1910_etc_hostname_configured(ubuntu_1910_bonded_network):
     """
     Validates /etc/hostname is configured correctly
     """
-    builder = debian_8_bonded_network()
+    builder = ubuntu_1910_bonded_network()
     tasks = builder.render()
     result = dedent(
         """\
@@ -231,11 +275,11 @@ def test_debian_8_etc_hostname_configured(debian_8_bonded_network):
     assert tasks["etc/hostname"] == result
 
 
-def test_debian_8_etc_hosts_configured(debian_8_bonded_network):
+def test_ubuntu_1910_etc_hosts_configured(ubuntu_1910_bonded_network):
     """
     Validates /etc/hosts is configured correctly
     """
-    builder = debian_8_bonded_network()
+    builder = ubuntu_1910_bonded_network()
     tasks = builder.render()
     result = dedent(
         """\
@@ -250,11 +294,26 @@ def test_debian_8_etc_hosts_configured(debian_8_bonded_network):
     assert tasks["etc/hosts"] == result
 
 
-def test_debian_8_no_persistent_interface_names(debian_8_bonded_network):
+# pylama:ignore=E501
+def test_ubuntu_1910_persistent_interface_names(ubuntu_1910_bonded_network):
     """
     When using certain operating systems, we want to bypass driver interface name,
     here we make sure the /etc/udev/rules.d/70-persistent-net.rules is generated.
     """
-    builder = debian_8_bonded_network()
+    builder = ubuntu_1910_bonded_network()
     tasks = builder.render()
-    assert "etc/udev/rules.d/70-persistent-net.rules" not in tasks
+    result = dedent(
+        """\
+        # This file was automatically generated by the packet.net installation environment.
+        #
+        # You can modify it, as long as you keep each rule on a single
+        # line, and change only the value of the NAME= key.
+
+        # PCI device (custom name provided by external tool to mimic Predictable Network Interface Names)
+        SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{{address}}=="{iface0.mac}", ATTR{{dev_id}}=="0x0", ATTR{{type}}=="1", KERNEL=="e*", NAME="{iface0.name}"
+
+        # PCI device (custom name provided by external tool to mimic Predictable Network Interface Names)
+        SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{{address}}=="{iface1.mac}", ATTR{{dev_id}}=="0x0", ATTR{{type}}=="1", KERNEL=="e*", NAME="{iface1.name}"
+    """
+    ).format(iface0=builder.network.interfaces[0], iface1=builder.network.interfaces[1])
+    assert tasks["etc/udev/rules.d/70-persistent-net.rules"] == result

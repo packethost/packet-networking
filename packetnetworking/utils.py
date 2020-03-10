@@ -174,7 +174,7 @@ def generate_persistent_names():
     {% for iface in interfaces %}
 
     # PCI device (custom name provided by external tool to mimic Predictable Network Interface Names)
-    SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="{{iface.mac}}", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="{{iface.name}}"
+    SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="{{iface.mac}}", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="e*", NAME="{{iface.name}}"
     {% endfor %}
     """  # noqa
     return {"etc/udev/rules.d/70-persistent-net.rules": persistent_udev}
