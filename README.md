@@ -1,5 +1,7 @@
 # Packet Networking
 
+[![Build Status](https://drone.packet.net/api/badges/packethost/packet-networking/status.svg)](https://drone.packet.net/packethost/packet-networking)
+
 This is a tool to replace the `network.py` file in [OSIE](https://github.com/packethost/osie) by breaking out the
 network configurations into sub packages.
 
