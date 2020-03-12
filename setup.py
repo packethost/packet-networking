@@ -32,7 +32,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         "click >=6.0,<7.0",
-        "jinja2 >=2.9,<2.10",
+        "jinja2 >=2.10.1,<2.11",
         "requests >=2.21.0,<2.23",
     ],
     package_data={"packetnetworking": find_templates()},
