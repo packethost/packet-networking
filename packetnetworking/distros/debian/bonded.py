@@ -14,6 +14,10 @@ class DebianBondedNetwork(NetworkBuilder):
         self.task_template("etc/network/interfaces", "bonded/etc_network_interfaces.j2")
         self.task_template("etc/modules", "bonded/etc_modules.j2", write_mode="a")
 
-        if self.metadata.operating_system.version in ["14.04", "19.04", "19.10"]:
+        os = self.metadata.operating_system
+
+        if os.distro == "debian" and os.version == "10":
+            self.tasks.update(generate_persistent_names())
+        elif os.distro == "ubuntu" and os.version in ["14.04", "19.04", "19.10"]:
             self.tasks.update(generate_persistent_names())
         return self.tasks
