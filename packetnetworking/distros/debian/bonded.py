@@ -18,6 +18,11 @@ class DebianBondedNetwork(NetworkBuilder):
 
         if os.distro == "debian" and os.version == "10":
             self.tasks.update(generate_persistent_names())
-        elif os.distro == "ubuntu" and os.version in ["14.04", "19.04", "19.10"]:
+        elif os.distro == "ubuntu" and os.version in [
+            "14.04",
+            "19.04",
+            "19.10",
+            "20.04",
+        ]:
             self.tasks.update(generate_persistent_names())
         return self.tasks
