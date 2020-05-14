@@ -186,7 +186,7 @@ def resolvers(default):
         with open("/etc/resolv.conf") as f:
             reg = re.compile(r"nameserver ([0-9]+(\.[0-9]+){3})$")
             resolvers = tuple(
-                [m.group(1) for m in [reg.match(l) for l in f.readlines()] if m]
+                [m.group(1) for m in [reg.match(line) for line in f.readlines()] if m]
             )
     except Exception:
         pass
