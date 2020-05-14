@@ -23,6 +23,7 @@ class DebianBondedNetwork(NetworkBuilder):
             "19.04",
             "19.10",
             "20.04",
+            "20.10",
         ]:
             self.tasks.update(generate_persistent_names())
         return self.tasks
