@@ -6,6 +6,7 @@ import packetnetworking
 
 log = logging.getLogger("packetnetworking")
 
+
 # pylama:ignore=C901
 @click.command()
 @click.option(
