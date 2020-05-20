@@ -1,4 +1,5 @@
 import sys
+import time
 import json
 import click
 import logging
@@ -35,10 +36,18 @@ log = logging.getLogger("packetnetworking")
         + "(otherwise uses ones from /etc/resolv.conf)"
     ),
 )
+@click.option("-n", "--max-attempts", default=10, help="retry up to N times on failure")
 @click.option("-v", "--verbose", count=True, help="Provide more detailed output")
 @click.option("-q", "--quiet", is_flag=True, help="Silences all output")
 def cli(
-    metadata_file, metadata_url, operating_system, rootfs, resolvers, verbose, quiet
+    metadata_file,
+    metadata_url,
+    operating_system,
+    rootfs,
+    resolvers,
+    max_attempts,
+    verbose,
+    quiet,
 ):
     level = logging.WARNING
     if verbose:
@@ -68,6 +77,35 @@ def cli(
             )
         )
 
+    attempt = 1
+    while True:
+        try:
+            try_run(
+                metadata_file,
+                metadata_url,
+                operating_system,
+                rootfs,
+                resolvers,
+                verbose,
+                quiet,
+            )
+            break
+        except Exception as exc:
+            if attempt == max_attempts:
+                raise
+            attempt += 1
+            delay = 2 ** min(attempt, 7)
+            log.error(
+                "Caught unexpected exception ('{}'), retrying in {} seconds...".format(
+                    exc, delay
+                )
+            )
+            time.sleep(delay)
+
+
+def try_run(
+    metadata_file, metadata_url, operating_system, rootfs, resolvers, verbose, quiet
+):
     builder = packetnetworking.Builder()
     if metadata_file:
         builder.set_metadata(json.load(metadata_file))
