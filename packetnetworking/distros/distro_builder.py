@@ -1,9 +1,11 @@
 import os
 import sys
 import logging
+import json
 from textwrap import dedent
 
 from jinja2 import Template, StrictUndefined
+from jinja2.exceptions import UndefinedError
 
 from ..utils import Tasks, package_dir
 
@@ -107,6 +109,7 @@ class DistroBuilder(Tasks):
                     tasks.update(builder.tasks)
         return tasks
 
+    # pylama:ignore=C901
     def render(self):
         """
         Render compiles each task template into the final content.
@@ -139,21 +142,35 @@ class DistroBuilder(Tasks):
                 if fmt:
                     template = template.format(**fmt)
 
-            template = Template(
-                dedent(template),
+            template = dedent(template)
+            tmpl = Template(
+                template,
                 keep_trailing_newline=True,
                 lstrip_blocks=True,
                 trim_blocks=True,
                 undefined=StrictUndefined,
             )
-            if file_mode or mode:
-                rendered_tasks[path] = {
-                    "file_mode": file_mode,
-                    "mode": mode,
-                    "content": template.render(self.context()),
-                }
-            else:
-                rendered_tasks[path] = template.render(self.context())
+            try:
+                if file_mode or mode:
+                    rendered_tasks[path] = {
+                        "file_mode": file_mode,
+                        "mode": mode,
+                        "content": tmpl.render(self.context()),
+                    }
+                else:
+                    rendered_tasks[path] = tmpl.render(self.context())
+            except UndefinedError:
+                # having to use print as log.* isn't printing out the json
+                print(
+                    "==== METADATA ====\n"
+                    + json.dumps(self.metadata.as_dict(), indent=2),
+                    file=sys.stderr,
+                )
+                log.error(
+                    "An exception occured while processing task "
+                    + "'{}' with template:\n{}".format(path, template)
+                )
+                raise
         return rendered_tasks
 
     def run(self, rootfs_path):
