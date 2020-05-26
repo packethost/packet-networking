@@ -96,7 +96,8 @@ def cli(
             )
             break
         except Exception as exc:
-            # If a metadata file has been passed, retrying won't result in a different outcome.
+            # If a metadata file has been passed, retrying won't result in a
+            # different outcome.
             if metadata_file:
                 raise
             if attempt == max_attempts:

@@ -109,6 +109,7 @@ class DistroBuilder(Tasks):
                     tasks.update(builder.tasks)
         return tasks
 
+    # pylama:ignore=C901
     def render(self):
         """
         Render compiles each task template into the final content.
@@ -166,9 +167,8 @@ class DistroBuilder(Tasks):
                     file=sys.stderr,
                 )
                 log.error(
-                    "An exception occured while processing task '{}' with template:\n{}".format(
-                        path, template
-                    )
+                    "An exception occured while processing task "
+                    + "'{}' with template:\n{}".format(path, template)
                 )
                 raise
         return rendered_tasks
