@@ -36,7 +36,12 @@ log = logging.getLogger("packetnetworking")
         + "(otherwise uses ones from /etc/resolv.conf)"
     ),
 )
-@click.option("-n", "--max-attempts", default=10, help="retry up to N times on failure")
+@click.option(
+    "-n",
+    "--max-attempts",
+    default=10,
+    help="Retry up to N times on failure when downloading metadata from a url",
+)
 @click.option("-v", "--verbose", count=True, help="Provide more detailed output")
 @click.option("-q", "--quiet", is_flag=True, help="Silences all output")
 def cli(
@@ -91,6 +96,9 @@ def cli(
             )
             break
         except Exception as exc:
+            # If a metadata file has been passed, retrying won't result in a different outcome.
+            if metadata_file:
+                raise
             if attempt == max_attempts:
                 raise
             attempt += 1
