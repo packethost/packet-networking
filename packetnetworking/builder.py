@@ -66,6 +66,9 @@ class Builder(object):
         builder.build()
         return builder.run(rootfs_path)
 
+    def as_dict(self):
+        return {"metadata": self.metadata, "network": self.network.as_dict()}
+
 
 class NetworkData(object):
     def __init__(self, default_resolvers=None, default_private_subnets=None):
@@ -117,3 +120,13 @@ class NetworkData(object):
 
     def build_resolvers(self):
         self.resolvers = utils.resolvers(self.resolvers)
+
+    def as_dict(self):
+        return {
+            "bonding": self.bonding,
+            "interfaces": self.interfaces,
+            "bonds": self.bonds,
+            "addresses": self.addresses,
+            "resolvers": self.resolvers,
+            "private_subnets": self.private_subnets,
+        }
