@@ -275,7 +275,8 @@ def get_output(cmd):
 
 
 def get_lshw_info():
-    return json.loads(get_output(["lshw", "-json"]).decode())
+    # Workaround for x.large.arm: Skip framebuffer test ("-disable fb")
+    return json.loads(get_output(["lshw", "-json", "-disable", "fb"]).decode())
 
 
 def pam(arg, *funcs):
