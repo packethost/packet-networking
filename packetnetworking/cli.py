@@ -22,10 +22,12 @@ log = logging.getLogger("packetnetworking")
     default="http://metadata.packet.net/metadata",
     help="URL to download metadata from",
 )
-@click.option("-o", "--operating-system",
-              help="Operating System and version (ex: centos 7)")
-@click.option("-t", "--rootfs", type=click.Path(),
-              required=True, help="Path to root filesystem")
+@click.option(
+    "-o", "--operating-system", help="Operating System and version (ex: centos 7)"
+)
+@click.option(
+    "-t", "--rootfs", type=click.Path(), required=True, help="Path to root filesystem"
+)
 @click.option(
     "--resolvers",
     envvar="PACKET_RESOLVERS",
@@ -40,8 +42,7 @@ log = logging.getLogger("packetnetworking")
     default=10,
     help="Retry up to N times on failure when downloading metadata from a url",
 )
-@click.option("-v", "--verbose", count=True,
-              help="Provide more detailed output")
+@click.option("-v", "--verbose", count=True, help="Provide more detailed output")
 @click.option("-q", "--quiet", is_flag=True, help="Silences all output")
 def cli(
     metadata_file,
@@ -70,14 +71,16 @@ def cli(
     if not (metadata_file or metadata_url):
         if not quiet:
             print(
-                "--metadata-file or --metadata-url must be specified",
-                file=sys.stderr)
+                "--metadata-file or --metadata-url must be specified", file=sys.stderr
+            )
         click.exit(10)
 
     if metadata_file and metadata_url:
         log.debug(
             "Metadata file '{}' specified, preferring over metadata url.".format(
-                metadata_file.name))
+                metadata_file.name
+            )
+        )
 
     attempt = 1
     while True:
@@ -103,18 +106,15 @@ def cli(
             delay = 2 ** min(attempt, 7)
             log.error(
                 "Caught unexpected exception ('{}'), retrying in {} seconds...".format(
-                    exc, delay))
+                    exc, delay
+                )
+            )
             time.sleep(delay)
 
 
 def try_run(
-        metadata_file,
-        metadata_url,
-        operating_system,
-        rootfs,
-        resolvers,
-        verbose,
-        quiet):
+    metadata_file, metadata_url, operating_system, rootfs, resolvers, verbose, quiet
+):
     builder = packetnetworking.Builder()
     if metadata_file:
         builder.set_metadata(json.load(metadata_file))
@@ -133,7 +133,11 @@ def try_run(
             sys.exit(20)
         os_name, os_version = operating_system.split()
         os = builder.metadata.operating_system
-        if os.distro.lower() != os_name.lower() or os.version.lower() != os_version.lower():
+        if os.distro: os.distro = os.distro.lower()
+        if os.version: os.version = os.version.lower()
+        if os_distro: os_distro = os_distro.lower()
+        if os_version: os_version = os_version.lower()
+        if os.distro != os_name or os.version != os_version:
             os.orig_distro = os.distro
             os.orig_version = os.version
             os.distro = os_name.lower()
