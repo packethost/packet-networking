@@ -1,3 +1,7 @@
+clone:
+  git:
+    image: quay.io/packet/drone-git
+
 matrix:
   PYTHON_VERSION:
     - 3.5
