@@ -133,7 +133,7 @@ def try_run(
             sys.exit(20)
         os_name, os_version = operating_system.split()
         os = builder.metadata.operating_system
-       if os.distro.lower() != os_name.lower() or os.version.lower() != os_version.lower():
+        if os.distro.lower() != os_name.lower() or os.version.lower() != os_version.lower():
             os.orig_distro = os.distro
             os.orig_version = os.version
             os.distro = os_name.lower()
