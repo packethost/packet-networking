@@ -135,7 +135,7 @@ def try_run(
         os = builder.metadata.operating_system
         if os.distro:
             os.distro = os.distro.lower()
-	if os.version:
+        if os.version:
             os.version = os.version.lower()
         if os_distro: 
             os_distro = os_distro.lower()
