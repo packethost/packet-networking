@@ -137,8 +137,8 @@ def try_run(
             os.distro = os.distro.lower()
         if os.version:
             os.version = os.version.lower()
-        if os_distro:
-            os_distro = os_distro.lower()
+        if os_name:
+            os_name = os_name.lower()
         if os_version:
             os_version = os_version.lower()
         if os.distro != os_name or os.version != os_version:
