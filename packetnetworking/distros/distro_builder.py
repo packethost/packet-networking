@@ -7,7 +7,7 @@ from textwrap import dedent
 from jinja2 import Template, StrictUndefined
 from jinja2.exceptions import UndefinedError
 
-from ..utils import Tasks, package_dir
+from .. import utils
 
 log = logging.getLogger()
 
@@ -16,10 +16,10 @@ def get_templates_dir(instance):
     instance_dir = os.path.abspath(
         os.path.dirname(sys.modules[instance.__class__.__module__].__file__)
     )
-    return os.path.join(os.path.relpath(instance_dir, package_dir), "templates")
+    return os.path.join(os.path.relpath(instance_dir, utils.package_dir), "templates")
 
 
-class DistroBuilder(Tasks):
+class DistroBuilder(utils.Tasks):
     distros = None
     network_builders = []
 
