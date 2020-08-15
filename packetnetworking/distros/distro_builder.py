@@ -193,6 +193,9 @@ class DistroBuilder(utils.Tasks):
                     )
                 continue
 
+            # Resolve symlinks to write to the destination file
+            abspath = utils.resolve_path(rootfs_path, relpath)
+
             file_mode = "w"
             mode = None
             if isinstance(content, dict):

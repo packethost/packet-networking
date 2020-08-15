@@ -6,6 +6,7 @@ import sys
 
 import click
 
+MAX_RESOLVE_DEPTH = 10
 package_dir = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -163,6 +164,27 @@ def jfind(j, fn):
         return result[0]
     else:
         return result
+
+
+# resolve_path follows symlinks, making sure the path stays within the
+# rootfs path provided
+def resolve_path(rootfs, path, _depth=0):
+    if _depth > MAX_RESOLVE_DEPTH:
+        raise RecursionError("Symlink max depth reached")
+    if path.startswith(rootfs):
+        # pylama:ignore=E203
+        relpath = os.path.join("/", path[len(rootfs) :])
+        abspath = path
+    else:
+        relpath = os.path.join("/", path)
+        abspath = os.path.normpath(os.path.join(rootfs, "." + relpath))
+    if not os.path.islink(abspath):
+        return abspath
+    rellink = os.readlink(abspath)
+    reldir = os.path.relpath(os.path.dirname(abspath), rootfs)
+    sysdir = os.path.join("/", reldir)
+    syslink = os.path.normpath(os.path.join(sysdir, rellink))
+    return resolve_path(rootfs, syslink, _depth=_depth + 1)
 
 
 def generate_persistent_names():
