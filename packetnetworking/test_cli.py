@@ -332,13 +332,13 @@ def test_setup_builder(md_file, md_url, expected, mockit, metadata):
         pytest.param(
             True,
             "Distro version",
-            ("distro", "version", False, True),
+            ("distro", "version", False, False),
             id="Diff: Distro Case",
         ),
         pytest.param(
             True,
             "distro Version",
-            ("distro", "version", False, True),
+            ("distro", "version", False, False),
             id="Diff: Version Case",
         ),
     ],
