@@ -3,7 +3,7 @@ import time
 import json
 import click
 import logging
-import packetnetworking
+from packetnetworking import builder as sysbuilder
 
 log = logging.getLogger("packetnetworking")
 
@@ -115,12 +115,33 @@ def cli(
 def try_run(
     metadata_file, metadata_url, operating_system, rootfs, resolvers, verbose, quiet
 ):
-    builder = packetnetworking.Builder()
+    builder = setup_builder(metadata_file, metadata_url)
+
+    set_os(builder, operating_system, quiet)
+
+    builder.initialize()
+
+    set_resolvers(builder, resolvers)
+
+    tasks = builder.run(rootfs)
+    if not tasks:
+        if not quiet:
+            click.echo("No tasks processed", file=sys.stderr)
+        sys.exit(30)
+    if not quiet:
+        print("Configuration files written to root filesystem '{}'".format(rootfs))
+
+
+def setup_builder(metadata_file, metadata_url):
+    builder = sysbuilder.Builder()
     if metadata_file:
         builder.set_metadata(json.load(metadata_file))
     else:
         builder.load_metadata(metadata_url)
+    return builder
 
+
+def set_os(builder, operating_system, quiet):
     if operating_system:
         if len(operating_system.split()) != 2:
             if not quiet:
@@ -146,16 +167,9 @@ def try_run(
                 ).format(os=os)
             )
 
-    builder.initialize()
+
+def set_resolvers(builder, resolvers):
     if resolvers:
         resolvers = [x for x in resolvers.split(",") if x.strip()]
         if resolvers:
             builder.network.resolvers = resolvers
-
-    tasks = builder.run(rootfs)
-    if not tasks:
-        if not quiet:
-            click.echo("No tasks processed", file=sys.stderr)
-        sys.exit(30)
-    if not quiet:
-        print("Configuration files written to root filesystem '{}'".format(rootfs))
