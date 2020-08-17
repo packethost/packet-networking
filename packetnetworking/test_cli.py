@@ -335,7 +335,22 @@ def test_cli(test, mockit):
             mocked_try_run.assert_called_with(*test["called_with"])
 
 
-def test_cli_retries_on_exception(mockit):
+@pytest.mark.parametrize(
+    "opt,n,runs,sleep",
+    [
+        pytest.param(
+            "--max-attempts", 2, 2, 4, id="Max Attempts long option (--max-attempts)"
+        ),
+        pytest.param("-n", 2, 2, 4, id="Max Attempts short option (-n)"),
+        pytest.param("--max-attempts", -1, 1, None, id="Attempt -1: no sleep"),
+        pytest.param("--max-attempts", 0, 1, None, id="Attempt 0: no sleep"),
+        pytest.param("--max-attempts", 1, 1, None, id="Attempt 1: no sleep"),
+        pytest.param("--max-attempts", 2, 2, 4, id="Attempt 2: sleep 4 seconds"),
+        pytest.param("--max-attempts", 7, 7, 128, id="Attempt 7: sleep 128 seconds"),
+        pytest.param("--max-attempts", 8, 8, 128, id="Attempt 8: sleep 128 seconds"),
+    ],
+)
+def test_cli_retries_on_exception(opt, n, runs, sleep, mockit):
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("packet-networking-test")
@@ -344,15 +359,14 @@ def test_cli_retries_on_exception(mockit):
             mocked_try_run.side_effect = Exception("fail")
             with patch("packetnetworking.cli.log") as mocked_log:
                 with mockit(time.sleep) as mocked_time_sleep:
-                    result = runner.invoke(cli.cli, default_args + ["-n", "2"])
-    # max retries is set to 2
-    # try_run gets called twice
-    assert mocked_try_run.call_count == 2
-    # first retry logs a message and sleeps
-    # second retry fails and does not log a message or sleep
-    assert mocked_log.error.call_count == 1
-    assert mocked_time_sleep.call_count == 1
-    mocked_time_sleep.assert_called_with(4)
+                    result = runner.invoke(cli.cli, default_args + [opt, str(n)])
+    # try_run is executed for every attempt.
+    assert mocked_try_run.call_count == runs
+    # log and sleep are executed on every exception excluding the last
+    assert mocked_log.error.call_count == runs - 1
+    assert mocked_time_sleep.call_count == runs - 1
+    if sleep is not None:
+        mocked_time_sleep.assert_called_with(sleep)
 
     # Exception raised, therefore bad exit code
     assert result.exit_code != 0
