@@ -100,7 +100,7 @@ def cli(
             # different outcome.
             if metadata_file:
                 raise
-            if attempt == max_attempts:
+            if attempt == max(max_attempts, 1):
                 raise
             attempt += 1
             delay = 2 ** min(attempt, 7)
