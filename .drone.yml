@@ -1,3 +1,7 @@
+clone:
+  git:
+    image: quay.io/packet/drone-git
+
 matrix:
   PYTHON_VERSION:
     - 3.5
@@ -11,7 +15,7 @@ pipeline:
     commands:
       - pip install black==19.3b0 pylama
       - black --check --diff .
-      - pylama packetnetworking setup.py
+      - pylama --ignore=E203 packetnetworking setup.py
 
   test:
     image: python:${PYTHON_VERSION}
