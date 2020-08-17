@@ -55,6 +55,38 @@ def assert_output(test, result):
         ),
         pytest.param(
             {
+                "args": ["--rootfs", "packet-networking-test"],
+                "exit_code": 0,
+                "called_with": (
+                    None,  # metadata_file
+                    "http://metadata.packet.net/metadata",  # metadata_url
+                    None,  # operating_system
+                    "packet-networking-test",  # rootfs
+                    None,  # resolvers
+                    0,  # verbose
+                    False,  # quiet
+                ),
+            },
+            id="rootfs: --rootfs",
+        ),
+        pytest.param(
+            {
+                "args": ["-t", "packet-networking-test"],
+                "exit_code": 0,
+                "called_with": (
+                    None,  # metadata_file
+                    "http://metadata.packet.net/metadata",  # metadata_url
+                    None,  # operating_system
+                    "packet-networking-test",  # rootfs
+                    None,  # resolvers
+                    0,  # verbose
+                    False,  # quiet
+                ),
+            },
+            id="rootfs: -t",
+        ),
+        pytest.param(
+            {
                 "args": default_args,
                 "exit_code": 0,
                 "called_with": (
@@ -115,7 +147,23 @@ def assert_output(test, result):
                     False,  # quiet
                 ),
             },
-            id="--operating-system defined",
+            id="Operating System: --operating-system",
+        ),
+        pytest.param(
+            {
+                "args": default_args + ["-o", "test version"],
+                "exit_code": 0,
+                "called_with": (
+                    None,  # metadata_file
+                    "http://metadata.packet.net/metadata",  # metadata_url
+                    "test version",  # operating_system
+                    "packet-networking-test",  # rootfs
+                    None,  # resolvers
+                    0,  # verbose
+                    False,  # quiet
+                ),
+            },
+            id="Operating System: -o",
         ),
         pytest.param(
             {
@@ -147,7 +195,7 @@ def assert_output(test, result):
                     False,  # quiet
                 ),
             },
-            id="verbose level 1 (INFO)",
+            id="verbose level 1 (INFO): -v",
         ),
         pytest.param(
             {
@@ -163,7 +211,7 @@ def assert_output(test, result):
                     False,  # quiet
                 ),
             },
-            id="verbose level 2 (DEBUG)",
+            id="verbose level 2 (DEBUG): -v",
         ),
         pytest.param(
             {
@@ -179,7 +227,55 @@ def assert_output(test, result):
                     False,  # quiet
                 ),
             },
-            id="verbose level 3+ (DEBUG)",
+            id="verbose level 3+ (DEBUG): -v",
+        ),
+        pytest.param(
+            {
+                "args": default_args + ["--verbose"],
+                "exit_code": 0,
+                "called_with": (
+                    None,  # metadata_file
+                    "http://metadata.packet.net/metadata",  # metadata_url
+                    None,  # operating_system
+                    "packet-networking-test",  # rootfs
+                    None,  # resolvers
+                    1,  # verbose
+                    False,  # quiet
+                ),
+            },
+            id="verbose level 1 (INFO): --verbose",
+        ),
+        pytest.param(
+            {
+                "args": default_args + ["--verbose", "--verbose"],
+                "exit_code": 0,
+                "called_with": (
+                    None,  # metadata_file
+                    "http://metadata.packet.net/metadata",  # metadata_url
+                    None,  # operating_system
+                    "packet-networking-test",  # rootfs
+                    None,  # resolvers
+                    2,  # verbose
+                    False,  # quiet
+                ),
+            },
+            id="verbose level 2 (DEBUG): --verbose",
+        ),
+        pytest.param(
+            {
+                "args": default_args + ["--verbose", "--verbose", "--verbose"],
+                "exit_code": 0,
+                "called_with": (
+                    None,  # metadata_file
+                    "http://metadata.packet.net/metadata",  # metadata_url
+                    None,  # operating_system
+                    "packet-networking-test",  # rootfs
+                    None,  # resolvers
+                    3,  # verbose
+                    False,  # quiet
+                ),
+            },
+            id="verbose level 3+ (DEBUG): --verbose",
         ),
         pytest.param(
             {
@@ -195,7 +291,23 @@ def assert_output(test, result):
                     True,  # quiet
                 ),
             },
-            id="quiet",
+            id="quiet long option (--quiet)",
+        ),
+        pytest.param(
+            {
+                "args": default_args + ["-q"],
+                "exit_code": 0,
+                "called_with": (
+                    None,  # metadata_file
+                    "http://metadata.packet.net/metadata",  # metadata_url
+                    None,  # operating_system
+                    "packet-networking-test",  # rootfs
+                    None,  # resolvers
+                    0,  # verbose
+                    True,  # quiet
+                ),
+            },
+            id="quiet short option (-q)",
         ),
     ],
 )
