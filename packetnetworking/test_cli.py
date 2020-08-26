@@ -4,7 +4,6 @@ from unittest.mock import MagicMock, mock_open, patch
 
 import copy
 import json
-import os
 import pytest
 import time
 
@@ -313,14 +312,13 @@ def assert_output(test, result):
 )
 def test_cli(test, mockit):
     runner = CliRunner()
-    with runner.isolated_filesystem():
-        os.mkdir("packet-networking-test")
-        with open("metadata.json", "w") as f:
-            f.write("data")
+    # yapf: disable
+    with runner.isolated_filesystem(), \
+            patch("builtins.open", mock_open(read_data="data")) as mocked_open, \
+            mockit(cli.try_run) as mocked_try_run:
+        result = runner.invoke(cli.cli, test["args"])
+    # yapf: enable
 
-        with patch("builtins.open", mock_open(read_data="data")) as mocked_open:
-            with mockit(cli.try_run) as mocked_try_run:
-                result = runner.invoke(cli.cli, test["args"])
     assert_output(test, result)
     assert result.exit_code == test["exit_code"]
     if not test.get("called_with"):
@@ -352,14 +350,15 @@ def test_cli(test, mockit):
 )
 def test_cli_retries_on_exception(opt, n, runs, sleep, mockit):
     runner = CliRunner()
-    with runner.isolated_filesystem():
-        os.mkdir("packet-networking-test")
+    # yapf: disable
+    with runner.isolated_filesystem(), \
+            mockit(cli.try_run) as mocked_try_run, \
+            patch("packetnetworking.cli.log") as mocked_log, \
+            mockit(time.sleep) as mocked_time_sleep:
+        mocked_try_run.side_effect = Exception("fail")
+        result = runner.invoke(cli.cli, default_args + [opt, str(n)])
+    # yapf: enable
 
-        with mockit(cli.try_run) as mocked_try_run:
-            mocked_try_run.side_effect = Exception("fail")
-            with patch("packetnetworking.cli.log") as mocked_log:
-                with mockit(time.sleep) as mocked_time_sleep:
-                    result = runner.invoke(cli.cli, default_args + [opt, str(n)])
     # try_run is executed for every attempt.
     assert mocked_try_run.call_count == runs
     # log and sleep are executed on every exception excluding the last
@@ -373,44 +372,49 @@ def test_cli_retries_on_exception(opt, n, runs, sleep, mockit):
 
 
 def test_try_run_with_url(mockit, metadata):
-    with patch("requests.get") as mocked_requests_get:
+    # yapf: disable
+    with patch("requests.get") as mocked_requests_get, \
+            mockit(utils.get_interfaces, return_value=test_phys_interfaces), \
+            patch.object(builder.Builder, "run", return_value=True):
         mocked_requests_get.return_value.status_code = 200
         mocked_requests_get.return_value.json = MagicMock(
             return_value=metadata(test_metadata)
         )
-        with mockit(utils.get_interfaces, return_value=test_phys_interfaces):
-            with patch.object(builder.Builder, "run", return_value=True):
-                cli.try_run(
-                    None,
-                    "http://localhost/metadata",
-                    None,
-                    "/tmp/packet-networking-test",
-                    None,
-                    None,
-                    None,
-                )
+        cli.try_run(
+            None,
+            "http://localhost/metadata",
+            None,
+            "/tmp/packet-networking-test",
+            None,
+            None,
+            None,
+        )
+    # yapf: enable
+
     assert mocked_requests_get.call_count == 1
     mocked_requests_get.assert_called_with("http://localhost/metadata")
 
 
 def test_try_run_with_file(mockit, metadata):
     md = metadata(test_metadata)
-    with mockit(json.load) as mocked_json_load:
+    # pylama:ignore=E501
+    # yapf: disable
+    with mockit(json.load) as mocked_json_load, \
+            mockit(utils.get_interfaces, return_value=test_phys_interfaces), \
+            patch.object(builder.Builder, "load_metadata") as mocked_builder_load_metadata, \
+            patch.object(builder.Builder, "run", return_value=True):
         mocked_json_load.return_value = md
-        with mockit(utils.get_interfaces, return_value=test_phys_interfaces):
-            with patch.object(
-                builder.Builder, "load_metadata"
-            ) as mocked_builder_load_metadata:
-                with patch.object(builder.Builder, "run", return_value=True):
-                    cli.try_run(
-                        "i'm a file handler",
-                        "http://localhost/metadata",
-                        None,
-                        "/tmp/packet-networking-test",
-                        None,
-                        None,
-                        None,
-                    )
+        cli.try_run(
+            "i'm a file handler",
+            "http://localhost/metadata",
+            None,
+            "/tmp/packet-networking-test",
+            None,
+            None,
+            None,
+        )
+    # yapf: enable
+
     mocked_builder_load_metadata.assert_not_called()
     assert mocked_json_load.call_count == 1
     mocked_json_load.assert_called_with("i'm a file handler")
@@ -425,10 +429,12 @@ def test_try_run_with_file(mockit, metadata):
     ],
 )
 def test_setup_builder(md_file, md_url, expected, mockit, metadata):
-    with mockit(json.load) as mocked_json_load:
-        with patch.object(builder.Builder, "set_metadata") as set_metadata:
-            with patch.object(builder.Builder, "load_metadata") as load_metadata:
-                cli.setup_builder(md_file, md_url)
+    # yapf: disable
+    with mockit(json.load) as mocked_json_load, \
+            patch.object(builder.Builder, "set_metadata") as set_metadata, \
+            patch.object(builder.Builder, "load_metadata") as load_metadata:
+        cli.setup_builder(md_file, md_url)
+    # yapf: enable
 
     expect_set, expect_load = expected
     assert set_metadata.called == expect_set
