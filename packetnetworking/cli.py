@@ -3,7 +3,7 @@ import time
 import json
 import click
 import logging
-import packetnetworking
+from packetnetworking import builder as sysbuilder
 
 log = logging.getLogger("packetnetworking")
 
@@ -100,7 +100,7 @@ def cli(
             # different outcome.
             if metadata_file:
                 raise
-            if attempt == max_attempts:
+            if attempt == max(max_attempts, 1):
                 raise
             attempt += 1
             delay = 2 ** min(attempt, 7)
@@ -115,12 +115,33 @@ def cli(
 def try_run(
     metadata_file, metadata_url, operating_system, rootfs, resolvers, verbose, quiet
 ):
-    builder = packetnetworking.Builder()
+    builder = setup_builder(metadata_file, metadata_url)
+
+    set_os(builder, operating_system, quiet)
+
+    builder.initialize()
+
+    set_resolvers(builder, resolvers)
+
+    tasks = builder.run(rootfs)
+    if not tasks:
+        if not quiet:
+            click.echo("No tasks processed", file=sys.stderr)
+        sys.exit(30)
+    if not quiet:
+        print("Configuration files written to root filesystem '{}'".format(rootfs))
+
+
+def setup_builder(metadata_file, metadata_url):
+    builder = sysbuilder.Builder()
     if metadata_file:
         builder.set_metadata(json.load(metadata_file))
     else:
         builder.load_metadata(metadata_url)
+    return builder
 
+
+def set_os(builder, operating_system, quiet):
     if operating_system:
         if len(operating_system.split()) != 2:
             if not quiet:
@@ -133,6 +154,14 @@ def try_run(
             sys.exit(20)
         os_name, os_version = operating_system.split()
         os = builder.metadata.operating_system
+        if os.distro:
+            os.distro = os.distro.lower()
+        if os.version:
+            os.version = os.version.lower()
+        if os_name:
+            os_name = os_name.lower()
+        if os_version:
+            os_version = os_version.lower()
         if os.distro != os_name or os.version != os_version:
             os.orig_distro = os.distro
             os.orig_version = os.version
@@ -146,16 +175,9 @@ def try_run(
                 ).format(os=os)
             )
 
-    builder.initialize()
+
+def set_resolvers(builder, resolvers):
     if resolvers:
         resolvers = [x for x in resolvers.split(",") if x.strip()]
         if resolvers:
             builder.network.resolvers = resolvers
-
-    tasks = builder.run(rootfs)
-    if not tasks:
-        if not quiet:
-            click.echo("No tasks processed", file=sys.stderr)
-        sys.exit(30)
-    if not quiet:
-        print("Configuration files written to root filesystem '{}'".format(rootfs))
