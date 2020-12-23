@@ -220,18 +220,13 @@ def resolvers(default):
 
 
 def get_interfaces():
-    subprocess.run(
-        "for nic in /sys/class/net/e*; do ip link set ${nic##*/} up; done",
-        shell=True,
-        check=True,
-    )
     # let udev discover the nics, some renaming may take place which is why we
     # don't store the discovered nics
-    for nic in discover_nics(get_lshw_info()):
+    for nic in discover_nics(get_devices_info()):
         udev_update_db(nic["logicalname"])
 
     nics = []
-    for nic in discover_nics(get_lshw_info()):
+    for nic in discover_nics(get_devices_info()):
         lname = nic["logicalname"]
         name = None
         names = {}
@@ -251,12 +246,7 @@ def get_interfaces():
                 name = names[t]
                 break
 
-        n = {
-            "names": names,
-            "name": name,
-            "mac": nic["serial"],
-            "driver": nic["configuration"]["driver"],
-        }
+        n = {"names": names, "name": name, "mac": nic["mac"], "driver": nic["driver"]}
         # for test-network.py
         if n["driver"] == "dummy":
             n["name"] = lname
@@ -301,38 +291,43 @@ def get_lshw_info():
     return json.loads(get_output(["lshw", "-json", "-disable", "fb"]).decode())
 
 
+def get_devices_info():
+    path = "/sys/class/net/"
+    nics = []
+    ifaces = os.listdir(path)
+    for iface in ifaces:
+        try:
+            driver_path = os.readlink(path + iface + "/device/driver")
+            driver = os.path.basename(driver_path)
+        except OSError:
+            continue
+
+        with open(path + iface + "/address") as f:
+            mac = f.readline().strip()
+
+        n = {"logicalname": iface, "mac": mac, "driver": driver}
+        nics.append(n)
+    return nics
+
+
 def pam(arg, *funcs):
     """pam is like map but instead of calling one function with multiple args,
     it calls multiple functions with one arg"""
     return map(lambda f: f(arg), *funcs)
 
 
-def discover_nics(dev):
+def discover_nics(devs):
     ignored_drivers = ("bridge", "veth", "virtio-pci")
     nics = []
 
     def is_real_nic(dev):
-        return dev["configuration"]["driver"] not in ignored_drivers
+        return dev["driver"] not in ignored_drivers
 
-    def has_link(dev):
-        return dev["configuration"]["link"] == "yes"
-
-    if dev["class"] == "network" and "ethernet" in dev["capabilities"]:
-        print(
-            "name={} driver={}".format(
-                dev["logicalname"], dev["configuration"]["driver"]
-            )
-        )
+    for dev in devs:
+        print("name={} driver={}".format(dev["logicalname"], dev["driver"]))
 
         if is_real_nic(dev):
             nics.append(dev)
-
-    for child in dev.get("children", ()):
-        n = discover_nics(child)
-        if not n:
-            continue
-
-        nics.extend(n)
 
     return nics
 
