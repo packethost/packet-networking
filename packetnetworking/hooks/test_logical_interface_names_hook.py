@@ -17,7 +17,7 @@ def mocked_trigger_logical_names(mocked_trigger):
 
 
 def test_baremetal_hua_logical_interface_names_hook_iface0_name(
-    mocked_trigger_logical_names
+    mocked_trigger_logical_names,
 ):
     builder = mocked_trigger_logical_names(
         "baremetal_hua", (LogicalInterfaceNamesHook, "initialized")
@@ -26,7 +26,7 @@ def test_baremetal_hua_logical_interface_names_hook_iface0_name(
 
 
 def test_baremetal_hua_logical_interface_names_hook_iface1_name(
-    mocked_trigger_logical_names
+    mocked_trigger_logical_names,
 ):
     builder = mocked_trigger_logical_names(
         "baremetal_hua", (LogicalInterfaceNamesHook, "initialized")
@@ -35,7 +35,7 @@ def test_baremetal_hua_logical_interface_names_hook_iface1_name(
 
 
 def test_unmodified_plan_logical_interface_names_hook_iface0_name(
-    mocked_trigger_logical_names
+    mocked_trigger_logical_names,
 ):
     builder = mocked_trigger_logical_names(
         "unmodified.plan", (LogicalInterfaceNamesHook, "initialized")
@@ -44,7 +44,7 @@ def test_unmodified_plan_logical_interface_names_hook_iface0_name(
 
 
 def test_unmodified_plan_logical_interface_names_hook_iface1_name(
-    mocked_trigger_logical_names
+    mocked_trigger_logical_names,
 ):
     builder = mocked_trigger_logical_names(
         "unmodified.plan", (LogicalInterfaceNamesHook, "initialized")

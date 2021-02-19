@@ -191,7 +191,7 @@ def test_distro_builder_context_as_expected(fake_distro_builder_with_metadata):
 
 
 def test_distro_builder_render_calls_has_network_tasks(
-    fake_distro_builder_with_metadata
+    fake_distro_builder_with_metadata,
 ):
     fake_distro = fake_distro_builder_with_metadata()
     fake_distro.tasks = {
@@ -211,7 +211,7 @@ def test_distro_builder_render_calls_has_network_tasks(
 
 
 def test_distro_builder_render_does_nothing_with_delete_tasks(
-    fake_distro_builder_with_metadata
+    fake_distro_builder_with_metadata,
 ):
     fake_distro = fake_distro_builder_with_metadata()
     fake_distro.tasks = {"path/to/file": None}
@@ -290,7 +290,7 @@ def test_distro_builder_run_deletes_file(fake_distro_builder_with_metadata):
 
 
 def test_distro_builder_run_skips_deleting_missing_file(
-    fake_distro_builder_with_metadata
+    fake_distro_builder_with_metadata,
 ):
     fake_distro = fake_distro_builder_with_metadata()
     fake_distro.tasks = {"path/to/file": None}

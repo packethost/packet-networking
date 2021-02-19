@@ -11,7 +11,7 @@ def debian_10_individual_network(generic_debian_individual_network):
 
 
 def test_debian_10_public_individual_task_etc_network_interfaces(
-    debian_10_individual_network
+    debian_10_individual_network,
 ):
     """Validates /etc/network/interfaces for a public bond"""
 
@@ -52,7 +52,7 @@ def test_debian_10_public_individual_task_etc_network_interfaces(
 
 
 def test_debian_10_private_individual_task_etc_network_interfaces(
-    debian_10_individual_network
+    debian_10_individual_network,
 ):
     """
     When no public ip is assigned, we should see the private ip details in the
@@ -84,7 +84,7 @@ def test_debian_10_private_individual_task_etc_network_interfaces(
 
 # pylama:ignore=E501
 def test_debian_10_public_individual_task_etc_network_interfaces_with_custom_private_ip_space(
-    debian_10_individual_network
+    debian_10_individual_network,
 ):
     """Validates /etc/network/interfaces for a public bond"""
     subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
@@ -127,7 +127,7 @@ def test_debian_10_public_individual_task_etc_network_interfaces_with_custom_pri
 
 
 def test_debian_10_private_individual_task_etc_network_interfaces_with_custom_private_ip_space(
-    debian_10_individual_network
+    debian_10_individual_network,
 ):
     """
     When no public ip is assigned, we should see the private ip details in the

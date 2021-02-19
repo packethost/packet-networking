@@ -96,7 +96,7 @@ def test_debian_10_private_bonded_task_etc_network_interfaces(debian_10_bonded_n
 
 
 def test_debian_10_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
-    debian_10_bonded_network
+    debian_10_bonded_network,
 ):
     """Validates /etc/network/interfaces for a public bond"""
     subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
@@ -147,7 +147,7 @@ def test_debian_10_public_bonded_task_etc_network_interfaces_with_custom_private
 
 
 def test_debian_10_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
-    debian_10_bonded_network
+    debian_10_bonded_network,
 ):
     """
     When no public ip is assigned, we should see the private ip details in the

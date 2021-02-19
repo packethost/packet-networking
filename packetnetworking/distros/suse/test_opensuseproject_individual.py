@@ -23,7 +23,7 @@ def test_opensuseproject_private_only_throws_error(opensuseproject_individual_ne
 
 # pylama:ignore=E501
 def test_opensuseproject_public_individual_task_etc_sysconfig_network_ifcfg_enp0(
-    opensuseproject_individual_network
+    opensuseproject_individual_network,
 ):
     """Validates /etc/sysconfig/network/ifcfg-enp0 file"""
     builder = opensuseproject_individual_network(public=True)
@@ -50,7 +50,7 @@ def test_opensuseproject_public_individual_task_etc_sysconfig_network_ifcfg_enp0
 
 
 def test_opensuseproject_public_route_task_etc_sysconfig_network_routes(
-    opensuseproject_individual_network
+    opensuseproject_individual_network,
 ):
     """
     Validates /etc/sysconfig/network/routes is configured correctly
@@ -67,7 +67,7 @@ def test_opensuseproject_public_route_task_etc_sysconfig_network_routes(
 
 
 def test_opensuseproject_public_route_task_etc_sysconfig_network_routes_with_private_subnet_routes(
-    opensuseproject_individual_network
+    opensuseproject_individual_network,
 ):
     """
     Validates /etc/sysconfig/network/routes is configured correctly
@@ -86,7 +86,7 @@ def test_opensuseproject_public_route_task_etc_sysconfig_network_routes_with_pri
 
 
 def test_opensuseproject_public_task_etc_sysconfig_network_ifcfg_enp1(
-    opensuseproject_individual_network
+    opensuseproject_individual_network,
 ):
     """
     For each interface, we should see the corresponding ifcfg file

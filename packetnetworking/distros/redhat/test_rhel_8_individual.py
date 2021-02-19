@@ -31,7 +31,7 @@ def test_rhel_8_public_individual_task_etc_sysconfig_network(rhel_8_individual_n
 
 
 def test_rhel_8_public_individual_task_etc_sysconfig_network_scripts_ifcfg_enp0(
-    rhel_8_individual_network
+    rhel_8_individual_network,
 ):
     """Validates /etc/sysconfig/network-scripts/ifcfg-enp0 for a public bond"""
     builder = rhel_8_individual_network(public=True)
@@ -63,7 +63,7 @@ def test_rhel_8_public_individual_task_etc_sysconfig_network_scripts_ifcfg_enp0(
 
 
 def test_rhel_8_private_individual_task_etc_sysconfig_network_scripts_ifcfg_enp0(
-    rhel_8_individual_network
+    rhel_8_individual_network,
 ):
     """
     When no public ip is assigned, we should see the private ip details in the
@@ -94,7 +94,7 @@ def test_rhel_8_private_individual_task_etc_sysconfig_network_scripts_ifcfg_enp0
 
 
 def test_rhel_8_private_alias_task_etc_sysconfig_network_scripts_ifcfg_enp0_0(
-    rhel_8_individual_network
+    rhel_8_individual_network,
 ):
     """
     When a public ip is assigned, the private ip address should become an
@@ -125,7 +125,7 @@ def test_rhel_8_private_alias_task_etc_sysconfig_network_scripts_ifcfg_enp0_0(
 
 
 def test_rhel_8_private_alias_task_missing_for_private_only_enp(
-    rhel_8_individual_network
+    rhel_8_individual_network,
 ):
     """
     When no public ip is assigned, we should not see an alias created
@@ -137,7 +137,7 @@ def test_rhel_8_private_alias_task_missing_for_private_only_enp(
 
 
 def test_rhel_8_private_route_task_etc_sysconfig_network_scripts_route_enp0(
-    rhel_8_individual_network
+    rhel_8_individual_network,
 ):
     """
     When using a public ip, the private ip is assigned as an alias, this
@@ -156,7 +156,7 @@ def test_rhel_8_private_route_task_etc_sysconfig_network_scripts_route_enp0(
 
 # pylama:ignore=E501
 def test_rhel_8_private_route_task_etc_sysconfig_network_scripts_route_enp0_with_custom_private_subnets(
-    rhel_8_individual_network
+    rhel_8_individual_network,
 ):
     """
     When using a public ip, the private ip is assigned as an alias, this
@@ -176,7 +176,7 @@ def test_rhel_8_private_route_task_etc_sysconfig_network_scripts_route_enp0_with
 
 
 def test_rhel_8_private_route_task_missing_for_private_only_enp(
-    rhel_8_individual_network
+    rhel_8_individual_network,
 ):
     """
     When no public ip is assigned, we should not see a route file created

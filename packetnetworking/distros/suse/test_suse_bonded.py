@@ -84,7 +84,7 @@ def test_suse_public_route_task_etc_sysconfig_network_routes(suse_bonded_network
 
 
 def test_suse_public_route_task_etc_sysconfig_network_routes_with_private_subnet_routes(
-    suse_bonded_network
+    suse_bonded_network,
 ):
     """
     Validates /etc/sysconfig/network/routes is configured correctly

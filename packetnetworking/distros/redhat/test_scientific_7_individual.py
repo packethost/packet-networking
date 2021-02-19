@@ -12,7 +12,7 @@ def scientific_7_individual_network(generic_redhat_individual_network):
 
 
 def test_scientific_7_public_individual_task_etc_sysconfig_network(
-    scientific_7_individual_network
+    scientific_7_individual_network,
 ):
     """Validates /etc/sysconfig/network for a public bond"""
     builder = scientific_7_individual_network(public=True)
@@ -33,7 +33,7 @@ def test_scientific_7_public_individual_task_etc_sysconfig_network(
 
 
 def test_scientific_7_public_individual_task_etc_sysconfig_network_scripts_ifcfg_enp0(
-    scientific_7_individual_network
+    scientific_7_individual_network,
 ):
     """Validates /etc/sysconfig/network-scripts/ifcfg-enp0 for a public bond"""
     builder = scientific_7_individual_network(public=True)
@@ -65,7 +65,7 @@ def test_scientific_7_public_individual_task_etc_sysconfig_network_scripts_ifcfg
 
 
 def test_scientific_7_private_individual_task_etc_sysconfig_network_scripts_ifcfg_enp0(
-    scientific_7_individual_network
+    scientific_7_individual_network,
 ):
     """
     When no public ip is assigned, we should see the private ip details in the
@@ -96,7 +96,7 @@ def test_scientific_7_private_individual_task_etc_sysconfig_network_scripts_ifcf
 
 
 def test_scientific_7_private_alias_task_etc_sysconfig_network_scripts_ifcfg_enp0_0(
-    scientific_7_individual_network
+    scientific_7_individual_network,
 ):
     """
     When a public ip is assigned, the private ip address should become an
@@ -127,7 +127,7 @@ def test_scientific_7_private_alias_task_etc_sysconfig_network_scripts_ifcfg_enp
 
 
 def test_scientific_7_private_alias_task_missing_for_private_only_enp(
-    scientific_7_individual_network
+    scientific_7_individual_network,
 ):
     """
     When no public ip is assigned, we should not see an alias created
@@ -139,7 +139,7 @@ def test_scientific_7_private_alias_task_missing_for_private_only_enp(
 
 
 def test_scientific_7_private_route_task_etc_sysconfig_network_scripts_route_enp0(
-    scientific_7_individual_network
+    scientific_7_individual_network,
 ):
     """
     When using a public ip, the private ip is assigned as an alias, this
@@ -158,7 +158,7 @@ def test_scientific_7_private_route_task_etc_sysconfig_network_scripts_route_enp
 
 # pylama:ignore=E501
 def test_scientific_7_private_route_task_etc_sysconfig_network_scripts_route_enp0_with_custom_private_subnets(
-    scientific_7_individual_network
+    scientific_7_individual_network,
 ):
     """
     When using a public ip, the private ip is assigned as an alias, this
@@ -178,7 +178,7 @@ def test_scientific_7_private_route_task_etc_sysconfig_network_scripts_route_enp
 
 
 def test_scientific_7_private_route_task_missing_for_private_only_enp(
-    scientific_7_individual_network
+    scientific_7_individual_network,
 ):
     """
     When no public ip is assigned, we should not see a route file created

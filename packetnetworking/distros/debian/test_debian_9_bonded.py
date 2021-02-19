@@ -96,7 +96,7 @@ def test_debian_9_private_bonded_task_etc_network_interfaces(debian_9_bonded_net
 
 # pylama:ignore=E501
 def test_debian_9_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
-    debian_9_bonded_network
+    debian_9_bonded_network,
 ):
     """Validates /etc/network/interfaces for a public bond"""
     subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
@@ -147,7 +147,7 @@ def test_debian_9_public_bonded_task_etc_network_interfaces_with_custom_private_
 
 
 def test_debian_9_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
-    debian_9_bonded_network
+    debian_9_bonded_network,
 ):
     """
     When no public ip is assigned, we should see the private ip details in the

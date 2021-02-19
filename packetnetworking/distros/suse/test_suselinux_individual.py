@@ -22,7 +22,7 @@ def test_suselinux_private_only_throws_error(suselinux_individual_network):
 
 
 def test_suselinux_public_individual_task_etc_sysconfig_network_ifcfg_enp0(
-    suselinux_individual_network
+    suselinux_individual_network,
 ):
     """Validates /etc/sysconfig/network/ifcfg-enp0 file"""
     builder = suselinux_individual_network(public=True)
@@ -49,7 +49,7 @@ def test_suselinux_public_individual_task_etc_sysconfig_network_ifcfg_enp0(
 
 
 def test_suselinux_public_route_task_etc_sysconfig_network_routes(
-    suselinux_individual_network
+    suselinux_individual_network,
 ):
     """
     Validates /etc/sysconfig/network/routes is configured correctly
@@ -67,7 +67,7 @@ def test_suselinux_public_route_task_etc_sysconfig_network_routes(
 
 # pylama:ignore=E501
 def test_suselinux_public_route_task_etc_sysconfig_network_routes_with_private_subnet_routes(
-    suselinux_individual_network
+    suselinux_individual_network,
 ):
     """
     Validates /etc/sysconfig/network/routes is configured correctly
@@ -86,7 +86,7 @@ def test_suselinux_public_route_task_etc_sysconfig_network_routes_with_private_s
 
 
 def test_suselinux_public_task_etc_sysconfig_network_ifcfg_enp1(
-    suselinux_individual_network
+    suselinux_individual_network,
 ):
     """
     For each interface, we should see the corresponding ifcfg file

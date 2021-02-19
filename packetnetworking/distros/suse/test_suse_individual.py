@@ -22,7 +22,7 @@ def test_suse_private_only_throws_error(suse_individual_network):
 
 
 def test_suse_public_individual_task_etc_sysconfig_network_ifcfg_enp0(
-    suse_individual_network
+    suse_individual_network,
 ):
     """Validates /etc/sysconfig/network/ifcfg-enp0 file"""
     builder = suse_individual_network(public=True)
@@ -65,7 +65,7 @@ def test_suse_public_route_task_etc_sysconfig_network_routes(suse_individual_net
 
 # pylama:ignore=E501
 def test_suse_public_route_task_etc_sysconfig_network_routes_with_private_subnet_routes(
-    suse_individual_network
+    suse_individual_network,
 ):
     """
     Validates /etc/sysconfig/network/routes is configured correctly
