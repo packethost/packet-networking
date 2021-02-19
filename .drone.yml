@@ -4,6 +4,7 @@ clone:
 
 matrix:
   PYTHON_VERSION:
+    # yes py35 is eol, but tinkerbell/osie still uses old ubuntu and py3.5... sigh
     - 3.5
     - 3.6
     - 3.7
