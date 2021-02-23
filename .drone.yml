@@ -16,7 +16,7 @@ pipeline:
     image: nixos/nix:2.3.6
     commands:
       - nix-shell --run "black --check --diff ."
-      - nix-shell --run "pylama --ignore=E203 packetnetworking setup.py"
+      - nix-shell --run "pylama packetnetworking setup.py"
 
   test:
     image: python:${PYTHON_VERSION}
