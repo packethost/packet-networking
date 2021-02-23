@@ -2,7 +2,7 @@ import copy
 import re
 import time
 import json
-from unittest.mock import MagicMock, mock_open, patch
+from unittest.mock import MagicMock, patch
 
 from click.testing import CliRunner
 import pytest
@@ -306,24 +306,22 @@ def assert_output(test, result):
 )
 def test_cli(test, mockit):
     runner = CliRunner()
-    # fmt: off
-    with runner.isolated_filesystem(), \
-            patch("builtins.open", mock_open(read_data="data")) as mocked_open, \
-            mockit(cli.try_run) as mocked_try_run:
+    with runner.isolated_filesystem(), mockit(cli.try_run) as mocked_try_run:
+        if test["called_with"] and test["called_with"][0]:
+            # metadata_file is populated, lets write it
+            with open(test["called_with"][0], "w") as f:
+                f.write("{}")
+
         result = runner.invoke(cli.cli, test["args"])
-    # fmt: on
 
     assert_output(test, result)
     assert result.exit_code == test["exit_code"]
     if not test.get("called_with"):
-        mocked_open.assert_not_called()
         mocked_try_run.assert_not_called()
     else:
         if test["called_with"][0]:
-            mocked_open.assert_called_with(test["called_with"][0], "r")
             assert mocked_try_run.call_args_list[0].args[1:] == test["called_with"][1:]
         else:
-            mocked_open.assert_not_called()
             mocked_try_run.assert_called_with(*test["called_with"])
 
 
