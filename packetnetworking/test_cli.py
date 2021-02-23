@@ -25,6 +25,7 @@ test_resolvers = ["1.1.1.1", "2.2.2.2"]
 
 
 def assert_output(test, result):
+    print("result.output:", result.output)
     if "output" in test:
         if isinstance(test["output"], list):
             for check in test["output"]:
