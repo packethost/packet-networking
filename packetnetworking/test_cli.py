@@ -28,18 +28,7 @@ test_resolvers = ["1.1.1.1", "2.2.2.2"]
 def assert_output(test, result):
     print("result.output:", result.output)
     if "output" in test:
-        if isinstance(test["output"], list):
-            for check in test["output"]:
-                assert check in result.output
-        else:
-            assert test["output"] in result.output
-
-    if "output_not" in test:
-        if isinstance(test["output_not"], list):
-            for check in test["output_not"]:
-                assert check not in result.output
-        else:
-            assert test["output_not"] not in result.output
+        assert test["output"] in result.output
 
 
 @pytest.mark.parametrize(
