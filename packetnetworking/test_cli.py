@@ -1,11 +1,12 @@
-from click.testing import CliRunner
-from . import builder, cli, utils
+import copy
+import time
+import json
 from unittest.mock import MagicMock, mock_open, patch
 
-import copy
-import json
+from click.testing import CliRunner
 import pytest
-import time
+
+from . import builder, cli, utils
 
 
 default_args = ["--rootfs", "packet-networking-test"]
