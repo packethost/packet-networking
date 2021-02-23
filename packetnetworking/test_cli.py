@@ -1,4 +1,5 @@
 import copy
+import re
 import time
 import json
 from unittest.mock import MagicMock, mock_open, patch
@@ -28,7 +29,7 @@ test_resolvers = ["1.1.1.1", "2.2.2.2"]
 def assert_output(test, result):
     print("result.output:", result.output)
     if "output" in test:
-        assert test["output"] in result.output
+        assert test["output"].search(result.output) is not None
 
 
 @pytest.mark.parametrize(
@@ -39,7 +40,9 @@ def assert_output(test, result):
                 "args": [],
                 "exit_code": 2,
                 "called_with": None,
-                "output": 'Missing option "-t" / "--rootfs"',
+                "output": re.compile(
+                    """Missing option ['"]-t['"] / ['"]--rootfs['"]"""
+                ),
             },
             id="rootfs required",
         ),
