@@ -1,7 +1,6 @@
 from .. import NetworkBuilder
 
 
-# pylama:ignore=E501
 class SuseBondedNetwork(NetworkBuilder):
     def build(self):
         if self.network.bonding.link_aggregation in ["bonded", "mlag_ha"]:

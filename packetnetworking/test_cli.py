@@ -389,7 +389,6 @@ def test_try_run_with_url(mockit, metadata):
 
 def test_try_run_with_file(mockit, metadata):
     md = metadata(test_metadata)
-    # pylama:ignore=E501
     # fmt: off
     with mockit(json.load) as mocked_json_load, \
             mockit(utils.get_interfaces, return_value=test_phys_interfaces), \

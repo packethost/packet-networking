@@ -57,7 +57,6 @@ def test_debian_11_public_bonded_task_etc_network_interfaces(debian_11_bonded_ne
     assert tasks["etc/network/interfaces"] == result
 
 
-# pylama:ignore=E501
 def test_debian_11_private_bonded_task_etc_network_interfaces(debian_11_bonded_network):
     """
     When no public ip is assigned, we should see the private ip details in the
@@ -250,7 +249,6 @@ def test_debian_11_etc_hosts_configured(debian_11_bonded_network):
     assert tasks["etc/hosts"] == result
 
 
-# pylama:ignore=E501
 def test_debian_11_persistent_interface_names(debian_11_bonded_network):
     """
     When using certain operating systems, we want to bypass driver interface name,

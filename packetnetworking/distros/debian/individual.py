@@ -2,7 +2,6 @@ from .. import NetworkBuilder
 from ...utils import generate_persistent_names
 
 
-# pylama:ignore=E501
 class DebianIndividualNetwork(NetworkBuilder):
     def build(self):
         if self.network.bonding.link_aggregation == "individual":

@@ -118,7 +118,6 @@ def test_ubuntu_2004_private_bonded_task_etc_network_interfaces(
     assert tasks["etc/network/interfaces"] == result
 
 
-# pylama:ignore=E501
 def test_ubuntu_2004_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
     ubuntu_2004_bonded_network,
 ):
@@ -294,7 +293,6 @@ def test_ubuntu_2004_etc_hosts_configured(ubuntu_2004_bonded_network):
     assert tasks["etc/hosts"] == result
 
 
-# pylama:ignore=E501
 def test_ubuntu_2004_persistent_interface_names(ubuntu_2004_bonded_network):
     """
     When using certain operating systems, we want to bypass driver interface name,

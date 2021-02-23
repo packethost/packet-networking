@@ -43,7 +43,6 @@ def test_centos_7_private_bonded_task_etc_sysconfig_network(centos_7_bonded_netw
     assert tasks["etc/sysconfig/network"] == result
 
 
-# pylama:ignore=E501
 def test_centos_7_bonded_task_etc_modprobe_d_bonding(centos_7_bonded_network):
     """Validates /etc/modprobe.d/bonding.conf has correct bonding mode"""
     builder = centos_7_bonded_network()
@@ -187,7 +186,6 @@ def test_centos_7_private_route_task_etc_sysconfig_network_scripts_route_bond0(
     assert tasks["etc/sysconfig/network-scripts/route-bond0"] == result
 
 
-# pylama:ignore=E501
 def test_centos_7_private_route_task_etc_sysconfig_network_scripts_route_bond0_with_custom_private_subnets(
     centos_7_bonded_network,
 ):

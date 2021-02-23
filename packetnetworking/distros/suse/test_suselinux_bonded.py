@@ -21,7 +21,6 @@ def test_suselinux_private_only_throws_error(suselinux_bonded_network):
         builder.render()
 
 
-# pylama:ignore=E501
 def test_suselinux_bonded_task_etc_modprobe_d_bonding(suselinux_bonded_network):
     """Validates /etc/modprobe.d/bonding.conf has correct bonding mode"""
     builder = suselinux_bonded_network()
@@ -86,7 +85,6 @@ def test_suselinux_public_route_task_etc_sysconfig_network_routes(
     assert tasks["etc/sysconfig/network/routes"] == result
 
 
-# pylama:ignore=E501
 def test_suselinux_public_route_task_etc_sysconfig_network_routes_with_private_subnet_routes(
     suselinux_bonded_network,
 ):

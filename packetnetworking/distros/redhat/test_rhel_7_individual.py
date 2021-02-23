@@ -29,9 +29,6 @@ def test_rhel_7_public_individual_task_etc_sysconfig_network(rhel_7_individual_n
     assert tasks["etc/sysconfig/network"] == result
 
 
-# pylama:ignore=E501
-
-
 def test_rhel_7_public_individual_task_etc_sysconfig_network_scripts_ifcfg_enp0(
     rhel_7_individual_network,
 ):
@@ -156,7 +153,6 @@ def test_rhel_7_private_route_task_etc_sysconfig_network_scripts_route_enp0(
     assert tasks["etc/sysconfig/network-scripts/route-enp0"] == result
 
 
-# pylama:ignore=E501
 def test_rhel_7_private_route_task_etc_sysconfig_network_scripts_route_enp0_with_custom_private_subnets(
     rhel_7_individual_network,
 ):

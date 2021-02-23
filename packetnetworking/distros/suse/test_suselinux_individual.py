@@ -65,7 +65,6 @@ def test_suselinux_public_route_task_etc_sysconfig_network_routes(
     assert tasks["etc/sysconfig/network/routes"] == result
 
 
-# pylama:ignore=E501
 def test_suselinux_public_route_task_etc_sysconfig_network_routes_with_private_subnet_routes(
     suselinux_individual_network,
 ):

@@ -82,7 +82,6 @@ def test_debian_8_private_individual_task_etc_network_interfaces(
     assert tasks["etc/network/interfaces"] == result
 
 
-# pylama:ignore=E501
 def test_debian_8_public_individual_task_etc_network_interfaces_with_custom_private_ip_space(
     debian_8_individual_network,
 ):

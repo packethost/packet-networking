@@ -1,7 +1,6 @@
 from .. import NetworkBuilder
 
 
-# pylama:ignore=E501
 class SuseIndividualNetwork(NetworkBuilder):
     def build(self):
         if self.network.bonding.link_aggregation == "individual":
