@@ -172,8 +172,8 @@ def resolve_path(rootfs, path, _depth=0):
     if _depth > MAX_RESOLVE_DEPTH:
         raise RecursionError("Symlink max depth reached")
     if path.startswith(rootfs):
-        # pylama:ignore=E203
-        relpath = os.path.join("/", path[len(rootfs) :])
+        i = len(rootfs)
+        relpath = os.path.join("/", path[i:])
         abspath = path
     else:
         relpath = os.path.join("/", path)

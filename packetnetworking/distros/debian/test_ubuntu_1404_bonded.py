@@ -11,7 +11,7 @@ def ubuntu_1404_bonded_network(generic_debian_bonded_network):
 
 
 def test_ubuntu_1404_public_bonded_task_etc_network_interfaces(
-    ubuntu_1404_bonded_network
+    ubuntu_1404_bonded_network,
 ):
     """Validates /etc/network/interfaces for a public bond"""
 
@@ -70,7 +70,7 @@ def test_ubuntu_1404_public_bonded_task_etc_network_interfaces(
 
 
 def test_ubuntu_1404_private_bonded_task_etc_network_interfaces(
-    ubuntu_1404_bonded_network
+    ubuntu_1404_bonded_network,
 ):
     """
     When no public ip is assigned, we should see the private ip details in the
@@ -118,9 +118,8 @@ def test_ubuntu_1404_private_bonded_task_etc_network_interfaces(
     assert tasks["etc/network/interfaces"] == result
 
 
-# pylama:ignore=E501
 def test_ubuntu_1404_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
-    ubuntu_1404_bonded_network
+    ubuntu_1404_bonded_network,
 ):
     """Validates /etc/network/interfaces for a public bond"""
     subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
@@ -181,7 +180,7 @@ def test_ubuntu_1404_public_bonded_task_etc_network_interfaces_with_custom_priva
 
 
 def test_ubuntu_1404_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
-    ubuntu_1404_bonded_network
+    ubuntu_1404_bonded_network,
 ):
     """
     When no public ip is assigned, we should see the private ip details in the
@@ -294,7 +293,6 @@ def test_ubuntu_1404_etc_hosts_configured(ubuntu_1404_bonded_network):
     assert tasks["etc/hosts"] == result
 
 
-# pylama:ignore=E501
 def test_ubuntu_1404_persistent_interface_names(ubuntu_1404_bonded_network):
     """
     When using certain operating systems, we want to bypass driver interface name,

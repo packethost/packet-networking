@@ -21,7 +21,6 @@ def test_suse_private_only_throws_error(suse_bonded_network):
         builder.render()
 
 
-# pylama:ignore=E501
 def test_suse_bonded_task_etc_modprobe_d_bonding(suse_bonded_network):
     """Validates /etc/modprobe.d/bonding.conf has correct bonding mode"""
     builder = suse_bonded_network()
@@ -35,7 +34,6 @@ def test_suse_bonded_task_etc_modprobe_d_bonding(suse_bonded_network):
     assert tasks["etc/modprobe.d/bonding.conf"] == result
 
 
-# pylama:ignore=E501
 def test_suse_public_bonded_task_etc_sysconfig_network_ifcfg_bond0(suse_bonded_network):
     """Validates /etc/sysconfig/network/ifcfg-bond0 for a public bond"""
     builder = suse_bonded_network(public=True)
@@ -84,7 +82,7 @@ def test_suse_public_route_task_etc_sysconfig_network_routes(suse_bonded_network
 
 
 def test_suse_public_route_task_etc_sysconfig_network_routes_with_private_subnet_routes(
-    suse_bonded_network
+    suse_bonded_network,
 ):
     """
     Validates /etc/sysconfig/network/routes is configured correctly

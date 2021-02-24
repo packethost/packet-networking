@@ -3,7 +3,6 @@ from ...utils import generate_persistent_names
 import os
 
 
-# pylama:ignore=E501
 class RedhatIndividualNetwork(NetworkBuilder):
     def build(self):
         if self.network.bonding.link_aggregation == "individual":

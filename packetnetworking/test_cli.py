@@ -1,11 +1,13 @@
-from click.testing import CliRunner
-from . import builder, cli, utils
-from unittest.mock import MagicMock, mock_open, patch
-
 import copy
-import json
-import pytest
+import re
 import time
+import json
+from unittest.mock import MagicMock, patch
+
+from click.testing import CliRunner
+import pytest
+
+from . import builder, cli, utils
 
 
 default_args = ["--rootfs", "packet-networking-test"]
@@ -25,19 +27,9 @@ test_resolvers = ["1.1.1.1", "2.2.2.2"]
 
 
 def assert_output(test, result):
+    print("result.output:", result.output)
     if "output" in test:
-        if isinstance(test["output"], list):
-            for check in test["output"]:
-                assert check in result.output
-        else:
-            assert test["output"] in result.output
-
-    if "output_not" in test:
-        if isinstance(test["output_not"], list):
-            for check in test["output_not"]:
-                assert check not in result.output
-        else:
-            assert test["output_not"] not in result.output
+        assert test["output"].search(result.output) is not None
 
 
 @pytest.mark.parametrize(
@@ -48,7 +40,9 @@ def assert_output(test, result):
                 "args": [],
                 "exit_code": 2,
                 "called_with": None,
-                "output": 'Missing option "-t" / "--rootfs"',
+                "output": re.compile(
+                    """Missing option ['"]-t['"] / ['"]--rootfs['"]"""
+                ),
             },
             id="rootfs required",
         ),
@@ -312,24 +306,22 @@ def assert_output(test, result):
 )
 def test_cli(test, mockit):
     runner = CliRunner()
-    # yapf: disable
-    with runner.isolated_filesystem(), \
-            patch("builtins.open", mock_open(read_data="data")) as mocked_open, \
-            mockit(cli.try_run) as mocked_try_run:
+    with runner.isolated_filesystem(), mockit(cli.try_run) as mocked_try_run:
+        if test["called_with"] and test["called_with"][0]:
+            # metadata_file is populated, lets write it
+            with open(test["called_with"][0], "w") as f:
+                f.write("{}")
+
         result = runner.invoke(cli.cli, test["args"])
-    # yapf: enable
 
     assert_output(test, result)
     assert result.exit_code == test["exit_code"]
     if not test.get("called_with"):
-        mocked_open.assert_not_called()
         mocked_try_run.assert_not_called()
     else:
         if test["called_with"][0]:
-            mocked_open.assert_called_with(test["called_with"][0], "r")
             assert mocked_try_run.call_args_list[0].args[1:] == test["called_with"][1:]
         else:
-            mocked_open.assert_not_called()
             mocked_try_run.assert_called_with(*test["called_with"])
 
 
@@ -350,14 +342,14 @@ def test_cli(test, mockit):
 )
 def test_cli_retries_on_exception(opt, n, runs, sleep, mockit):
     runner = CliRunner()
-    # yapf: disable
+    # fmt: off
     with runner.isolated_filesystem(), \
             mockit(cli.try_run) as mocked_try_run, \
             patch("packetnetworking.cli.log") as mocked_log, \
             mockit(time.sleep) as mocked_time_sleep:
         mocked_try_run.side_effect = Exception("fail")
         result = runner.invoke(cli.cli, default_args + [opt, str(n)])
-    # yapf: enable
+    # fmt: on
 
     # try_run is executed for every attempt.
     assert mocked_try_run.call_count == runs
@@ -372,7 +364,7 @@ def test_cli_retries_on_exception(opt, n, runs, sleep, mockit):
 
 
 def test_try_run_with_url(mockit, metadata):
-    # yapf: disable
+    # fmt: off
     with patch("requests.get") as mocked_requests_get, \
             mockit(utils.get_interfaces, return_value=test_phys_interfaces), \
             patch.object(builder.Builder, "run", return_value=True):
@@ -389,7 +381,7 @@ def test_try_run_with_url(mockit, metadata):
             None,
             None,
         )
-    # yapf: enable
+    # fmt: on
 
     assert mocked_requests_get.call_count == 1
     mocked_requests_get.assert_called_with("http://localhost/metadata")
@@ -397,8 +389,7 @@ def test_try_run_with_url(mockit, metadata):
 
 def test_try_run_with_file(mockit, metadata):
     md = metadata(test_metadata)
-    # pylama:ignore=E501
-    # yapf: disable
+    # fmt: off
     with mockit(json.load) as mocked_json_load, \
             mockit(utils.get_interfaces, return_value=test_phys_interfaces), \
             patch.object(builder.Builder, "load_metadata") as mocked_builder_load_metadata, \
@@ -413,7 +404,7 @@ def test_try_run_with_file(mockit, metadata):
             None,
             None,
         )
-    # yapf: enable
+    # fmt: on
 
     mocked_builder_load_metadata.assert_not_called()
     assert mocked_json_load.call_count == 1
@@ -429,12 +420,12 @@ def test_try_run_with_file(mockit, metadata):
     ],
 )
 def test_setup_builder(md_file, md_url, expected, mockit, metadata):
-    # yapf: disable
+    # fmt: off
     with mockit(json.load) as mocked_json_load, \
             patch.object(builder.Builder, "set_metadata") as set_metadata, \
             patch.object(builder.Builder, "load_metadata") as load_metadata:
         cli.setup_builder(md_file, md_url)
-    # yapf: enable
+    # fmt: on
 
     expect_set, expect_load = expected
     assert set_metadata.called == expect_set

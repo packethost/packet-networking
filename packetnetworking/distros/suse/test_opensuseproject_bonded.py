@@ -21,9 +21,8 @@ def test_opensuseproject_private_only_throws_error(opensuseproject_bonded_networ
         builder.render()
 
 
-# pylama:ignore=E501
 def test_opensuseproject_bonded_task_etc_modprobe_d_bonding(
-    opensuseproject_bonded_network
+    opensuseproject_bonded_network,
 ):
     """Validates /etc/modprobe.d/bonding.conf has correct bonding mode"""
     builder = opensuseproject_bonded_network()
@@ -38,7 +37,7 @@ def test_opensuseproject_bonded_task_etc_modprobe_d_bonding(
 
 
 def test_opensuseproject_public_bonded_task_etc_sysconfig_network_ifcfg_bond0(
-    opensuseproject_bonded_network
+    opensuseproject_bonded_network,
 ):
     """Validates /etc/sysconfig/network/ifcfg-bond0 for a public bond"""
     builder = opensuseproject_bonded_network(public=True)
@@ -72,7 +71,7 @@ def test_opensuseproject_public_bonded_task_etc_sysconfig_network_ifcfg_bond0(
 
 
 def test_opensuseproject_public_route_task_etc_sysconfig_network_routes(
-    opensuseproject_bonded_network
+    opensuseproject_bonded_network,
 ):
     """
     Validates /etc/sysconfig/network/routes is configured correctly
@@ -88,9 +87,8 @@ def test_opensuseproject_public_route_task_etc_sysconfig_network_routes(
     assert tasks["etc/sysconfig/network/routes"] == result
 
 
-# pylama:ignore=E501
 def test_opensuseproject_public_route_task_etc_sysconfig_network_routes_with_private_subnet_routes(
-    opensuseproject_bonded_network
+    opensuseproject_bonded_network,
 ):
     """
     Validates /etc/sysconfig/network/routes is configured correctly
@@ -109,7 +107,7 @@ def test_opensuseproject_public_route_task_etc_sysconfig_network_routes_with_pri
 
 
 def test_opensuseproject_public_task_etc_sysconfig_network_ifcfg_enp0(
-    opensuseproject_bonded_network
+    opensuseproject_bonded_network,
 ):
     """
     For each interface, we should see the corresponding ifcfg file
@@ -127,7 +125,7 @@ def test_opensuseproject_public_task_etc_sysconfig_network_ifcfg_enp0(
 
 
 def test_opensuseproject_public_task_etc_sysconfig_network_ifcfg_enp1(
-    opensuseproject_bonded_network
+    opensuseproject_bonded_network,
 ):
     """
     For each interface, we should see the corresponding ifcfg file

@@ -4,6 +4,7 @@ clone:
 
 matrix:
   PYTHON_VERSION:
+    # yes py35 is eol, but tinkerbell/osie still uses old ubuntu and py3.5... sigh
     - 3.5
     - 3.6
     - 3.7
@@ -12,11 +13,10 @@ matrix:
 
 pipeline:
   fmt_and_lint:
-    image: python:3.8-alpine
+    image: nixos/nix:2.3.6
     commands:
-      - pip install black==19.3b0 pylama
-      - black --check --diff .
-      - pylama --ignore=E203 packetnetworking setup.py
+      - nix-shell --run "black --check --diff ."
+      - nix-shell --run "pylama packetnetworking setup.py"
 
   test:
     image: python:${PYTHON_VERSION}

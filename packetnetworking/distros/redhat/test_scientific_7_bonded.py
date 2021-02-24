@@ -12,7 +12,7 @@ def scientific_7_bonded_network(generic_redhat_bonded_network):
 
 
 def test_scientific_7_public_bonded_task_etc_sysconfig_network(
-    scientific_7_bonded_network
+    scientific_7_bonded_network,
 ):
     """Validates /etc/sysconfig/network for a public bond"""
     builder = scientific_7_bonded_network(public=True)
@@ -30,7 +30,7 @@ def test_scientific_7_public_bonded_task_etc_sysconfig_network(
 
 
 def test_scientific_7_private_bonded_task_etc_sysconfig_network(
-    scientific_7_bonded_network
+    scientific_7_bonded_network,
 ):
     """Validates /etc/sysconfig/network for a private only bond"""
     builder = scientific_7_bonded_network(public=False)
@@ -47,7 +47,6 @@ def test_scientific_7_private_bonded_task_etc_sysconfig_network(
     assert tasks["etc/sysconfig/network"] == result
 
 
-# pylama:ignore=E501
 def test_scientific_7_bonded_task_etc_modprobe_d_bonding(scientific_7_bonded_network):
     """Validates /etc/modprobe.d/bonding.conf has correct bonding mode"""
     builder = scientific_7_bonded_network()
@@ -62,7 +61,7 @@ def test_scientific_7_bonded_task_etc_modprobe_d_bonding(scientific_7_bonded_net
 
 
 def test_scientific_7_public_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
-    scientific_7_bonded_network
+    scientific_7_bonded_network,
 ):
     """Validates /etc/sysconfig/network-scripts/ifcfg-bond0 for a public bond"""
     builder = scientific_7_bonded_network(public=True)
@@ -97,7 +96,7 @@ def test_scientific_7_public_bonded_task_etc_sysconfig_network_scripts_ifcfg_bon
 
 
 def test_scientific_7_private_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
-    scientific_7_bonded_network
+    scientific_7_bonded_network,
 ):
     """
     When no public ip is assigned, we should see the private ip details in the
@@ -131,7 +130,7 @@ def test_scientific_7_private_bonded_task_etc_sysconfig_network_scripts_ifcfg_bo
 
 
 def test_scientific_7_private_alias_task_etc_sysconfig_network_scripts_ifcfg_bond0_0(
-    scientific_7_bonded_network
+    scientific_7_bonded_network,
 ):
     """
     When a public ip is assigned, the private ip address should become an
@@ -162,7 +161,7 @@ def test_scientific_7_private_alias_task_etc_sysconfig_network_scripts_ifcfg_bon
 
 
 def test_scientific_7_private_alias_task_missing_for_private_only_bond(
-    scientific_7_bonded_network
+    scientific_7_bonded_network,
 ):
     """
     When no public ip is assigned, we should not see an alias created
@@ -174,7 +173,7 @@ def test_scientific_7_private_alias_task_missing_for_private_only_bond(
 
 
 def test_scientific_7_private_route_task_etc_sysconfig_network_scripts_route_bond0(
-    scientific_7_bonded_network
+    scientific_7_bonded_network,
 ):
     """
     When using a public ip, the private ip is assigned as an alias, this
@@ -191,9 +190,8 @@ def test_scientific_7_private_route_task_etc_sysconfig_network_scripts_route_bon
     assert tasks["etc/sysconfig/network-scripts/route-bond0"] == result
 
 
-# pylama:ignore=E501
 def test_scientific_7_private_route_task_etc_sysconfig_network_scripts_route_bond0_with_custom_private_subnets(
-    scientific_7_bonded_network
+    scientific_7_bonded_network,
 ):
     """
     When using a public ip, the private ip is assigned as an alias, this
@@ -213,7 +211,7 @@ def test_scientific_7_private_route_task_etc_sysconfig_network_scripts_route_bon
 
 
 def test_scientific_7_private_route_task_missing_for_private_only_bond(
-    scientific_7_bonded_network
+    scientific_7_bonded_network,
 ):
     """
     When no public ip is assigned, we should not see a route file created
