@@ -3,8 +3,10 @@ from .. import NetworkBuilder
 
 class SuseIndividualNetwork(NetworkBuilder):
     def build(self):
-        if self.network.bonding.link_aggregation == "individual":
-            self.build_tasks()
+        if self.network.bonding.link_aggregation != "individual":
+            return
+
+        self.build_tasks()
 
     def build_tasks(self):
         self.tasks = {}

@@ -4,8 +4,10 @@ from ...utils import generate_persistent_names
 
 class DebianIndividualNetwork(NetworkBuilder):
     def build(self):
-        if self.network.bonding.link_aggregation == "individual":
-            self.build_tasks()
+        if self.network.bonding.link_aggregation != "individual":
+            return
+
+        self.build_tasks()
 
     def build_tasks(self):
         self.tasks = {}

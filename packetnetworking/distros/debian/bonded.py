@@ -4,8 +4,10 @@ from ...utils import generate_persistent_names
 
 class DebianBondedNetwork(NetworkBuilder):
     def build(self):
-        if self.network.bonding.link_aggregation in ["bonded", "mlag_ha"]:
-            self.build_tasks()
+        if self.network.bonding.link_aggregation not in ("bonded", "mlag_ha"):
+            return
+
+        self.build_tasks()
 
     def build_tasks(self):
         self.tasks = {}
