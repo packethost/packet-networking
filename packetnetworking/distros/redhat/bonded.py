@@ -8,11 +8,10 @@ class RedhatBondedNetwork(NetworkBuilder):
         if self.network.bonding.link_aggregation not in ("bonded", "mlag_ha"):
             return
 
+        super().build()
         self.build_tasks()
 
     def build_tasks(self):
-        self.tasks = {}
-
         self.task_template("etc/sysconfig/network", "bonded/etc_sysconfig_network.j2")
         self.task_template(
             "etc/modprobe.d/bonding.conf", "bonded/etc_modprobe.d_bonding.conf.j2"

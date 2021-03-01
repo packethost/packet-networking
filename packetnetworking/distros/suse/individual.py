@@ -6,11 +6,10 @@ class SuseIndividualNetwork(NetworkBuilder):
         if self.network.bonding.link_aggregation != "individual":
             return
 
+        super().build()
         self.build_tasks()
 
     def build_tasks(self):
-        self.tasks = {}
-
         iface0 = self.network.interfaces[0]
 
         self.task_template(

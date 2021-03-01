@@ -28,7 +28,7 @@ class DistroBuilder(utils.Tasks):
         self.metadata = metadata
         self.network = self.metadata.network
         self.builders = []
-        self.tasks = None
+        self.tasks = {}
 
     @property
     def ipv4pub(self):
@@ -49,15 +49,14 @@ class DistroBuilder(utils.Tasks):
         """
         self.build_tasks()
         log.debug(
-            "Discovered {:d} {} tasks".format(
-                len(self.tasks or {}), self.__class__.__name__
-            )
+            "Discovered {:d} {} tasks".format(len(self.tasks), self.__class__.__name__)
         )
         found_tasks = False
         for NetworkBuilder in self.network_builders:
             builder = NetworkBuilder(self.metadata)
             if not hasattr(builder, "templates_base"):
                 builder.templates_base = self.templates_base
+
             self.builders.append(builder)
             builder.build()
             if builder.tasks:
@@ -116,12 +115,15 @@ class DistroBuilder(utils.Tasks):
         """
         if self.tasks is None:
             self.build()
+
         if not self.has_network_tasks:
             log.error("No network builder tasks discovered")
             return {}
+
         rendered_tasks = {}
         if not self.all_tasks:
             return {}
+
         for path, template in self.all_tasks.items():
             log.debug("Rendering task: '{}'".format(path))
             if template is None:

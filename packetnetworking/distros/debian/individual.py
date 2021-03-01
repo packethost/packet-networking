@@ -7,11 +7,10 @@ class DebianIndividualNetwork(NetworkBuilder):
         if self.network.bonding.link_aggregation != "individual":
             return
 
+        super().build()
         self.build_tasks()
 
     def build_tasks(self):
-        self.tasks = {}
-
         self.task_template(
             "etc/network/interfaces", "individual/etc_network_interfaces.j2"
         )

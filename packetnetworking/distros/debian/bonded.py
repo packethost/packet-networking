@@ -7,11 +7,10 @@ class DebianBondedNetwork(NetworkBuilder):
         if self.network.bonding.link_aggregation not in ("bonded", "mlag_ha"):
             return
 
+        super().build()
         self.build_tasks()
 
     def build_tasks(self):
-        self.tasks = {}
-
         self.task_template("etc/network/interfaces", "bonded/etc_network_interfaces.j2")
         self.task_template("etc/modules", "bonded/etc_modules.j2", write_mode="a")
 

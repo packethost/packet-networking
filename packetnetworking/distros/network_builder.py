@@ -5,7 +5,10 @@ class NetworkBuilder(Tasks):
     def __init__(self, metadata):
         self.metadata = metadata
         self.network = self.metadata.network
-        self.tasks = None
+        self.tasks = {}
+
+    def build(self):
+        pass
 
     @property
     def ipv4pub(self):
