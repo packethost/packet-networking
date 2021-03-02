@@ -10,7 +10,7 @@ from .individual import DebianIndividualNetwork
 def debianbuilder(mockit, fake, metadata, patch_dict):
     gen_metadata = metadata
 
-    def _builder(metadata=None, public=True):
+    def _builder(metadata=None, public=True, post_gen_metadata=None):
         resolvers = ("1.2.3.4", "2.3.4.5")
         meta_interfaces = [
             {"name": "eth0", "mac": "00:0c:29:51:53:a1", "bond": "bond0"},
@@ -24,6 +24,8 @@ def debianbuilder(mockit, fake, metadata, patch_dict):
         if metadata:
             patch_dict(_metadata, metadata)
         md = gen_metadata(_metadata, public=public)
+        if post_gen_metadata:
+            md = post_gen_metadata(md)
         with mockit(utils.get_interfaces, return_value=phys_interfaces):
             builder_metadata = Builder(md).initialize()
             builder_metadata.network.resolvers = resolvers
@@ -63,7 +65,7 @@ def generic_debian_bonded_network(debianbuilder, patch_dict, request):
 
 @pytest.fixture
 def generic_debian_individual_network(debianbuilder, patch_dict):
-    def _builder(distro, version, public=True, metadata=None):
+    def _builder(distro, version, public=True, metadata=None, **kwargs):
         version = str(version)
         slug = "{distro}_{version}".format(distro=distro, version=version)
         metadata = patch_dict(
@@ -77,7 +79,7 @@ def generic_debian_individual_network(debianbuilder, patch_dict):
             },
             metadata or {},
         )
-        builder = debianbuilder(metadata, public=public)
+        builder = debianbuilder(metadata, public=public, **kwargs)
         builder.build()
         builder.builders = [
             builder
