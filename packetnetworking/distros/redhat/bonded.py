@@ -33,8 +33,8 @@ class RedhatBondedNetwork(NetworkBuilder):
                 "bonded/etc_sysconfig_network-scripts_route-bond0.j2",
             )
 
-        for i in range(len(self.network.interfaces)):
-            name = self.network.interfaces[i]["name"]
+        for i, iface in enumerate(self.network.interfaces):
+            name = iface["name"]
             self.task_template(
                 "etc/sysconfig/network-scripts/ifcfg-" + name,
                 "bonded/etc_sysconfig_network-scripts_ifcfg-template.j2",

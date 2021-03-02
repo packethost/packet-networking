@@ -21,8 +21,8 @@ class SuseBondedNetwork(NetworkBuilder):
             "etc/sysconfig/network/routes", "bonded/etc_sysconfig_network_routes.j2"
         )
 
-        for i in range(len(self.network.interfaces)):
-            name = self.network.interfaces[i]["name"]
+        for i, iface in enumerate(self.network.interfaces):
+            name = iface["name"]
             self.task_template(
                 "etc/sysconfig/network/ifcfg-" + name,
                 "bonded/etc_sysconfig_network_ifcfg-template.j2",
