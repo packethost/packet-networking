@@ -1,9 +1,30 @@
+import textwrap
+
 import pytest
+
 from ...builder import Builder
 from ... import utils
 from .builder import DebianBuilder
 from .bonded import DebianBondedNetwork
 from .individual import DebianIndividualNetwork
+
+
+@pytest.fixture
+def expected_file_etc_network_interfaces_dhcp_2():
+    expected_file_etc_network_interfaces_dhcp_2 = textwrap.dedent(
+        """\
+        auto lo
+        iface lo inet loopback
+
+        auto enp0
+        iface enp0 inet dhcp
+
+        auto enp1
+        iface enp1 inet dhcp
+
+    """
+    )
+    yield expected_file_etc_network_interfaces_dhcp_2
 
 
 @pytest.fixture

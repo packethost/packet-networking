@@ -11,9 +11,11 @@ class DebianIndividualNetwork(NetworkBuilder):
         self.build_tasks()
 
     def build_tasks(self):
-        self.task_template(
-            "etc/network/interfaces", "individual/etc_network_interfaces.j2"
-        )
+        template = "individual/etc_network_interfaces.j2"
+        if self.dhcp:
+            template = "dhcp/etc_network_interfaces.j2"
+
+        self.task_template("etc/network/interfaces", template)
 
         os = self.metadata.operating_system
 

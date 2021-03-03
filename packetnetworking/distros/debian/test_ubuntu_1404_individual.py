@@ -232,6 +232,23 @@ def test_ubuntu_1404_persistent_interface_names(ubuntu_1404_individual_network):
     assert tasks["etc/udev/rules.d/70-persistent-net.rules"] == result
 
 
+def test_ubuntu_1404_public_individual_dhcp_task_etc_network_interfaces(
+    ubuntu_1404_individual_network,
+    make_interfaces_dhcp_metadata,
+    expected_file_etc_network_interfaces_dhcp_2,
+):
+    """Validates /etc/network/interfaces for a public dhcp interfaces"""
+
+    builder = ubuntu_1404_individual_network(
+        public=True, post_gen_metadata=make_interfaces_dhcp_metadata
+    )
+    tasks = builder.render()
+
+    result = expected_file_etc_network_interfaces_dhcp_2
+
+    assert tasks["etc/network/interfaces"] == result
+
+
 def test_ubuntu_1404_etc_resolvers_dhcp(
     ubuntu_1404_individual_network, make_interfaces_dhcp_metadata,
 ):
