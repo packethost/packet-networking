@@ -6,6 +6,7 @@ class NetworkBuilder(Tasks):
         self.metadata = metadata
         self.network = self.metadata.network
         self.tasks = {}
+        self.dhcp = any((iface.get("dhcp") for iface in self.network.interfaces))
 
     def build(self):
         pass
