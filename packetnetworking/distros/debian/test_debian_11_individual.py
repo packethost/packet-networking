@@ -230,3 +230,16 @@ def test_debian_11_persistent_interface_names(debian_11_individual_network):
     """
     ).format(iface0=builder.network.interfaces[0], iface1=builder.network.interfaces[1])
     assert tasks["etc/udev/rules.d/70-persistent-net.rules"] == result
+
+
+def test_debian_11_etc_resolvers_dhcp(
+    debian_11_individual_network, make_interfaces_dhcp_metadata,
+):
+    """
+    Validates /etc/resolv.conf is skipped
+    """
+    builder = debian_11_individual_network(
+        post_gen_metadata=make_interfaces_dhcp_metadata
+    )
+    tasks = builder.render()
+    assert tasks["etc/resolv.conf"] is None

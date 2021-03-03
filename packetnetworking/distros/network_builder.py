@@ -9,7 +9,8 @@ class NetworkBuilder(Tasks):
         self.dhcp = any((iface.get("dhcp") for iface in self.network.interfaces))
 
     def build(self):
-        pass
+        if self.dhcp:
+            self.tasks["etc/resolv.conf"] = None
 
     @property
     def ipv4pub(self):

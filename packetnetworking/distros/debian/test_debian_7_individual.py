@@ -216,3 +216,16 @@ def test_debian_7_no_persistent_interface_names(debian_7_individual_network):
     builder = debian_7_individual_network()
     tasks = builder.render()
     assert "etc/udev/rules.d/70-persistent-net.rules" not in tasks
+
+
+def test_debian_7_etc_resolvers_dhcp(
+    debian_7_individual_network, make_interfaces_dhcp_metadata,
+):
+    """
+    Validates /etc/resolv.conf is skipped
+    """
+    builder = debian_7_individual_network(
+        post_gen_metadata=make_interfaces_dhcp_metadata
+    )
+    tasks = builder.render()
+    assert tasks["etc/resolv.conf"] is None

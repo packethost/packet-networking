@@ -230,3 +230,16 @@ def test_ubuntu_1404_persistent_interface_names(ubuntu_1404_individual_network):
     """
     ).format(iface0=builder.network.interfaces[0], iface1=builder.network.interfaces[1])
     assert tasks["etc/udev/rules.d/70-persistent-net.rules"] == result
+
+
+def test_ubuntu_1404_etc_resolvers_dhcp(
+    ubuntu_1404_individual_network, make_interfaces_dhcp_metadata,
+):
+    """
+    Validates /etc/resolv.conf is skipped
+    """
+    builder = ubuntu_1404_individual_network(
+        post_gen_metadata=make_interfaces_dhcp_metadata
+    )
+    tasks = builder.render()
+    assert tasks["etc/resolv.conf"] is None
