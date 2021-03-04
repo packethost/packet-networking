@@ -113,9 +113,6 @@ class DistroBuilder(utils.Tasks):
         """
         Render compiles each task template into the final content.
         """
-        if self.tasks is None:
-            self.build()
-
         if not self.has_network_tasks:
             log.error("No network builder tasks discovered")
             return {}
