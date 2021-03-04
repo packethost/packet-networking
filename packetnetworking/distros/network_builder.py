@@ -5,7 +5,12 @@ class NetworkBuilder(Tasks):
     def __init__(self, metadata):
         self.metadata = metadata
         self.network = self.metadata.network
-        self.tasks = None
+        self.tasks = {}
+        self.dhcp = any((iface.get("dhcp") for iface in self.network.interfaces))
+
+    def build(self):
+        if self.dhcp:
+            self.tasks["etc/resolv.conf"] = None
 
     @property
     def ipv4pub(self):

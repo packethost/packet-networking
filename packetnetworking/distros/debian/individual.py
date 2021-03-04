@@ -4,15 +4,18 @@ from ...utils import generate_persistent_names
 
 class DebianIndividualNetwork(NetworkBuilder):
     def build(self):
-        if self.network.bonding.link_aggregation == "individual":
-            self.build_tasks()
+        if self.network.bonding.link_aggregation != "individual":
+            return
+
+        super().build()
+        self.build_tasks()
 
     def build_tasks(self):
-        self.tasks = {}
+        template = "individual/etc_network_interfaces.j2"
+        if self.dhcp:
+            template = "dhcp/etc_network_interfaces.j2"
 
-        self.task_template(
-            "etc/network/interfaces", "individual/etc_network_interfaces.j2"
-        )
+        self.task_template("etc/network/interfaces", template)
 
         os = self.metadata.operating_system
 

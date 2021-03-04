@@ -338,7 +338,10 @@ def get_matched_interfaces(metainterfaces, realinterfaces):
     for metainterface in metainterfaces:
         for realinterface in realinterfaces:
             if metainterface["mac"].lower() == realinterface["mac"].lower():
-                nics.append(realinterface)
+                d = {}
+                d.update(metainterface)
+                d.update(realinterface)
+                nics.append(d)
 
     return nics
 

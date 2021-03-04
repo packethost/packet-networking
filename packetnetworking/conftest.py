@@ -159,3 +159,21 @@ def mockit():
         return mock.patch(i.__module__ + "." + i.__name__, *args, **kwargs)
 
     return _mockit
+
+
+@pytest.fixture
+def make_interfaces_dhcp_metadata(metadata):
+    def _make_interfaces_dhcp_metadata(overrides=None):
+        md = metadata(overrides or {})
+        if not md["network"].get("interfaces"):
+            return md
+
+        ifaces = []
+        for iface in md["network"]["interfaces"]:
+            iface.pop("bond")
+            iface["dhcp"] = True
+            ifaces.append(iface)
+        md["network"]["interfaces"] = ifaces
+        return md
+
+    return _make_interfaces_dhcp_metadata

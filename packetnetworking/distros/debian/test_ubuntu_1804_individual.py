@@ -216,3 +216,33 @@ def test_ubuntu_1804_no_persistent_interface_names(ubuntu_1804_individual_networ
     builder = ubuntu_1804_individual_network()
     tasks = builder.render()
     assert "etc/udev/rules.d/70-persistent-net.rules" not in tasks
+
+
+def test_ubuntu_1804_public_individual_dhcp_task_etc_network_interfaces(
+    ubuntu_1804_individual_network,
+    make_interfaces_dhcp_metadata,
+    expected_file_etc_network_interfaces_dhcp_2,
+):
+    """Validates /etc/network/interfaces for a public dhcp interfaces"""
+
+    builder = ubuntu_1804_individual_network(
+        public=True, post_gen_metadata=make_interfaces_dhcp_metadata
+    )
+    tasks = builder.render()
+
+    result = expected_file_etc_network_interfaces_dhcp_2
+
+    assert tasks["etc/network/interfaces"] == result
+
+
+def test_ubuntu_1804_etc_resolvers_dhcp(
+    ubuntu_1804_individual_network, make_interfaces_dhcp_metadata,
+):
+    """
+    Validates /etc/resolv.conf is skipped
+    """
+    builder = ubuntu_1804_individual_network(
+        post_gen_metadata=make_interfaces_dhcp_metadata
+    )
+    tasks = builder.render()
+    assert tasks["etc/resolv.conf"] is None
