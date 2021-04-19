@@ -1,6 +1,17 @@
 auto lo
 iface lo inet loopback
 
+{% if osinfo.distro == 'ubuntu' %}
+{% for iface in interfaces %}
+auto {{ iface.name }}
+iface {{ iface.name }} inet manual
+{% if iface.name != interfaces[0].name %}
+    pre-up sleep 4
+{% endif %}
+    bond-master bond0
+
+{% endfor %}
+{% endif %}
 auto bond0
 iface bond0 inet static
     {% if ip4pub %}
@@ -40,15 +51,4 @@ iface bond0:0 inet static
     post-up route add -net {{ subnet }} gw {{ ip4priv.gateway }}
     post-down route del -net {{ subnet }} gw {{ ip4priv.gateway }}
     {% endfor %}
-{% endif %}
-{% if osinfo.distro == 'ubuntu' %}
-{% for iface in interfaces %}
-
-auto {{ iface.name }}
-iface {{ iface.name }} inet manual
-{% if iface.name != interfaces[0].name %}
-    pre-up sleep 4
-{% endif %}
-    bond-master bond0
-{% endfor %}
 {% endif %}
