@@ -22,6 +22,15 @@ def test_ubuntu_1404_public_bonded_task_etc_network_interfaces(
         auto lo
         iface lo inet loopback
 
+        auto {iface0.name}
+        iface {iface0.name} inet manual
+            bond-master bond0
+
+        auto {iface1.name}
+        iface {iface1.name} inet manual
+            pre-up sleep 4
+            bond-master bond0
+
         auto bond0
         iface bond0 inet static
             address {ipv4pub.address}
@@ -46,15 +55,6 @@ def test_ubuntu_1404_public_bonded_task_etc_network_interfaces(
             netmask {ipv4priv.netmask}
             post-up route add -net 10.0.0.0/8 gw {ipv4priv.gateway}
             post-down route del -net 10.0.0.0/8 gw {ipv4priv.gateway}
-
-        auto {iface0.name}
-        iface {iface0.name} inet manual
-            bond-master bond0
-
-        auto {iface1.name}
-        iface {iface1.name} inet manual
-            pre-up sleep 4
-            bond-master bond0
     """
     ).format(
         ipv4pub=builder.ipv4pub.first,
@@ -83,6 +83,15 @@ def test_ubuntu_1404_private_bonded_task_etc_network_interfaces(
         auto lo
         iface lo inet loopback
 
+        auto {iface0.name}
+        iface {iface0.name} inet manual
+            bond-master bond0
+
+        auto {iface1.name}
+        iface {iface1.name} inet manual
+            pre-up sleep 4
+            bond-master bond0
+
         auto bond0
         iface bond0 inet static
             address {ipv4priv.address}
@@ -97,15 +106,6 @@ def test_ubuntu_1404_private_bonded_task_etc_network_interfaces(
             bond-slaves {iface0.name} {iface1.name}
             dns-nameservers {dns1} {dns2}
 
-
-        auto {iface0.name}
-        iface {iface0.name} inet manual
-            bond-master bond0
-
-        auto {iface1.name}
-        iface {iface1.name} inet manual
-            pre-up sleep 4
-            bond-master bond0
     """
     ).format(
         ipv4priv=builder.ipv4priv.first,
@@ -129,6 +129,15 @@ def test_ubuntu_1404_public_bonded_task_etc_network_interfaces_with_custom_priva
         """\
         auto lo
         iface lo inet loopback
+
+        auto {iface0.name}
+        iface {iface0.name} inet manual
+            bond-master bond0
+
+        auto {iface1.name}
+        iface {iface1.name} inet manual
+            pre-up sleep 4
+            bond-master bond0
 
         auto bond0
         iface bond0 inet static
@@ -156,15 +165,6 @@ def test_ubuntu_1404_public_bonded_task_etc_network_interfaces_with_custom_priva
             post-down route del -net 192.168.5.0/24 gw {ipv4priv.gateway}
             post-up route add -net 172.16.0.0/12 gw {ipv4priv.gateway}
             post-down route del -net 172.16.0.0/12 gw {ipv4priv.gateway}
-
-        auto {iface0.name}
-        iface {iface0.name} inet manual
-            bond-master bond0
-
-        auto {iface1.name}
-        iface {iface1.name} inet manual
-            pre-up sleep 4
-            bond-master bond0
     """
     ).format(
         ipv4pub=builder.ipv4pub.first,
@@ -194,6 +194,15 @@ def test_ubuntu_1404_private_bonded_task_etc_network_interfaces_with_custom_priv
         auto lo
         iface lo inet loopback
 
+        auto {iface0.name}
+        iface {iface0.name} inet manual
+            bond-master bond0
+
+        auto {iface1.name}
+        iface {iface1.name} inet manual
+            pre-up sleep 4
+            bond-master bond0
+
         auto bond0
         iface bond0 inet static
             address {ipv4priv.address}
@@ -208,15 +217,6 @@ def test_ubuntu_1404_private_bonded_task_etc_network_interfaces_with_custom_priv
             bond-slaves {iface0.name} {iface1.name}
             dns-nameservers {dns1} {dns2}
 
-
-        auto {iface0.name}
-        iface {iface0.name} inet manual
-            bond-master bond0
-
-        auto {iface1.name}
-        iface {iface1.name} inet manual
-            pre-up sleep 4
-            bond-master bond0
     """
     ).format(
         ipv4priv=builder.ipv4priv.first,
