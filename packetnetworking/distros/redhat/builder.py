@@ -6,6 +6,7 @@ from .individual import RedhatIndividualNetwork
 class RedhatBuilder(DistroBuilder):
     distros = [
         "centos",
+        "fedora",
         "redhatenterpriseserver",
         "redhatenterprise",
         "scientificcernslc",
