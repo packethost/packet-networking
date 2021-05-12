@@ -58,7 +58,7 @@ def test_fedora_31_bonded_task_etc_modprobe_d_bonding(fedora_31_bonded_network):
 
 
 def test_fedora_31_public_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
-    fedora_31_bonded_network
+    fedora_31_bonded_network,
 ):
     """Validates /etc/sysconfig/network-scripts/ifcfg-bond0 for a public bond"""
     builder = fedora_31_bonded_network(public=True)
@@ -93,7 +93,7 @@ def test_fedora_31_public_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
 
 
 def test_fedora_31_private_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
-    fedora_31_bonded_network
+    fedora_31_bonded_network,
 ):
     """
     When no public ip is assigned, we should see the private ip details in the
@@ -127,7 +127,7 @@ def test_fedora_31_private_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0
 
 
 def test_fedora_31_private_alias_task_etc_sysconfig_network_scripts_ifcfg_bond0_0(
-    fedora_31_bonded_network
+    fedora_31_bonded_network,
 ):
     """
     When a public ip is assigned, the private ip address should become an
@@ -158,7 +158,7 @@ def test_fedora_31_private_alias_task_etc_sysconfig_network_scripts_ifcfg_bond0_
 
 
 def test_fedora_31_private_alias_task_missing_for_private_only_bond(
-    fedora_31_bonded_network
+    fedora_31_bonded_network,
 ):
     """
     When no public ip is assigned, we should not see an alias created
@@ -170,7 +170,7 @@ def test_fedora_31_private_alias_task_missing_for_private_only_bond(
 
 
 def test_fedora_31_private_route_task_etc_sysconfig_network_scripts_route_bond0(
-    fedora_31_bonded_network
+    fedora_31_bonded_network,
 ):
     """
     When using a public ip, the private ip is assigned as an alias, this
@@ -189,7 +189,7 @@ def test_fedora_31_private_route_task_etc_sysconfig_network_scripts_route_bond0(
 
 # pylama:ignore=E501
 def test_fedora_31_private_route_task_etc_sysconfig_network_scripts_route_bond0_with_custom_private_subnets(
-    fedora_31_bonded_network
+    fedora_31_bonded_network,
 ):
     """
     When using a public ip, the private ip is assigned as an alias, this
@@ -209,7 +209,7 @@ def test_fedora_31_private_route_task_etc_sysconfig_network_scripts_route_bond0_
 
 
 def test_fedora_31_private_route_task_missing_for_private_only_bond(
-    fedora_31_bonded_network
+    fedora_31_bonded_network,
 ):
     """
     When no public ip is assigned, we should not see a route file created
