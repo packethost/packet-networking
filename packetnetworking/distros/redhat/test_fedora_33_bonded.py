@@ -4,16 +4,16 @@ import pytest
 
 
 @pytest.fixture
-def fedora_31_bonded_network(generic_redhat_bonded_network):
+def fedora_33_bonded_network(generic_redhat_bonded_network):
     def _builder(**kwargs):
-        return generic_redhat_bonded_network("fedora", "31", **kwargs)
+        return generic_redhat_bonded_network("fedora", "33", **kwargs)
 
     return _builder
 
 
-def test_fedora_31_public_bonded_task_etc_sysconfig_network(fedora_31_bonded_network):
+def test_fedora_33_public_bonded_task_etc_sysconfig_network(fedora_33_bonded_network):
     """Validates /etc/sysconfig/network for a public bond"""
-    builder = fedora_31_bonded_network(public=True)
+    builder = fedora_33_bonded_network(public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -27,9 +27,9 @@ def test_fedora_31_public_bonded_task_etc_sysconfig_network(fedora_31_bonded_net
     assert tasks["etc/sysconfig/network"] == result
 
 
-def test_fedora_31_private_bonded_task_etc_sysconfig_network(fedora_31_bonded_network):
+def test_fedora_33_private_bonded_task_etc_sysconfig_network(fedora_33_bonded_network):
     """Validates /etc/sysconfig/network for a private only bond"""
-    builder = fedora_31_bonded_network(public=False)
+    builder = fedora_33_bonded_network(public=False)
     tasks = builder.render()
     result = dedent(
         """\
@@ -44,9 +44,9 @@ def test_fedora_31_private_bonded_task_etc_sysconfig_network(fedora_31_bonded_ne
 
 
 # pylama:ignore=E501
-def test_fedora_31_bonded_task_etc_modprobe_d_bonding(fedora_31_bonded_network):
+def test_fedora_33_bonded_task_etc_modprobe_d_bonding(fedora_33_bonded_network):
     """Validates /etc/modprobe.d/bonding.conf has correct bonding mode"""
-    builder = fedora_31_bonded_network()
+    builder = fedora_33_bonded_network()
     tasks = builder.render()
     result = dedent(
         """\
@@ -57,11 +57,11 @@ def test_fedora_31_bonded_task_etc_modprobe_d_bonding(fedora_31_bonded_network):
     assert tasks["etc/modprobe.d/bonding.conf"] == result
 
 
-def test_fedora_31_public_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
-    fedora_31_bonded_network,
+def test_fedora_33_public_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
+    fedora_33_bonded_network,
 ):
     """Validates /etc/sysconfig/network-scripts/ifcfg-bond0 for a public bond"""
-    builder = fedora_31_bonded_network(public=True)
+    builder = fedora_33_bonded_network(public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -92,14 +92,14 @@ def test_fedora_31_public_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
     assert tasks["etc/sysconfig/network-scripts/ifcfg-bond0"] == result
 
 
-def test_fedora_31_private_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
-    fedora_31_bonded_network,
+def test_fedora_33_private_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
+    fedora_33_bonded_network,
 ):
     """
     When no public ip is assigned, we should see the private ip details in the
     /etc/sysconfig/network-scripts/ifcfg-bond0 interface file.
     """
-    builder = fedora_31_bonded_network(public=False)
+    builder = fedora_33_bonded_network(public=False)
     tasks = builder.render()
     result = dedent(
         """\
@@ -126,15 +126,15 @@ def test_fedora_31_private_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0
     assert tasks["etc/sysconfig/network-scripts/ifcfg-bond0"] == result
 
 
-def test_fedora_31_private_alias_task_etc_sysconfig_network_scripts_ifcfg_bond0_0(
-    fedora_31_bonded_network,
+def test_fedora_33_private_alias_task_etc_sysconfig_network_scripts_ifcfg_bond0_0(
+    fedora_33_bonded_network,
 ):
     """
     When a public ip is assigned, the private ip address should become an
     alias, this validates /etc/sysconfig/network-scripts/ifcfg-bond0:0 alias
     has been created for the private ip
     """
-    builder = fedora_31_bonded_network(public=True)
+    builder = fedora_33_bonded_network(public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -157,27 +157,27 @@ def test_fedora_31_private_alias_task_etc_sysconfig_network_scripts_ifcfg_bond0_
     assert tasks["etc/sysconfig/network-scripts/ifcfg-bond0:0"] == result
 
 
-def test_fedora_31_private_alias_task_missing_for_private_only_bond(
-    fedora_31_bonded_network,
+def test_fedora_33_private_alias_task_missing_for_private_only_bond(
+    fedora_33_bonded_network,
 ):
     """
     When no public ip is assigned, we should not see an alias created
     therefore /etc/sysconfig/network-scripts/ifcfg-bond0:0 should not exist.
     """
-    builder = fedora_31_bonded_network(public=False)
+    builder = fedora_33_bonded_network(public=False)
     tasks = builder.render()
     assert "etc/sysconfig/network-scripts/ifcfg-bond0:0" not in tasks
 
 
-def test_fedora_31_private_route_task_etc_sysconfig_network_scripts_route_bond0(
-    fedora_31_bonded_network,
+def test_fedora_33_private_route_task_etc_sysconfig_network_scripts_route_bond0(
+    fedora_33_bonded_network,
 ):
     """
     When using a public ip, the private ip is assigned as an alias, this
     validates the /etc/sysconfig/network-scripts/route-bond0 route is created
     for the private subnet.
     """
-    builder = fedora_31_bonded_network(public=True)
+    builder = fedora_33_bonded_network(public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -188,8 +188,8 @@ def test_fedora_31_private_route_task_etc_sysconfig_network_scripts_route_bond0(
 
 
 # pylama:ignore=E501
-def test_fedora_31_private_route_task_etc_sysconfig_network_scripts_route_bond0_with_custom_private_subnets(
-    fedora_31_bonded_network,
+def test_fedora_33_private_route_task_etc_sysconfig_network_scripts_route_bond0_with_custom_private_subnets(
+    fedora_33_bonded_network,
 ):
     """
     When using a public ip, the private ip is assigned as an alias, this
@@ -197,7 +197,7 @@ def test_fedora_31_private_route_task_etc_sysconfig_network_scripts_route_bond0_
     for the private subnet.
     """
     subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
-    builder = fedora_31_bonded_network(public=True, metadata=subnets)
+    builder = fedora_33_bonded_network(public=True, metadata=subnets)
     tasks = builder.render()
     result = dedent(
         """\
@@ -208,24 +208,24 @@ def test_fedora_31_private_route_task_etc_sysconfig_network_scripts_route_bond0_
     assert tasks["etc/sysconfig/network-scripts/route-bond0"] == result
 
 
-def test_fedora_31_private_route_task_missing_for_private_only_bond(
-    fedora_31_bonded_network,
+def test_fedora_33_private_route_task_missing_for_private_only_bond(
+    fedora_33_bonded_network,
 ):
     """
     When no public ip is assigned, we should not see a route file created
     therefore /etc/sysconfig/network-scripts/route-bond0 should not exist.
     """
-    builder = fedora_31_bonded_network(public=False)
+    builder = fedora_33_bonded_network(public=False)
     tasks = builder.render()
     assert "etc/sysconfig/network-scripts/route-bond0" not in tasks
 
 
-def test_fedora_31_individual_interface_files_created(fedora_31_bonded_network):
+def test_fedora_33_individual_interface_files_created(fedora_33_bonded_network):
     """
     For each interface, we should see the corresponding ifcfg file
     located at /etc/sysconfig/network-scripts/ifcfg-*
     """
-    builder = fedora_31_bonded_network(public=True)
+    builder = fedora_33_bonded_network(public=True)
     tasks = builder.render()
     for interface in builder.network.interfaces:
         result = dedent(
@@ -241,11 +241,11 @@ def test_fedora_31_individual_interface_files_created(fedora_31_bonded_network):
         assert tasks["etc/sysconfig/network-scripts/ifcfg-" + interface.name] == result
 
 
-def test_fedora_31_etc_resolvers_configured(fedora_31_bonded_network, fake):
+def test_fedora_33_etc_resolvers_configured(fedora_33_bonded_network, fake):
     """
     Validates /etc/resolv.conf is configured correctly
     """
-    builder = fedora_31_bonded_network()
+    builder = fedora_33_bonded_network()
     resolver1 = fake.ipv4()
     resolver2 = fake.ipv4()
     builder.network.resolvers = (resolver1, resolver2)
@@ -259,11 +259,11 @@ def test_fedora_31_etc_resolvers_configured(fedora_31_bonded_network, fake):
     assert tasks["etc/resolv.conf"] == result
 
 
-def test_fedora_31_etc_hostname_configured(fedora_31_bonded_network):
+def test_fedora_33_etc_hostname_configured(fedora_33_bonded_network):
     """
     Validates /etc/hostname is configured correctly
     """
-    builder = fedora_31_bonded_network()
+    builder = fedora_33_bonded_network()
     tasks = builder.render()
     result = dedent(
         """\
@@ -273,11 +273,11 @@ def test_fedora_31_etc_hostname_configured(fedora_31_bonded_network):
     assert tasks["etc/hostname"] == result
 
 
-def test_fedora_31_etc_hosts_configured(fedora_31_bonded_network):
+def test_fedora_33_etc_hosts_configured(fedora_33_bonded_network):
     """
     Validates /etc/hosts is configured correctly
     """
-    builder = fedora_31_bonded_network()
+    builder = fedora_33_bonded_network()
     tasks = builder.render()
     result = dedent(
         """\
@@ -288,11 +288,11 @@ def test_fedora_31_etc_hosts_configured(fedora_31_bonded_network):
     assert tasks["etc/hosts"] == result
 
 
-def test_fedora_31_sbin_ifup_pre_local(fedora_31_bonded_network):
+def test_fedora_33_sbin_ifup_pre_local(fedora_33_bonded_network):
     """
     Validates /sbin/ifup-pre-local is created correctly
     """
-    builder = fedora_31_bonded_network()
+    builder = fedora_33_bonded_network()
     tasks = builder.render()
     result = dedent(
         """\
@@ -315,12 +315,12 @@ def test_fedora_31_sbin_ifup_pre_local(fedora_31_bonded_network):
     assert tasks["sbin/ifup-pre-local"]["mode"] == 0o755
 
 
-def test_fedora_31_network_manager_is_disabled(fedora_31_bonded_network):
+def test_fedora_33_network_manager_is_disabled(fedora_33_bonded_network):
     """
     When using certain operating systems, we want to disable Network Manager,
     here we make sure those distros remove the necessary files
     """
-    builder = fedora_31_bonded_network()
+    builder = fedora_33_bonded_network()
     tasks = builder.render()
     for service in (
         "dbus-org.freedesktop.NetworkManager",
@@ -330,11 +330,11 @@ def test_fedora_31_network_manager_is_disabled(fedora_31_bonded_network):
         assert tasks[os.path.join("etc/systemd/system", service + ".service")] is None
 
 
-def test_fedora_31_persistent_interface_names_does_not_exist(fedora_31_bonded_network):
+def test_fedora_33_persistent_interface_names_does_not_exist(fedora_33_bonded_network):
     """
     When using certain operating systems, we want to bypass driver interface name,
     here we make sure the /etc/udev/rules.d/70-persistent-net.rules is generated.
     """
-    builder = fedora_31_bonded_network()
+    builder = fedora_33_bonded_network()
     tasks = builder.render()
     assert "etc/udev/rules.d/70-persistent-net.rules" not in tasks

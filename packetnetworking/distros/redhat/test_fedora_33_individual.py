@@ -4,18 +4,18 @@ import pytest
 
 
 @pytest.fixture
-def fedora_31_individual_network(generic_redhat_individual_network):
+def fedora_33_individual_network(generic_redhat_individual_network):
     def _builder(**kwargs):
-        return generic_redhat_individual_network("fedora", "31", **kwargs)
+        return generic_redhat_individual_network("fedora", "33", **kwargs)
 
     return _builder
 
 
-def test_fedora_31_public_individual_task_etc_sysconfig_network(
-    fedora_31_individual_network,
+def test_fedora_33_public_individual_task_etc_sysconfig_network(
+    fedora_33_individual_network,
 ):
     """Validates /etc/sysconfig/network for a public bond"""
-    builder = fedora_31_individual_network(public=True)
+    builder = fedora_33_individual_network(public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -32,11 +32,11 @@ def test_fedora_31_public_individual_task_etc_sysconfig_network(
 # pylama:ignore=E501
 
 
-def test_fedora_31_public_individual_task_etc_sysconfig_network_scripts_ifcfg_enp0(
-    fedora_31_individual_network,
+def test_fedora_33_public_individual_task_etc_sysconfig_network_scripts_ifcfg_enp0(
+    fedora_33_individual_network,
 ):
     """Validates /etc/sysconfig/network-scripts/ifcfg-enp0 for a public bond"""
-    builder = fedora_31_individual_network(public=True)
+    builder = fedora_33_individual_network(public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -64,14 +64,14 @@ def test_fedora_31_public_individual_task_etc_sysconfig_network_scripts_ifcfg_en
     assert tasks["etc/sysconfig/network-scripts/ifcfg-enp0"] == result
 
 
-def test_fedora_31_private_individual_task_etc_sysconfig_network_scripts_ifcfg_enp0(
-    fedora_31_individual_network,
+def test_fedora_33_private_individual_task_etc_sysconfig_network_scripts_ifcfg_enp0(
+    fedora_33_individual_network,
 ):
     """
     When no public ip is assigned, we should see the private ip details in the
     /etc/sysconfig/network-scripts/ifcfg-enp0 interface file.
     """
-    builder = fedora_31_individual_network(public=False)
+    builder = fedora_33_individual_network(public=False)
     tasks = builder.render()
     result = dedent(
         """\
@@ -95,15 +95,15 @@ def test_fedora_31_private_individual_task_etc_sysconfig_network_scripts_ifcfg_e
     assert tasks["etc/sysconfig/network-scripts/ifcfg-enp0"] == result
 
 
-def test_fedora_31_private_alias_task_etc_sysconfig_network_scripts_ifcfg_enp0_0(
-    fedora_31_individual_network,
+def test_fedora_33_private_alias_task_etc_sysconfig_network_scripts_ifcfg_enp0_0(
+    fedora_33_individual_network,
 ):
     """
     When a public ip is assigned, the private ip address should become an
     alias, this validates /etc/sysconfig/network-scripts/ifcfg-enp0:0 alias
     has been created for the private ip
     """
-    builder = fedora_31_individual_network(public=True)
+    builder = fedora_33_individual_network(public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -126,27 +126,27 @@ def test_fedora_31_private_alias_task_etc_sysconfig_network_scripts_ifcfg_enp0_0
     assert tasks["etc/sysconfig/network-scripts/ifcfg-enp0:0"] == result
 
 
-def test_fedora_31_private_alias_task_missing_for_private_only_enp(
-    fedora_31_individual_network,
+def test_fedora_33_private_alias_task_missing_for_private_only_enp(
+    fedora_33_individual_network,
 ):
     """
     When no public ip is assigned, we should not see an alias created
     therefore /etc/sysconfig/network-scripts/ifcfg-enp0:0 should not exist.
     """
-    builder = fedora_31_individual_network(public=False)
+    builder = fedora_33_individual_network(public=False)
     tasks = builder.render()
     assert "etc/sysconfig/network-scripts/ifcfg-enp0:0" not in tasks
 
 
-def test_fedora_31_private_route_task_etc_sysconfig_network_scripts_route_enp0(
-    fedora_31_individual_network,
+def test_fedora_33_private_route_task_etc_sysconfig_network_scripts_route_enp0(
+    fedora_33_individual_network,
 ):
     """
     When using a public ip, the private ip is assigned as an alias, this
     validates the /etc/sysconfig/network-scripts/route-enp0 route is created
     for the private subnet.
     """
-    builder = fedora_31_individual_network(public=True)
+    builder = fedora_33_individual_network(public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -157,8 +157,8 @@ def test_fedora_31_private_route_task_etc_sysconfig_network_scripts_route_enp0(
 
 
 # pylama:ignore=E501
-def test_fedora_31_private_route_task_etc_sysconfig_network_scripts_route_enp0_with_custom_private_subnets(
-    fedora_31_individual_network,
+def test_fedora_33_private_route_task_etc_sysconfig_network_scripts_route_enp0_with_custom_private_subnets(
+    fedora_33_individual_network,
 ):
     """
     When using a public ip, the private ip is assigned as an alias, this
@@ -166,7 +166,7 @@ def test_fedora_31_private_route_task_etc_sysconfig_network_scripts_route_enp0_w
     for the private subnet.
     """
     subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
-    builder = fedora_31_individual_network(public=True, metadata=subnets)
+    builder = fedora_33_individual_network(public=True, metadata=subnets)
     tasks = builder.render()
     result = dedent(
         """\
@@ -177,23 +177,23 @@ def test_fedora_31_private_route_task_etc_sysconfig_network_scripts_route_enp0_w
     assert tasks["etc/sysconfig/network-scripts/route-enp0"] == result
 
 
-def test_fedora_31_private_route_task_missing_for_private_only_enp(
-    fedora_31_individual_network,
+def test_fedora_33_private_route_task_missing_for_private_only_enp(
+    fedora_33_individual_network,
 ):
     """
     When no public ip is assigned, we should not see a route file created
     therefore /etc/sysconfig/network-scripts/route-enp0 should not exist.
     """
-    builder = fedora_31_individual_network(public=False)
+    builder = fedora_33_individual_network(public=False)
     tasks = builder.render()
     assert "etc/sysconfig/network-scripts/route-enp0" not in tasks
 
 
-def test_fedora_31_etc_resolvers_configured(fedora_31_individual_network, fake):
+def test_fedora_33_etc_resolvers_configured(fedora_33_individual_network, fake):
     """
     Validates /etc/resolv.conf is configured correctly
     """
-    builder = fedora_31_individual_network()
+    builder = fedora_33_individual_network()
     resolver1 = fake.ipv4()
     resolver2 = fake.ipv4()
     builder.network.resolvers = (resolver1, resolver2)
@@ -207,11 +207,11 @@ def test_fedora_31_etc_resolvers_configured(fedora_31_individual_network, fake):
     assert tasks["etc/resolv.conf"] == result
 
 
-def test_fedora_31_etc_hostname_configured(fedora_31_individual_network):
+def test_fedora_33_etc_hostname_configured(fedora_33_individual_network):
     """
     Validates /etc/hostname is configured correctly
     """
-    builder = fedora_31_individual_network()
+    builder = fedora_33_individual_network()
     tasks = builder.render()
     result = dedent(
         """\
@@ -221,11 +221,11 @@ def test_fedora_31_etc_hostname_configured(fedora_31_individual_network):
     assert tasks["etc/hostname"] == result
 
 
-def test_fedora_31_etc_hosts_configured(fedora_31_individual_network):
+def test_fedora_33_etc_hosts_configured(fedora_33_individual_network):
     """
     Validates /etc/hosts is configured correctly
     """
-    builder = fedora_31_individual_network()
+    builder = fedora_33_individual_network()
     tasks = builder.render()
     result = dedent(
         """\
@@ -236,12 +236,12 @@ def test_fedora_31_etc_hosts_configured(fedora_31_individual_network):
     assert tasks["etc/hosts"] == result
 
 
-def test_fedora_31_network_manager_is_disabled(fedora_31_individual_network):
+def test_fedora_33_network_manager_is_disabled(fedora_33_individual_network):
     """
     When using certain operating systems, we want to disable Network Manager,
     here we make sure those distros remove the necessary files
     """
-    builder = fedora_31_individual_network()
+    builder = fedora_33_individual_network()
     tasks = builder.render()
     for service in (
         "dbus-org.freedesktop.NetworkManager",
@@ -251,13 +251,13 @@ def test_fedora_31_network_manager_is_disabled(fedora_31_individual_network):
         assert tasks[os.path.join("etc/systemd/system", service + ".service")] is None
 
 
-def test_fedora_31_persistent_interface_names_does_not_exist(
-    fedora_31_individual_network,
+def test_fedora_33_persistent_interface_names_does_not_exist(
+    fedora_33_individual_network,
 ):
     """
     When using certain operating systems, we want to bypass driver interface name,
     here we make sure the /etc/udev/rules.d/70-persistent-net.rules is generated.
     """
-    builder = fedora_31_individual_network()
+    builder = fedora_33_individual_network()
     tasks = builder.render()
     assert "etc/udev/rules.d/70-persistent-net.rules" not in tasks
