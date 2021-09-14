@@ -1,0 +1,68 @@
+env: {}
+
+steps:
+  - label: "format"
+    key: "format"
+    commands:
+      - nix-shell --run "black --check --diff ."
+    plugins:
+      - docker#v3.8.0:
+          image: "nixos/nix:2.3.6"
+
+  - label: "lint"
+    key: "lint"
+    commands:
+      - nix-shell --run "pylama packetnetworking setup.py"
+    plugins:
+      - docker#v3.8.0:
+          image: "nixos/nix:2.3.6"
+
+  - label: "test-py35"
+    key: "test-py35"
+    depends_on: ["format", "lint"]
+    commands:
+      - pip install tox
+      - tox -e py35
+    plugins:
+      - docker#v3.8.0:
+          image: "python:3.5"
+
+  - label: "test-py36"
+    key: "test-py36"
+    depends_on: ["format", "lint"]
+    commands:
+      - pip install tox
+      - tox -e py36
+    plugins:
+      - docker#v3.8.0:
+          image: "python:3.6"
+
+  - label: "test-py37"
+    key: "test-py37"
+    depends_on: ["format", "lint"]
+    commands:
+      - pip install tox
+      - tox -e py37
+    plugins:
+      - docker#v3.8.0:
+          image: "python:3.7"
+
+  - label: "test-py38"
+    key: "test-py38"
+    depends_on: ["format", "lint"]
+    commands:
+      - pip install tox
+      - tox -e py38
+    plugins:
+      - docker#v3.8.0:
+          image: "python:3.8"
+
+  - label: "test-py39"
+    key: "test-py39"
+    depends_on: ["format", "lint"]
+    commands:
+      - pip install tox
+      - tox -e py39
+    plugins:
+      - docker#v3.8.0:
+          image: "python:3.9"
