@@ -30,3 +30,43 @@ jobs:
           python-version: '3.5'
       - run: pip install tox
       - run: tox -e py35
+  test-python-36:
+    runs-on: ubuntu-latest
+    needs: [format, lint]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.6'
+      - run: pip install tox
+      - run: tox -e py36
+  test-python-37:
+    runs-on: ubuntu-latest
+    needs: [format, lint]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+      - run: pip install tox
+      - run: tox -e py37
+  test-python-38:
+    runs-on: ubuntu-latest
+    needs: [format, lint]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - run: pip install tox
+      - run: tox -e py38
+  test-python-39:
+    runs-on: ubuntu-latest
+    needs: [format, lint]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - run: pip install tox
+      - run: tox -e py39
