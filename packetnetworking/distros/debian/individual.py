@@ -23,6 +23,7 @@ class DebianIndividualNetwork(NetworkBuilder):
             self.tasks.update(generate_persistent_names())
         elif os.distro == "ubuntu" and os.version in [
             "14.04",
+            "18.04",
             "19.04",
             "19.10",
             "20.04",
