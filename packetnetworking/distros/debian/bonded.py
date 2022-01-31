@@ -16,7 +16,7 @@ class DebianBondedNetwork(NetworkBuilder):
 
         os = self.metadata.operating_system
 
-        if os.distro == "debian" and os.version in ["10", "11"]:
+        if os.distro == "debian" and os.version not in ["7", "8"]:
             self.tasks.update(generate_persistent_names())
         elif os.distro == "ubuntu" and os.version in [
             "14.04",
