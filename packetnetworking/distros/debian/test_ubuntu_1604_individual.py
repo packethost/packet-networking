@@ -236,7 +236,7 @@ def test_ubuntu_1604_public_individual_dhcp_task_etc_network_interfaces(
 
 
 def test_ubuntu_1604_etc_resolvers_dhcp(
-    ubuntu_1604_individual_network, make_interfaces_dhcp_metadata,
+    ubuntu_1604_individual_network, make_interfaces_dhcp_metadata
 ):
     """
     Validates /etc/resolv.conf is skipped

@@ -236,7 +236,7 @@ def test_debian_9_public_individual_dhcp_task_etc_network_interfaces(
 
 
 def test_debian_9_etc_resolvers_dhcp(
-    debian_9_individual_network, make_interfaces_dhcp_metadata,
+    debian_9_individual_network, make_interfaces_dhcp_metadata
 ):
     """
     Validates /etc/resolv.conf is skipped

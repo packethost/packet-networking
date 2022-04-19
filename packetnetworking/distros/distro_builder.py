@@ -149,6 +149,9 @@ class DistroBuilder(utils.Tasks):
                 trim_blocks=True,
                 undefined=StrictUndefined,
             )
+
+            tmpl.environment.globals.update(generated_header=utils.generated_header)
+
             try:
                 if file_mode or mode:
                     rendered_tasks[path] = {
