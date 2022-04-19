@@ -1,5 +1,5 @@
 from .. import NetworkBuilder
-from ...utils import generate_persistent_names
+from ...utils import generate_persistent_names_udev
 import os
 
 
@@ -52,5 +52,5 @@ class RedhatIndividualNetwork(NetworkBuilder):
                     os.path.join("etc/systemd/system", service + ".service")
                 ] = None
         else:
-            self.tasks.update(generate_persistent_names())
+            self.tasks.update(generate_persistent_names_udev())
         return self.tasks
