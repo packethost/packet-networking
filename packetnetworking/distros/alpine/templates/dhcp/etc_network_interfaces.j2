@@ -1,0 +1,8 @@
+auto lo
+iface lo inet loopback
+
+{% for iface in interfaces %}
+auto {{ iface.meta_name }}
+iface {{ iface.meta_name }} inet dhcp
+
+{% endfor %}

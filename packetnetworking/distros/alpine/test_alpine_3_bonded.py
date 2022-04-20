@@ -4,46 +4,39 @@ import pytest
 
 
 @pytest.fixture
-def ubuntu_1404_bonded_network(generic_debian_bonded_network):
+def alpine_3_bonded_network(generic_alpine_bonded_network):
     def _builder(**kwargs):
-        return generic_debian_bonded_network("ubuntu", "14.04", **kwargs)
+        return generic_alpine_bonded_network("alpine", "3", **kwargs)
 
     return _builder
 
 
-def test_ubuntu_1404_public_bonded_task_etc_network_interfaces(
-    ubuntu_1404_bonded_network,
-):
+def test_alpine_3_public_bonded_task_etc_network_interfaces(alpine_3_bonded_network):
     """Validates /etc/network/interfaces for a public bond"""
 
-    builder = ubuntu_1404_bonded_network(public=True)
+    builder = alpine_3_bonded_network(public=True)
     tasks = builder.render()
     result = dedent(
         """\
         auto lo
         iface lo inet loopback
 
-        auto {iface0.name}
-        iface {iface0.name} inet manual
-            bond-master bond0
-
-        auto {iface1.name}
-        iface {iface1.name} inet manual
-            pre-up sleep 4
-            bond-master bond0
-
         auto bond0
         iface bond0 inet static
             address {ipv4pub.address}
             netmask {ipv4pub.netmask}
             gateway {ipv4pub.gateway}
+
+            use bond
+            requires {iface0.meta_name} {iface1.meta_name}
+            bond-members {iface0.meta_name} {iface1.meta_name}
+            bond-mode {bonding_mode}
+
             bond-downdelay 200
             bond-miimon 100
-            bond-mode {bonding_mode}
             bond-updelay 200
             bond-xmit_hash_policy layer3+4
-            bond-lacp-rate 1
-            bond-slaves {iface0.name} {iface1.name}
+
             dns-nameservers {dns1} {dns2}
         iface bond0 inet6 static
             address {ipv6pub.address}
@@ -70,41 +63,34 @@ def test_ubuntu_1404_public_bonded_task_etc_network_interfaces(
     assert tasks["etc/network/interfaces"] == result
 
 
-def test_ubuntu_1404_private_bonded_task_etc_network_interfaces(
-    ubuntu_1404_bonded_network,
-):
+def test_alpine_3_private_bonded_task_etc_network_interfaces(alpine_3_bonded_network):
     """
     When no public ip is assigned, we should see the private ip details in the
     /etc/network/interfaces file.
     """
-    builder = ubuntu_1404_bonded_network(public=False)
+    builder = alpine_3_bonded_network(public=False)
     tasks = builder.render()
     result = dedent(
         """\
         auto lo
         iface lo inet loopback
 
-        auto {iface0.name}
-        iface {iface0.name} inet manual
-            bond-master bond0
-
-        auto {iface1.name}
-        iface {iface1.name} inet manual
-            pre-up sleep 4
-            bond-master bond0
-
         auto bond0
         iface bond0 inet static
             address {ipv4priv.address}
             netmask {ipv4priv.netmask}
             gateway {ipv4priv.gateway}
+
+            use bond
+            requires {iface0.meta_name} {iface1.meta_name}
+            bond-members {iface0.meta_name} {iface1.meta_name}
+            bond-mode {bonding_mode}
+
             bond-downdelay 200
             bond-miimon 100
-            bond-mode {bonding_mode}
             bond-updelay 200
             bond-xmit_hash_policy layer3+4
-            bond-lacp-rate 1
-            bond-slaves {iface0.name} {iface1.name}
+
             dns-nameservers {dns1} {dns2}
 
     """
@@ -119,39 +105,34 @@ def test_ubuntu_1404_private_bonded_task_etc_network_interfaces(
     assert tasks["etc/network/interfaces"] == result
 
 
-def test_ubuntu_1404_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
-    ubuntu_1404_bonded_network,
+def test_alpine_3_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
+    alpine_3_bonded_network,
 ):
     """Validates /etc/network/interfaces for a public bond"""
     subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
-    builder = ubuntu_1404_bonded_network(public=True, metadata=subnets)
+    builder = alpine_3_bonded_network(public=True, metadata=subnets)
     tasks = builder.render()
     result = dedent(
         """\
         auto lo
         iface lo inet loopback
 
-        auto {iface0.name}
-        iface {iface0.name} inet manual
-            bond-master bond0
-
-        auto {iface1.name}
-        iface {iface1.name} inet manual
-            pre-up sleep 4
-            bond-master bond0
-
         auto bond0
         iface bond0 inet static
             address {ipv4pub.address}
             netmask {ipv4pub.netmask}
             gateway {ipv4pub.gateway}
+
+            use bond
+            requires {iface0.meta_name} {iface1.meta_name}
+            bond-members {iface0.meta_name} {iface1.meta_name}
+            bond-mode {bonding_mode}
+
             bond-downdelay 200
             bond-miimon 100
-            bond-mode {bonding_mode}
             bond-updelay 200
             bond-xmit_hash_policy layer3+4
-            bond-lacp-rate 1
-            bond-slaves {iface0.name} {iface1.name}
+
             dns-nameservers {dns1} {dns2}
         iface bond0 inet6 static
             address {ipv6pub.address}
@@ -180,42 +161,37 @@ def test_ubuntu_1404_public_bonded_task_etc_network_interfaces_with_custom_priva
     assert tasks["etc/network/interfaces"] == result
 
 
-def test_ubuntu_1404_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
-    ubuntu_1404_bonded_network,
+def test_alpine_3_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
+    alpine_3_bonded_network,
 ):
     """
     When no public ip is assigned, we should see the private ip details in the
     /etc/network/interfaces file.
     """
     subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
-    builder = ubuntu_1404_bonded_network(public=False, metadata=subnets)
+    builder = alpine_3_bonded_network(public=False, metadata=subnets)
     tasks = builder.render()
     result = dedent(
         """\
         auto lo
         iface lo inet loopback
 
-        auto {iface0.name}
-        iface {iface0.name} inet manual
-            bond-master bond0
-
-        auto {iface1.name}
-        iface {iface1.name} inet manual
-            pre-up sleep 4
-            bond-master bond0
-
         auto bond0
         iface bond0 inet static
             address {ipv4priv.address}
             netmask {ipv4priv.netmask}
             gateway {ipv4priv.gateway}
+
+            use bond
+            requires {iface0.meta_name} {iface1.meta_name}
+            bond-members {iface0.meta_name} {iface1.meta_name}
+            bond-mode {bonding_mode}
+
             bond-downdelay 200
             bond-miimon 100
-            bond-mode {bonding_mode}
             bond-updelay 200
             bond-xmit_hash_policy layer3+4
-            bond-lacp-rate 1
-            bond-slaves {iface0.name} {iface1.name}
+
             dns-nameservers {dns1} {dns2}
 
     """
@@ -230,9 +206,9 @@ def test_ubuntu_1404_private_bonded_task_etc_network_interfaces_with_custom_priv
     assert tasks["etc/network/interfaces"] == result
 
 
-def test_ubuntu_1404_task_etc_modules(ubuntu_1404_bonded_network):
+def test_alpine_3_task_etc_modules(alpine_3_bonded_network):
     """Validates /etc/modules for a public bond"""
-    builder = ubuntu_1404_bonded_network(public=True)
+    builder = alpine_3_bonded_network(public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -243,11 +219,11 @@ def test_ubuntu_1404_task_etc_modules(ubuntu_1404_bonded_network):
     assert tasks["etc/modules"]["content"] == result
 
 
-def test_ubuntu_1404_etc_resolvers_configured(ubuntu_1404_bonded_network, fake):
+def test_alpine_3_etc_resolvers_configured(alpine_3_bonded_network, fake):
     """
     Validates /etc/resolv.conf is configured correctly
     """
-    builder = ubuntu_1404_bonded_network()
+    builder = alpine_3_bonded_network()
     resolver1 = fake.ipv4()
     resolver2 = fake.ipv4()
     builder.network.resolvers = (resolver1, resolver2)
@@ -261,11 +237,11 @@ def test_ubuntu_1404_etc_resolvers_configured(ubuntu_1404_bonded_network, fake):
     assert tasks["etc/resolv.conf"] == result
 
 
-def test_ubuntu_1404_etc_hostname_configured(ubuntu_1404_bonded_network):
+def test_alpine_3_etc_hostname_configured(alpine_3_bonded_network):
     """
     Validates /etc/hostname is configured correctly
     """
-    builder = ubuntu_1404_bonded_network()
+    builder = alpine_3_bonded_network()
     tasks = builder.render()
     result = dedent(
         """\
@@ -275,11 +251,11 @@ def test_ubuntu_1404_etc_hostname_configured(ubuntu_1404_bonded_network):
     assert tasks["etc/hostname"] == result
 
 
-def test_ubuntu_1404_etc_hosts_configured(ubuntu_1404_bonded_network):
+def test_alpine_3_etc_hosts_configured(alpine_3_bonded_network):
     """
     Validates /etc/hosts is configured correctly
     """
-    builder = ubuntu_1404_bonded_network()
+    builder = alpine_3_bonded_network()
     tasks = builder.render()
     result = dedent(
         """\
@@ -294,29 +270,34 @@ def test_ubuntu_1404_etc_hosts_configured(ubuntu_1404_bonded_network):
     assert tasks["etc/hosts"] == result
 
 
-def test_ubuntu_1404_persistent_interface_names(ubuntu_1404_bonded_network):
+def test_alpine_3_persistent_interface_names(alpine_3_bonded_network):
     """
     When using certain operating systems, we want to bypass driver interface name,
-    here we make sure the /etc/udev/rules.d/70-persistent-net.rules is generated.
+    here we make sure the /etc/mdev.conf and /etc/mactab are generated.
     """
-    builder = ubuntu_1404_bonded_network()
+    builder = alpine_3_bonded_network()
     tasks = builder.render()
-    result = dedent(
+
+    mdevconf_result = dedent(
         """\
         {header}
-        #
-        # You can modify it, as long as you keep each rule on a single
-        # line, and change only the value of the NAME= key.
 
-        # PCI device (custom name provided by external tool to mimic Predictable Network Interface Names)
-        SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{{address}}=="{iface0.mac}", ATTR{{dev_id}}=="0x0", ATTR{{type}}=="1", NAME="{iface0.name}"
+        -SUBSYSTEM=net;DEVPATH=.*/net/.*;.*     root:root 600 @/sbin/nameif -s
+    """
+    ).format(header=utils.generated_header())
 
-        # PCI device (custom name provided by external tool to mimic Predictable Network Interface Names)
-        SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{{address}}=="{iface1.mac}", ATTR{{dev_id}}=="0x0", ATTR{{type}}=="1", NAME="{iface1.name}"
+    mactab_result = dedent(
+        """\
+        {header}
+
+        {iface0.meta_name} {iface0.mac}
+        {iface1.meta_name} {iface1.mac}
     """
     ).format(
         header=utils.generated_header(),
         iface0=builder.network.interfaces[0],
         iface1=builder.network.interfaces[1],
     )
-    assert tasks["etc/udev/rules.d/70-persistent-net.rules"] == result
+
+    assert tasks["etc/mdev.conf"] == mdevconf_result
+    assert tasks["etc/mactab"] == mactab_result

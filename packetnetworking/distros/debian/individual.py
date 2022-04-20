@@ -1,5 +1,5 @@
 from .. import NetworkBuilder
-from ...utils import generate_persistent_names
+from ...utils import generate_persistent_names_udev
 
 
 class DebianIndividualNetwork(NetworkBuilder):
@@ -20,7 +20,7 @@ class DebianIndividualNetwork(NetworkBuilder):
         os = self.metadata.operating_system
 
         if os.distro == "debian" and os.version in ["10", "11"]:
-            self.tasks.update(generate_persistent_names())
+            self.tasks.update(generate_persistent_names_udev())
         elif os.distro == "ubuntu" and os.version in [
             "14.04",
             "18.04",
@@ -30,5 +30,5 @@ class DebianIndividualNetwork(NetworkBuilder):
             "20.10",
             "21.04",
         ]:
-            self.tasks.update(generate_persistent_names())
+            self.tasks.update(generate_persistent_names_udev())
         return self.tasks

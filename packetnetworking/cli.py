@@ -153,6 +153,15 @@ def set_os(builder, operating_system, quiet):
                 )
             sys.exit(20)
         os_name, os_version = operating_system.split()
+
+        if os_name == "n/a" or os_version == "n/a":
+            log.debug(
+                "Provided os information is invalid, ignoring. os='{os_name}' version='{os_version}'".format(
+                    os_name=os_name, os_version=os_version
+                )
+            )
+            return
+
         os = builder.metadata.operating_system
         if os.distro:
             os.distro = os.distro.lower()
