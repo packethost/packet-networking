@@ -2,7 +2,7 @@ auto lo
 iface lo inet loopback
 
 {% for iface in interfaces %}
-auto {{ iface.name }}
-iface {{ iface.name }} inet dhcp
+auto {{ iface.meta_name }}
+iface {{ iface.meta_name }} inet dhcp
 
 {% endfor %}

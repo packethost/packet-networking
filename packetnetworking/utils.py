@@ -228,7 +228,7 @@ def generate_persistent_names_mdev():
         {{ generated_header() }}
 
         {% for iface in interfaces %}
-        {{ iface.name }} {{ iface.mac }}
+        {{ iface.meta_name }} {{ iface.mac }}
         {% endfor %}
     """
 
@@ -374,6 +374,10 @@ def get_matched_interfaces(metainterfaces, realinterfaces):
                 d = {}
                 d.update(metainterface)
                 d.update(realinterface)
+
+                # Expose the original metadata name for alternative implementations
+                d["meta_name"] = metainterface.get("name")
+
                 nics.append(d)
 
     return nics

@@ -1,8 +1,8 @@
 auto lo
 iface lo inet loopback
 
-auto {{ iface0.name }}
-iface {{ iface0.name }} inet static
+auto {{ iface0.meta_name }}
+iface {{ iface0.meta_name }} inet static
     {% if ip4pub %}
     address {{ ip4pub.address }}
     netmask {{ ip4pub.netmask }}
@@ -16,15 +16,15 @@ iface {{ iface0.name }} inet static
     dns-nameservers{% for dns in resolvers %} {{ dns }}{% endfor %}
 
 {% if ip6pub %}
-iface {{ iface0.name }} inet6 static
+iface {{ iface0.meta_name }} inet6 static
     address {{ ip6pub.address }}
     netmask {{ ip6pub.cidr }}
     gateway {{ ip6pub.gateway }}
 {% endif %}
 
 {% if ip4pub %}
-auto {{ iface0.name }}:0
-iface {{ iface0.name }}:0 inet static
+auto {{ iface0.meta_name }}:0
+iface {{ iface0.meta_name }}:0 inet static
     address {{ ip4priv.address }}
     netmask {{ ip4priv.netmask }}
     {% for subnet in private_subnets %}

@@ -16,11 +16,11 @@ def expected_file_etc_network_interfaces_dhcp_2():
         auto lo
         iface lo inet loopback
 
-        auto enp0
-        iface enp0 inet dhcp
+        auto eth0
+        iface eth0 inet dhcp
 
-        auto enp1
-        iface enp1 inet dhcp
+        auto eth1
+        iface eth1 inet dhcp
 
     """
     )

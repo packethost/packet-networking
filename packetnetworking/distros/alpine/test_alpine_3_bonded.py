@@ -28,8 +28,8 @@ def test_alpine_3_public_bonded_task_etc_network_interfaces(alpine_3_bonded_netw
             gateway {ipv4pub.gateway}
 
             use bond
-            requires {iface0.name} {iface1.name}
-            bond-members {iface0.name} {iface1.name}
+            requires {iface0.meta_name} {iface1.meta_name}
+            bond-members {iface0.meta_name} {iface1.meta_name}
             bond-mode {bonding_mode}
 
             bond-downdelay 200
@@ -82,8 +82,8 @@ def test_alpine_3_private_bonded_task_etc_network_interfaces(alpine_3_bonded_net
             gateway {ipv4priv.gateway}
 
             use bond
-            requires {iface0.name} {iface1.name}
-            bond-members {iface0.name} {iface1.name}
+            requires {iface0.meta_name} {iface1.meta_name}
+            bond-members {iface0.meta_name} {iface1.meta_name}
             bond-mode {bonding_mode}
 
             bond-downdelay 200
@@ -124,8 +124,8 @@ def test_alpine_3_public_bonded_task_etc_network_interfaces_with_custom_private_
             gateway {ipv4pub.gateway}
 
             use bond
-            requires {iface0.name} {iface1.name}
-            bond-members {iface0.name} {iface1.name}
+            requires {iface0.meta_name} {iface1.meta_name}
+            bond-members {iface0.meta_name} {iface1.meta_name}
             bond-mode {bonding_mode}
 
             bond-downdelay 200
@@ -183,8 +183,8 @@ def test_alpine_3_private_bonded_task_etc_network_interfaces_with_custom_private
             gateway {ipv4priv.gateway}
 
             use bond
-            requires {iface0.name} {iface1.name}
-            bond-members {iface0.name} {iface1.name}
+            requires {iface0.meta_name} {iface1.meta_name}
+            bond-members {iface0.meta_name} {iface1.meta_name}
             bond-mode {bonding_mode}
 
             bond-downdelay 200
@@ -290,8 +290,8 @@ def test_alpine_3_persistent_interface_names(alpine_3_bonded_network):
         """\
         {header}
 
-        {iface0.name} {iface0.mac}
-        {iface1.name} {iface1.mac}
+        {iface0.meta_name} {iface0.mac}
+        {iface1.meta_name} {iface1.mac}
     """
     ).format(
         header=utils.generated_header(),

@@ -23,20 +23,20 @@ def test_alpine_3_public_individual_task_etc_network_interfaces(
         auto lo
         iface lo inet loopback
 
-        auto enp0
-        iface enp0 inet static
+        auto eth0
+        iface eth0 inet static
             address {ipv4pub.address}
             netmask {ipv4pub.netmask}
             gateway {ipv4pub.gateway}
 
             dns-nameservers {dns1} {dns2}
-        iface enp0 inet6 static
+        iface eth0 inet6 static
             address {ipv6pub.address}
             netmask {ipv6pub.cidr}
             gateway {ipv6pub.gateway}
 
-        auto enp0:0
-        iface enp0:0 inet static
+        auto eth0:0
+        iface eth0:0 inet static
             address {ipv4priv.address}
             netmask {ipv4priv.netmask}
             post-up route add -net 10.0.0.0/8 gw {ipv4priv.gateway}
@@ -66,8 +66,8 @@ def test_alpine_3_private_individual_task_etc_network_interfaces(
         auto lo
         iface lo inet loopback
 
-        auto enp0
-        iface enp0 inet static
+        auto eth0
+        iface eth0 inet static
             address {ipv4priv.address}
             netmask {ipv4priv.netmask}
             gateway {ipv4priv.gateway}
@@ -95,20 +95,20 @@ def test_alpine_3_public_individual_task_etc_network_interfaces_with_custom_priv
         auto lo
         iface lo inet loopback
 
-        auto enp0
-        iface enp0 inet static
+        auto eth0
+        iface eth0 inet static
             address {ipv4pub.address}
             netmask {ipv4pub.netmask}
             gateway {ipv4pub.gateway}
 
             dns-nameservers {dns1} {dns2}
-        iface enp0 inet6 static
+        iface eth0 inet6 static
             address {ipv6pub.address}
             netmask {ipv6pub.cidr}
             gateway {ipv6pub.gateway}
 
-        auto enp0:0
-        iface enp0:0 inet static
+        auto eth0:0
+        iface eth0:0 inet static
             address {ipv4priv.address}
             netmask {ipv4priv.netmask}
             post-up route add -net 192.168.5.0/24 gw {ipv4priv.gateway}
@@ -141,8 +141,8 @@ def test_alpine_3_private_individual_task_etc_network_interfaces_with_custom_pri
         auto lo
         iface lo inet loopback
 
-        auto enp0
-        iface enp0 inet static
+        auto eth0
+        iface eth0 inet static
             address {ipv4priv.address}
             netmask {ipv4priv.netmask}
             gateway {ipv4priv.gateway}
@@ -229,8 +229,8 @@ def test_alpine_3_persistent_interface_names(alpine_3_individual_network):
         """\
         {header}
 
-        {iface0.name} {iface0.mac}
-        {iface1.name} {iface1.mac}
+        {iface0.meta_name} {iface0.mac}
+        {iface1.meta_name} {iface1.mac}
     """
     ).format(
         header=utils.generated_header(),

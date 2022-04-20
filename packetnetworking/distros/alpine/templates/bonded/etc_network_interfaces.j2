@@ -14,9 +14,9 @@ iface bond0 inet static
     {% endif %}
 
     use bond
-    requires{% for iface in interfaces %} {{ iface.name }}{% endfor %}
+    requires{% for iface in interfaces %} {{ iface.meta_name }}{% endfor %}
 
-    bond-members{% for iface in interfaces %} {{ iface.name }}{% endfor %}
+    bond-members{% for iface in interfaces %} {{ iface.meta_name }}{% endfor %}
 
     bond-mode {{ net.bonding.mode }}
 
