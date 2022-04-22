@@ -232,7 +232,10 @@ def generate_persistent_names_mdev():
         {% endfor %}
     """
 
-    return {"etc/mdev.conf": mdevconf, "etc/mactab": mactab}
+    return {
+        "etc/mdev.conf": {"file_mode": "a", "template": mdevconf},
+        "etc/mactab": mactab,
+    }
 
 
 def resolvers(default):
