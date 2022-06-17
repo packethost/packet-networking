@@ -75,6 +75,7 @@ class NetworkData(object):
         self.nw_metadata = None
         self.bonding = None
         self.interfaces = None
+        self.physical_interfaces = None
         self.bonds = None
         self.addresses = None
         self.resolvers = default_resolvers
@@ -105,6 +106,7 @@ class NetworkData(object):
             log.debug("Metadata Interfaces: {}".format(self.nw_metadata.interfaces))
             raise LookupError("No interfaces matched ones provided from metadata")
         self.interfaces = utils.RecursiveAttributes(matched_ifaces)
+        self.physical_interfaces = utils.RecursiveAttributes(physical_ifaces)
 
     def build_bonds(self):
         self.bonds = utils.RecursiveDictAttributes({})
@@ -125,6 +127,7 @@ class NetworkData(object):
         return {
             "bonding": self.bonding,
             "interfaces": self.interfaces,
+            "physical_interfaces": self.physical_interfaces,
             "bonds": self.bonds,
             "addresses": self.addresses,
             "resolvers": self.resolvers,
