@@ -17,7 +17,7 @@ class RedhatBondedNetwork(NetworkBuilder):
             "etc/modprobe.d/bonding.conf", "bonded/etc_modprobe.d_bonding.conf.j2"
         )
 
-        for bond in self.network.bonds.keys():
+        for bond in self.network.bonds:
             self.task_template(
                 "etc/sysconfig/network-scripts/ifcfg-{}".format(bond),
                 "bonded/etc_sysconfig_network-scripts_ifcfg-bondX.j2",
