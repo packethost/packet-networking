@@ -1,6 +1,6 @@
 DEVICE={iface}
 ONBOOT=yes
 HWADDR={{{{ interfaces[{i}].mac }}}}
-MASTER={iface.bond}
+MASTER={{{{ interfaces[{i}].bond }}}}
 SLAVE=yes
 BOOTPROTO=none

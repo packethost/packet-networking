@@ -16,22 +16,27 @@ class RedhatBondedNetwork(NetworkBuilder):
         self.task_template(
             "etc/modprobe.d/bonding.conf", "bonded/etc_modprobe.d_bonding.conf.j2"
         )
-        self.task_template(
-            "etc/sysconfig/network-scripts/ifcfg-bond0",
-            "bonded/etc_sysconfig_network-scripts_ifcfg-bond0.j2",
-        )
 
-        if self.ipv4pub:
-            # Only needed when a public ip is used, otherwise private ip is
-            # already set and no special routes are needed.
+        for bond in self.network.bonds.keys():
             self.task_template(
-                "etc/sysconfig/network-scripts/ifcfg-bond0:0",
-                "bonded/etc_sysconfig_network-scripts_ifcfg-bond0_0.j2",
+                "etc/sysconfig/network-scripts/ifcfg-{}".format(bond),
+                "bonded/etc_sysconfig_network-scripts_ifcfg-bondX.j2",
+                fmt={"bond": bond},
             )
-            self.task_template(
-                "etc/sysconfig/network-scripts/route-bond0",
-                "bonded/etc_sysconfig_network-scripts_route-bond0.j2",
-            )
+
+            if self.ipv4pub:
+                # Only needed when a public ip is used, otherwise private ip is
+                # already set and no special routes are needed.
+                self.task_template(
+                    "etc/sysconfig/network-scripts/ifcfg-{}:0".format(bond),
+                    "bonded/etc_sysconfig_network-scripts_ifcfg-bondX_0.j2",
+                    fmt={"bond": bond},
+                )
+                self.task_template(
+                    "etc/sysconfig/network-scripts/route-{}".format(bond),
+                    "bonded/etc_sysconfig_network-scripts_route-bondX.j2",
+                    fmt={"bond": bond},
+                )
 
         for i, iface in enumerate(self.network.interfaces):
             name = iface["name"]
