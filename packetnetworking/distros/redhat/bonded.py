@@ -24,7 +24,7 @@ class RedhatBondedNetwork(NetworkBuilder):
                 fmt={"bond": bond},
             )
 
-            if self.ipv4pub:
+            if self.ipv4pub and bond == "bond0":
                 # Only needed when a public ip is used, otherwise private ip is
                 # already set and no special routes are needed.
                 self.task_template(
