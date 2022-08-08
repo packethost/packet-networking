@@ -1,2 +1,4 @@
-alias bond0 bonding
-options bond0 mode={{ net.bonding.mode }} miimon=100 downdelay=200 updelay=200 xmit_hash_policy=layer3+4 lacp_rate=1
+{% for bond in net.bonds %}
+alias {{ bond }} bonding
+options {{ bond }} mode={{ net.bonding.mode }} miimon=100 downdelay=200 updelay=200 xmit_hash_policy=layer3+4 lacp_rate=1
+{% endfor %}
