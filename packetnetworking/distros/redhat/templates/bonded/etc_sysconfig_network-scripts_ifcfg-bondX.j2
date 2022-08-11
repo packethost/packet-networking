@@ -1,5 +1,6 @@
 DEVICE={bond}
 NAME={bond}
+{{% if bond == "bond0" %}}
 {{% if ip4pub %}}
 IPADDR={{{{ ip4pub.address }}}}
 NETMASK={{{{ ip4pub.netmask }}}}
@@ -9,16 +10,19 @@ IPADDR={{{{ ip4priv.address }}}}
 NETMASK={{{{ ip4priv.netmask }}}}
 GATEWAY={{{{ ip4priv.gateway }}}}
 {{% endif %}}
+{{% endif %}}
 BOOTPROTO=none
 ONBOOT=yes
 USERCTL=no
 TYPE=Bond
 BONDING_OPTS="mode={{{{ net.bonding.mode }}}} miimon=100 downdelay=200 updelay=200"
 
+{{% if bond == "bond0" %}}
 {{% if ip6pub %}}
 IPV6INIT=yes
 IPV6ADDR={{{{ ip6pub.address }}}}/{{{{ ip6pub.cidr }}}}
 IPV6_DEFAULTGW={{{{ ip6pub.gateway }}}}
+{{% endif %}}
 {{% endif %}}
 {{% for dns in resolvers %}}
 DNS{{{{ loop.index }}}}={{{{ dns }}}}
