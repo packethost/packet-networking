@@ -230,6 +230,14 @@ def generate_persistent_names_mdev():
         {% for iface in interfaces %}
         {{ iface.meta_name }} {{ iface.mac }}
         {% endfor %}
+        {%- if net.physical_interfaces|length > interfaces|length %}
+        {%- set existing_macs = interfaces|map(attribute='mac') | list %}
+        {%- set ns = namespace(idx=interfaces|length) %}
+        {%- for iface in net.physical_interfaces if iface.mac not in existing_macs %}
+        eth{{ ns.idx }} {{ iface.mac }}
+        {% set ns.idx = ns.idx + 1 %}
+        {% endfor %}
+        {% endif %}
     """
 
     return {"etc/mdev.conf": mdevconf, "etc/mactab": mactab}

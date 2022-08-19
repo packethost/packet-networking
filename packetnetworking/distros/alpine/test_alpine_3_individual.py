@@ -231,11 +231,15 @@ def test_alpine_3_persistent_interface_names(alpine_3_individual_network):
 
         {iface0.meta_name} {iface0.mac}
         {iface1.meta_name} {iface1.mac}
+        eth2 {phys_iface0.mac}
+        eth3 {phys_iface1.mac}
     """
     ).format(
         header=utils.generated_header(),
         iface0=builder.network.interfaces[0],
         iface1=builder.network.interfaces[1],
+        phys_iface0=builder.network.physical_interfaces[0],
+        phys_iface1=builder.network.physical_interfaces[1],
     )
 
     assert tasks["etc/mdev.conf"] == mdevconf_result

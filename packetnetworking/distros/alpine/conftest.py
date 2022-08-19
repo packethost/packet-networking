@@ -38,8 +38,10 @@ def alpinebuilder(mockit, fake, metadata, patch_dict):
             {"name": "eth1", "mac": "00:0c:29:51:53:a2", "bond": "bond0"},
         ]
         phys_interfaces = [
-            {"name": "enp0", "mac": "00:0c:29:51:53:a1"},
-            {"name": "enp1", "mac": "00:0c:29:51:53:a2"},
+            {"name": "enp0", "mac": "00:0c:29:51:53:a4"},
+            {"name": "enp1", "mac": "00:0c:29:51:53:a3"},
+            {"name": "enp2", "mac": "00:0c:29:51:53:a1"},
+            {"name": "enp3", "mac": "00:0c:29:51:53:a2"},
         ]
         _metadata = {"network": {"interfaces": meta_interfaces}}
         if metadata:
