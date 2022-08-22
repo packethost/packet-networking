@@ -1,6 +1,6 @@
 DEVICE={bond}
 NAME={bond}
-{{% if bond == "bond0" %}}
+{{% if "{bond}" == "bond0" %}}
 {{% if ip4pub %}}
 IPADDR={{{{ ip4pub.address }}}}
 NETMASK={{{{ ip4pub.netmask }}}}
