@@ -303,5 +303,5 @@ def test_alpine_3_persistent_interface_names(alpine_3_bonded_network):
         phys_iface1=builder.network.physical_interfaces[1],
     )
 
-    assert tasks["etc/mdev.conf"] == mdevconf_result
+    assert tasks["etc/mdev.conf"]["content"] == mdevconf_result
     assert tasks["etc/mactab"] == mactab_result
