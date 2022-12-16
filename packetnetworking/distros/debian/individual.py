@@ -22,13 +22,8 @@ class DebianIndividualNetwork(NetworkBuilder):
         if os.distro == "debian" and os.version in ["10", "11"]:
             self.tasks.update(generate_persistent_names_udev())
         elif os.distro == "ubuntu" and os.version in [
-            "14.04",
             "18.04",
-            "19.04",
-            "19.10",
             "20.04",
-            "20.10",
-            "21.04",
             "22.04",
         ]:
             self.tasks.update(generate_persistent_names_udev())

@@ -13,20 +13,5 @@ class DebianBondedNetwork(NetworkBuilder):
     def build_tasks(self):
         self.task_template("etc/network/interfaces", "bonded/etc_network_interfaces.j2")
         self.task_template("etc/modules", "bonded/etc_modules.j2", write_mode="a")
-
-        os = self.metadata.operating_system
-
-        if os.distro == "debian" and os.version not in ["7", "8"]:
-            self.tasks.update(generate_persistent_names_udev())
-        elif os.distro == "ubuntu" and os.version in [
-            "14.04",
-            "18.04",
-            "19.04",
-            "19.10",
-            "20.04",
-            "20.10",
-            "21.04",
-            "22.04",
-        ]:
-            self.tasks.update(generate_persistent_names_udev())
+        self.tasks.update(generate_persistent_names_udev())
         return self.tasks
