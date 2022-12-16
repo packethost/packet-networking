@@ -45,6 +45,7 @@ def test_ubuntu_2204_public_bonded_task_etc_network_interfaces(
             bond-lacp-rate 1
             bond-slaves {iface0.name} {iface1.name}
             dns-nameservers {dns1} {dns2}
+
         iface bond0 inet6 static
             address {ipv6pub.address}
             netmask {ipv6pub.cidr}
@@ -107,6 +108,7 @@ def test_ubuntu_2204_private_bonded_task_etc_network_interfaces(
             bond-slaves {iface0.name} {iface1.name}
             dns-nameservers {dns1} {dns2}
 
+
     """
     ).format(
         ipv4priv=builder.ipv4priv.first,
@@ -153,6 +155,7 @@ def test_ubuntu_2204_public_bonded_task_etc_network_interfaces_with_custom_priva
             bond-lacp-rate 1
             bond-slaves {iface0.name} {iface1.name}
             dns-nameservers {dns1} {dns2}
+
         iface bond0 inet6 static
             address {ipv6pub.address}
             netmask {ipv6pub.cidr}
@@ -217,6 +220,7 @@ def test_ubuntu_2204_private_bonded_task_etc_network_interfaces_with_custom_priv
             bond-lacp-rate 1
             bond-slaves {iface0.name} {iface1.name}
             dns-nameservers {dns1} {dns2}
+
 
     """
     ).format(

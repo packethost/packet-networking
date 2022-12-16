@@ -13,7 +13,7 @@ iface {{ iface0.name }} inet static
     gateway {{ ip4priv.gateway }}
     {% endif %}
 
-    dns-nameservers{% for dns in resolvers %} {{ dns }}{% endfor %}
+    dns-nameservers {{ resolvers | join(" ") }}
 
 {% if ip6pub %}
 iface {{ iface0.name }} inet6 static

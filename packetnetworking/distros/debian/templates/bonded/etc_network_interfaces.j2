@@ -33,7 +33,7 @@ iface bond0 inet static
     {% endif %}
     bond-slaves{% for iface in interfaces %} {{ iface.name }}{% endfor %}
 
-    dns-nameservers{% for dns in resolvers %} {{ dns }}{% endfor %}
+    dns-nameservers {{ resolvers | join(" ") }}
 
 {% if ip6pub %}
 iface bond0 inet6 static

@@ -30,6 +30,7 @@ def test_ubuntu_2204_public_individual_task_etc_network_interfaces(
             gateway {ipv4pub.gateway}
 
             dns-nameservers {dns1} {dns2}
+
         iface enp0 inet6 static
             address {ipv6pub.address}
             netmask {ipv6pub.cidr}
@@ -74,6 +75,7 @@ def test_ubuntu_2204_private_individual_task_etc_network_interfaces(
 
             dns-nameservers {dns1} {dns2}
 
+
     """
     ).format(
         ipv4priv=builder.ipv4priv.first,
@@ -102,6 +104,7 @@ def test_ubuntu_2204_public_individual_task_etc_network_interfaces_with_custom_p
             gateway {ipv4pub.gateway}
 
             dns-nameservers {dns1} {dns2}
+
         iface enp0 inet6 static
             address {ipv6pub.address}
             netmask {ipv6pub.cidr}
@@ -148,6 +151,7 @@ def test_ubuntu_2204_private_individual_task_etc_network_interfaces_with_custom_
             gateway {ipv4priv.gateway}
 
             dns-nameservers {dns1} {dns2}
+
 
     """
     ).format(

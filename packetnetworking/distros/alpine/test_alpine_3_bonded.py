@@ -38,6 +38,7 @@ def test_alpine_3_public_bonded_task_etc_network_interfaces(alpine_3_bonded_netw
             bond-xmit_hash_policy layer3+4
 
             dns-nameservers {dns1} {dns2}
+
         iface bond0 inet6 static
             address {ipv6pub.address}
             netmask {ipv6pub.cidr}
@@ -93,6 +94,7 @@ def test_alpine_3_private_bonded_task_etc_network_interfaces(alpine_3_bonded_net
 
             dns-nameservers {dns1} {dns2}
 
+
     """
     ).format(
         ipv4priv=builder.ipv4priv.first,
@@ -134,6 +136,7 @@ def test_alpine_3_public_bonded_task_etc_network_interfaces_with_custom_private_
             bond-xmit_hash_policy layer3+4
 
             dns-nameservers {dns1} {dns2}
+
         iface bond0 inet6 static
             address {ipv6pub.address}
             netmask {ipv6pub.cidr}
@@ -193,6 +196,7 @@ def test_alpine_3_private_bonded_task_etc_network_interfaces_with_custom_private
             bond-xmit_hash_policy layer3+4
 
             dns-nameservers {dns1} {dns2}
+
 
     """
     ).format(
