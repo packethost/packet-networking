@@ -20,53 +20,24 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
       - run: nix-shell --run "pylama packetnetworking setup.py"
-  test-python-37:
+  pytests:
     runs-on: ubuntu-latest
-    needs: [format, lint]
+    strategy:
+      matrix:
+        python-version:
+          - "3.7"
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.7'
+          python-version: "${{matrix.python-version}}"
       - run: pip install tox
-      - run: tox -e py37
-  test-python-38:
-    runs-on: ubuntu-latest
-    needs: [format, lint]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
-      - run: pip install tox
-      - run: tox -e py38
-  test-python-39:
-    runs-on: ubuntu-latest
-    needs: [format, lint]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-      - run: pip install tox
-      - run: tox -e py39
-  test-python-310:
-    runs-on: ubuntu-latest
-    needs: [format, lint]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-      - run: pip install tox
-      - run: tox -e py310
-  test-python-311:
-    runs-on: ubuntu-latest
-    needs: [format, lint]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      - run: pip install tox
-      - run: tox -e py311
+      - name: Test on Python ${{matrix.python-version}}
+        run: |
+          pyversion=py${{matrix.python-version}}
+          pyversion=${pyversion//./}
+          tox -e "$pyversion"
