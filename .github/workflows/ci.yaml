@@ -20,63 +20,24 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
       - run: nix-shell --run "pylama packetnetworking setup.py"
-  test-python-35:
+  pytests:
     runs-on: ubuntu-latest
-    needs: [format, lint]
+    strategy:
+      matrix:
+        python-version:
+          - "3.7"
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.5'
+          python-version: "${{matrix.python-version}}"
       - run: pip install tox
-      - run: tox -e py35
-  test-python-36:
-    runs-on: ubuntu-latest
-    needs: [format, lint]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.6'
-      - run: pip install tox
-      - run: tox -e py36
-  test-python-37:
-    runs-on: ubuntu-latest
-    needs: [format, lint]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.7'
-      - run: pip install tox
-      - run: tox -e py37
-  test-python-38:
-    runs-on: ubuntu-latest
-    needs: [format, lint]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
-      - run: pip install tox
-      - run: tox -e py38
-  test-python-39:
-    runs-on: ubuntu-latest
-    needs: [format, lint]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-      - run: pip install tox
-      - run: tox -e py39
-  test-python-310:
-    runs-on: ubuntu-latest
-    needs: [format, lint]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-      - run: pip install tox
-      - run: tox -e py310
+      - name: Test on Python ${{matrix.python-version}}
+        run: |
+          pyversion=py${{matrix.python-version}}
+          pyversion=${pyversion//./}
+          tox -e "$pyversion"

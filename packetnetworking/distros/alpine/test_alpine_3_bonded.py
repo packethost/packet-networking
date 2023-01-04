@@ -26,18 +26,17 @@ def test_alpine_3_public_bonded_task_etc_network_interfaces(alpine_3_bonded_netw
             address {ipv4pub.address}
             netmask {ipv4pub.netmask}
             gateway {ipv4pub.gateway}
+            dns-nameservers {dns1} {dns2}
 
             use bond
             requires {iface0.meta_name} {iface1.meta_name}
             bond-members {iface0.meta_name} {iface1.meta_name}
             bond-mode {bonding_mode}
-
             bond-downdelay 200
             bond-miimon 100
             bond-updelay 200
             bond-xmit_hash_policy layer3+4
 
-            dns-nameservers {dns1} {dns2}
         iface bond0 inet6 static
             address {ipv6pub.address}
             netmask {ipv6pub.cidr}
@@ -80,19 +79,16 @@ def test_alpine_3_private_bonded_task_etc_network_interfaces(alpine_3_bonded_net
             address {ipv4priv.address}
             netmask {ipv4priv.netmask}
             gateway {ipv4priv.gateway}
+            dns-nameservers {dns1} {dns2}
 
             use bond
             requires {iface0.meta_name} {iface1.meta_name}
             bond-members {iface0.meta_name} {iface1.meta_name}
             bond-mode {bonding_mode}
-
             bond-downdelay 200
             bond-miimon 100
             bond-updelay 200
             bond-xmit_hash_policy layer3+4
-
-            dns-nameservers {dns1} {dns2}
-
     """
     ).format(
         ipv4priv=builder.ipv4priv.first,
@@ -122,18 +118,17 @@ def test_alpine_3_public_bonded_task_etc_network_interfaces_with_custom_private_
             address {ipv4pub.address}
             netmask {ipv4pub.netmask}
             gateway {ipv4pub.gateway}
+            dns-nameservers {dns1} {dns2}
 
             use bond
             requires {iface0.meta_name} {iface1.meta_name}
             bond-members {iface0.meta_name} {iface1.meta_name}
             bond-mode {bonding_mode}
-
             bond-downdelay 200
             bond-miimon 100
             bond-updelay 200
             bond-xmit_hash_policy layer3+4
 
-            dns-nameservers {dns1} {dns2}
         iface bond0 inet6 static
             address {ipv6pub.address}
             netmask {ipv6pub.cidr}
@@ -181,19 +176,16 @@ def test_alpine_3_private_bonded_task_etc_network_interfaces_with_custom_private
             address {ipv4priv.address}
             netmask {ipv4priv.netmask}
             gateway {ipv4priv.gateway}
+            dns-nameservers {dns1} {dns2}
 
             use bond
             requires {iface0.meta_name} {iface1.meta_name}
             bond-members {iface0.meta_name} {iface1.meta_name}
             bond-mode {bonding_mode}
-
             bond-downdelay 200
             bond-miimon 100
             bond-updelay 200
             bond-xmit_hash_policy layer3+4
-
-            dns-nameservers {dns1} {dns2}
-
     """
     ).format(
         ipv4priv=builder.ipv4priv.first,

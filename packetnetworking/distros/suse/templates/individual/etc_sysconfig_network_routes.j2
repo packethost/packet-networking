@@ -1,4 +1,0 @@
-default     {{ ip4pub.gateway }}
-{% for subnet in private_subnets %}
-{{ subnet }}  {{ ip4priv.gateway }}
-{% endfor %}

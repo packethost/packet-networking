@@ -7,11 +7,9 @@ class RedhatBuilder(DistroBuilder):
     distros = [
         "almalinux",
         "centos",
-        "fedora",
         "redhatenterprise",
         "redhatenterpriseserver",
         "rocky",
-        "scientificcernslc",
     ]
     network_builders = [RedhatBondedNetwork, RedhatIndividualNetwork]
 

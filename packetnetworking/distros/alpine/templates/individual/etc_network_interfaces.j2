@@ -12,17 +12,16 @@ iface {{ iface0.meta_name }} inet static
     netmask {{ ip4priv.netmask }}
     gateway {{ ip4priv.gateway }}
     {% endif %}
-
-    dns-nameservers{% for dns in resolvers %} {{ dns }}{% endfor %}
-
+    dns-nameservers {{ resolvers | join(" ") }}
 {% if ip6pub %}
+
 iface {{ iface0.meta_name }} inet6 static
     address {{ ip6pub.address }}
     netmask {{ ip6pub.cidr }}
     gateway {{ ip6pub.gateway }}
 {% endif %}
-
 {% if ip4pub %}
+
 auto {{ iface0.meta_name }}:0
 iface {{ iface0.meta_name }}:0 inet static
     address {{ ip4priv.address }}

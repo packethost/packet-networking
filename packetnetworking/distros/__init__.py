@@ -3,7 +3,6 @@ from .network_builder import NetworkBuilder
 from .alpine import AlpineBuilder
 from .debian import DebianBuilder
 from .redhat import RedhatBuilder
-from .suse import SuseBuilder
 
 __all__ = [
     "DistroBuilder",
@@ -12,5 +11,4 @@ __all__ = [
     "AlpineBuilder",
     "DebianBuilder",
     "RedhatBuilder",
-    "SuseBuilder",
 ]

@@ -28,8 +28,8 @@ def test_alpine_3_public_individual_task_etc_network_interfaces(
             address {ipv4pub.address}
             netmask {ipv4pub.netmask}
             gateway {ipv4pub.gateway}
-
             dns-nameservers {dns1} {dns2}
+
         iface eth0 inet6 static
             address {ipv6pub.address}
             netmask {ipv6pub.cidr}
@@ -71,9 +71,7 @@ def test_alpine_3_private_individual_task_etc_network_interfaces(
             address {ipv4priv.address}
             netmask {ipv4priv.netmask}
             gateway {ipv4priv.gateway}
-
             dns-nameservers {dns1} {dns2}
-
     """
     ).format(
         ipv4priv=builder.ipv4priv.first,
@@ -100,8 +98,8 @@ def test_alpine_3_public_individual_task_etc_network_interfaces_with_custom_priv
             address {ipv4pub.address}
             netmask {ipv4pub.netmask}
             gateway {ipv4pub.gateway}
-
             dns-nameservers {dns1} {dns2}
+
         iface eth0 inet6 static
             address {ipv6pub.address}
             netmask {ipv6pub.cidr}
@@ -146,9 +144,7 @@ def test_alpine_3_private_individual_task_etc_network_interfaces_with_custom_pri
             address {ipv4priv.address}
             netmask {ipv4priv.netmask}
             gateway {ipv4priv.gateway}
-
             dns-nameservers {dns1} {dns2}
-
     """
     ).format(
         ipv4priv=builder.ipv4priv.first,
