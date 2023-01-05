@@ -129,17 +129,17 @@ class DistroBuilder(utils.Tasks):
 
             file_mode = None
             mode = None
+            context = self.context()
             if isinstance(template, dict):
+                context.update(template.get("context") or {})
                 file_mode = template.get("file_mode")
                 mode = template.get("mode", None)
-                fmt = template.get("fmt")
                 template_path = template.get("template_path")
-                template = template.get("template")
-                if template_path is not None:
+                if template_path is None:
+                    template = template.get("template")
+                else:
                     with open(template_path, "r") as f:
                         template = f.read()
-                if fmt:
-                    template = template.format(**fmt)
 
             template = dedent(template)
             tmpl = Template(
@@ -157,10 +157,10 @@ class DistroBuilder(utils.Tasks):
                     rendered_tasks[path] = {
                         "file_mode": file_mode,
                         "mode": mode,
-                        "content": tmpl.render(self.context()),
+                        "content": tmpl.render(context),
                     }
                 else:
-                    rendered_tasks[path] = tmpl.render(self.context())
+                    rendered_tasks[path] = tmpl.render(context)
             except UndefinedError:
                 # having to use print as log.* isn't printing out the json
                 print(

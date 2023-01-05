@@ -139,18 +139,18 @@ class IPAddressList(WhereList):
 
 
 class Tasks(object):
-    def task(self, task, content, write_mode=None, mode=None, fmt=None):
+    def task(self, task, content, write_mode=None, mode=None, context=None):
         self.tasks[task] = {
             "file_mode": write_mode,
             "mode": mode,
             "template": content,
-            "fmt": fmt,
+            "context": context,
         }
         return self.tasks[task]
 
-    def task_template(self, task, path, write_mode=None, mode=None, fmt=None):
+    def task_template(self, task, path, write_mode=None, mode=None, context=None):
         path = os.path.join(package_dir, self.templates_base, path)
-        t = self.task(task, None, write_mode, mode, fmt)
+        t = self.task(task, None, write_mode, mode, context)
         t["template_path"] = path
         return t
 

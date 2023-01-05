@@ -21,7 +21,7 @@ class RedhatBondedNetwork(NetworkBuilder):
             self.task_template(
                 "etc/sysconfig/network-scripts/ifcfg-{}".format(bond),
                 "bonded/etc_sysconfig_network-scripts_ifcfg-bondX.j2",
-                fmt={"bond": bond},
+                context={"bond": bond},
             )
 
             if self.ipv4pub and bond == "bond0":
@@ -30,12 +30,12 @@ class RedhatBondedNetwork(NetworkBuilder):
                 self.task_template(
                     "etc/sysconfig/network-scripts/ifcfg-{}:0".format(bond),
                     "bonded/etc_sysconfig_network-scripts_ifcfg-bondX_0.j2",
-                    fmt={"bond": bond},
+                    context={"bond": bond},
                 )
                 self.task_template(
                     "etc/sysconfig/network-scripts/route-{}".format(bond),
                     "bonded/etc_sysconfig_network-scripts_route-bondX.j2",
-                    fmt={"bond": bond},
+                    context={"bond": bond},
                 )
 
         for i, iface in enumerate(self.network.interfaces):
@@ -43,7 +43,7 @@ class RedhatBondedNetwork(NetworkBuilder):
             self.task_template(
                 "etc/sysconfig/network-scripts/ifcfg-" + name,
                 "bonded/etc_sysconfig_network-scripts_ifcfg-template.j2",
-                fmt={"iface": name, "i": i},
+                context={"iface": name, "i": i},
             )
 
         self.task_template(
