@@ -247,9 +247,9 @@ def test_ubuntu_1804_task_etc_modules(ubuntu_1804_bonded_network):
     assert tasks["etc/modules"]["content"] == result
 
 
-def test_ubuntu_1804_etc_resolvers_configured(ubuntu_1804_bonded_network, fake):
+def test_ubuntu_1804_etc_systemd_resolved_configured(ubuntu_1804_bonded_network, fake):
     """
-    Validates /etc/resolv.conf is configured correctly
+    Validates /etc/systemd/resolved.conf is configured correctly
     """
     builder = ubuntu_1804_bonded_network()
     resolver1 = fake.ipv4()
@@ -258,11 +258,12 @@ def test_ubuntu_1804_etc_resolvers_configured(ubuntu_1804_bonded_network, fake):
     tasks = builder.render()
     result = dedent(
         """\
-        nameserver {resolver1}
-        nameserver {resolver2}
+        [Resolve]
+        DNS={resolver1} {resolver2}
     """
     ).format(resolver1=resolver1, resolver2=resolver2)
-    assert tasks["etc/resolv.conf"] == result
+    assert tasks["etc/systemd/resolved.conf"] == result
+    assert "etc/resolv.conf" not in tasks
 
 
 def test_ubuntu_1804_etc_hostname_configured(ubuntu_1804_bonded_network):
