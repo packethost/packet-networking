@@ -31,7 +31,7 @@ setup(
     url="https://github.com/packethost/packet-networking/",
     packages=find_packages(),
     install_requires=[
-        "click >=6.0,<7.0",
+        "click >=8.1,<8.2",
         "jinja2 >=3.1.2,<4",
         "requests >=2.28.1,<2.29",
     ],
