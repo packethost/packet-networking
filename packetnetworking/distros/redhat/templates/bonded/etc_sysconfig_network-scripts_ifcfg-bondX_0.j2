@@ -1,11 +1,11 @@
-DEVICE={bond}:0
-NAME={bond}:0
-IPADDR={{{{ ip4priv.address }}}}
-NETMASK={{{{ ip4priv.netmask }}}}
-GATEWAY={{{{ ip4priv.gateway }}}}
+DEVICE={{bond}}:0
+NAME={{bond}}:0
+IPADDR={{ ip4priv.address }}
+NETMASK={{ ip4priv.netmask }}
+GATEWAY={{ ip4priv.gateway }}
 BOOTPROTO=none
 ONBOOT=yes
 USERCTL=no
-{{% for dns in resolvers %}}
-DNS{{{{ loop.index }}}}={{{{ dns }}}}
-{{% endfor %}}
+{% for dns in resolvers %}
+DNS{{ loop.index }}={{ dns }}
+{% endfor %}
