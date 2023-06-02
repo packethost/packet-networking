@@ -10,6 +10,7 @@ class RedhatBuilder(DistroBuilder):
         "fedora",
         "redhatenterprise",
         "redhatenterpriseserver",
+        "rhel",
         "rocky",
         "scientificcernslc",
     ]
