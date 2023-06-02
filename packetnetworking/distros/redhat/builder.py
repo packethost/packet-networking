@@ -9,6 +9,7 @@ class RedhatBuilder(DistroBuilder):
         "centos",
         "redhatenterprise",
         "redhatenterpriseserver",
+        "rhel",
         "rocky",
     ]
     network_builders = [RedhatBondedNetwork, RedhatIndividualNetwork]
