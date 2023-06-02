@@ -33,7 +33,7 @@ setup(
     install_requires=[
         "click >=8.1,<8.2",
         "jinja2 >=3.1.2,<4",
-        "requests >=2.28.1,<2.29",
+        "requests >=2.31,<2.32",
     ],
     package_data={"packetnetworking": find_templates()},
     extras_require={"test": test_reqs},
