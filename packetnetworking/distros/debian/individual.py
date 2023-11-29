@@ -25,6 +25,7 @@ class DebianIndividualNetwork(NetworkBuilder):
             "18.04",
             "20.04",
             "22.04",
+            "24.04",
         ]:
             self.tasks.update(generate_persistent_names_udev())
         return self.tasks
