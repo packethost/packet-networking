@@ -16,8 +16,5 @@ class DebianIndividualNetwork(NetworkBuilder):
             template = "dhcp/etc_network_interfaces.j2"
 
         self.task_template("etc/network/interfaces", template)
-
-        os = self.metadata.operating_system
-
         self.tasks.update(generate_persistent_names_udev())
         return self.tasks
