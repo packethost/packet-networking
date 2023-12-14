@@ -5,7 +5,6 @@ from .logical_interface_names_hook import LogicalInterfaceNamesHook
 @pytest.fixture
 def mocked_trigger_logical_names(mocked_trigger):
     def _builder(*args, **kwargs):
-
         phys_interfaces = [
             {"name": "enp0", "mac": "00:0c:29:51:53:a1", "names": {"LOGICAL": "ens0"}},
             {"name": "enp1", "mac": "00:0c:29:51:53:a2", "names": {"LOGICAL": "ens1"}},

@@ -10,7 +10,7 @@ package_dir = os.path.join(
 
 def find_templates():
     files = []
-    for (path, directories, filenames) in os.walk(package_dir):
+    for path, directories, filenames in os.walk(package_dir):
         if "templates" not in path.split(os.path.sep):
             continue
         for file in filenames:
