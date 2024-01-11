@@ -10,7 +10,7 @@ package_dir = os.path.join(
 
 def find_templates():
     files = []
-    for (path, directories, filenames) in os.walk(package_dir):
+    for path, directories, filenames in os.walk(package_dir):
         if "templates" not in path.split(os.path.sep):
             continue
         for file in filenames:
@@ -24,7 +24,7 @@ test_reqs = ["pytest", "pytest-cov", "mock", "faker", "netaddr", "tox"]
 
 setup(
     name="packet-networking",
-    version="1.0",
+    version="2.1",
     description="Tool used to setup the network files for an operating system.",
     author="Manny Mendez, Mike Mason",
     author_email="manny@packet.com, mason@packet.com",
