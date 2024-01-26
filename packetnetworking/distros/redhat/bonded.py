@@ -45,7 +45,7 @@ class RedhatBondedNetwork(NetworkBuilder):
                 "bonded/etc_sysconfig_network-scripts_ifcfg-template.j2",
                 context={"iface": name, "i": i},
             )
-            if self.metadata.operating_system['slug'] == "rhel_9":
+            if self.metadata.operating_system["slug"] == "rhel_9":
                 self.task_template(
                     "etc/systemd/network/70-" + name + ".link",
                     "bonded/etc_systemd_network-70-template.j2",
