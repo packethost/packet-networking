@@ -49,8 +49,8 @@ class RedhatBondedNetwork(NetworkBuilder):
                 "etc/systemd/network/70-" + name + ".link",
                 "bonded/etc_systemd_network-70-template.j2",
                 context={"iface": name, "i": i},
-            )            
-
+            )
+            
         self.task_template(
             "sbin/ifup-pre-local", "bonded/sbin_ifup-pre-local.j2", mode=0o755
         )
