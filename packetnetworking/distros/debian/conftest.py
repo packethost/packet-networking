@@ -10,7 +10,7 @@ from .individual import DebianIndividualNetwork
 
 
 versions = {
-    "debian": ["10", "11"],
+    "debian": ["10", "11", "12"],
     "ubuntu": ["18.04", "20.04", "22.04"],
 }
 versions = [[distro, version] for distro in versions for version in versions[distro]]

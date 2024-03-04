@@ -242,7 +242,10 @@ def test_persistent_interface_names(individual_network_builder, distro, version)
         iface0=builder.network.interfaces[0],
         iface1=builder.network.interfaces[1],
     )
-    assert tasks["etc/udev/rules.d/70-persistent-net.rules"] == result
+    if distro == "debian" and version == "12":
+        assert "etc/udev/rules.d/70-persistent-net.rules" not in tasks
+    else:
+        assert tasks["etc/udev/rules.d/70-persistent-net.rules"] == result
 
 
 @pytest.mark.parametrize("distro,version", versions)
