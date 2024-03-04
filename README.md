@@ -40,7 +40,7 @@ Additionally, if `--metadata-file` is specified, it will override the
 
 ## Example
 
-```
+```shell-session
 # packet-networking --metadata-file /tmp/metadata.json -o 'centos 7' --rootfs /tmp/rootfs -vvv
 DEBUG:packetnetworking:Metadata file '/tmp/metadata.json' specified, preferring over metadata url.
 name=ens33 driver=e1000
@@ -79,7 +79,7 @@ Configuration files written to root filesystem '/tmp/rootfs'
 
 Here is an example of the files created
 
-```
+```shell-session
 # find /tmp/rootfs/
 /tmp/rootfs/
 /tmp/rootfs/etc
@@ -99,9 +99,9 @@ Here is an example of the files created
 /tmp/rootfs/sbin/ifup-pre-local
 ```
 
-# Extending and manipulating data
+## Extending and manipulating data
 
-## Distro Builders
+### Distro Builders
 
 Currently each distro family has their own distro builder. For instance, the
 [Debian builder](packetnetworking/distros/debian) encompasses both Debian and
@@ -121,7 +121,7 @@ class DebianBuilder(DistroBuilder):
 Here we can see both Debian and Ubuntu distros are supported, and the only
 supported network builder is a bonded configuration.
 
-## Network Builders
+### Network Builders
 
 At the moment, the only supported network configuration at Packet is a bonded
 configuration. In the future will be able to add more network builders to support
@@ -177,7 +177,7 @@ will later be processed by the [Network Builder](packetnetworking/distros/networ
 list. The render function is called from within the `run` method, which after
 receiving the rendered tasks, will actually write or delete the files.
 
-## Hooks
+### Hooks
 
 In some instances, we need to modify the data before we process the builders.
 One of these instances are for plans which should only have a single interface,
@@ -212,9 +212,9 @@ metadata and the initialized network details.
 Triggers can define additional arguments and keyword arguments that will be
 passed to each hook triggered.
 
-## Running Tests
+### Running Tests
 
-```
+```shell-session
 git clone git@github.com:packethost/packet-networking.git
 cd packet-networking/
 pip3 install -e .[test]
@@ -223,7 +223,7 @@ py.test packetnetworking
 
 **Example Output:**
 
-```
+```shell-session
 # py.test packetnetworking
 ===================================== test session starts ======================================
 platform linux -- Python 3.5.2, pytest-5.0.1, py-1.8.0, pluggy-0.12.0

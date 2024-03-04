@@ -4,22 +4,14 @@ on:
   pull_request:
 
 jobs:
-  format:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v20
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-      - run: nix-shell --run "black --check --diff ."
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v20
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-      - run: nix-shell --run "pylama packetnetworking setup.py"
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@v9
+      - uses: DeterminateSystems/magic-nix-cache-action@v3
+      - run: nix develop --impure --command pre-commit run --all
+      - run: nix develop --impure --command pylama packetnetworking setup.py
   pytests:
     runs-on: ubuntu-latest
     strategy:
