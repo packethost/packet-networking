@@ -7,7 +7,7 @@ from .individual import RedhatIndividualNetwork
 
 versions = {
     "centos": ["7"],
-    "redhatenterpriseserver": ["7", "8"],
+    "redhatenterpriseserver": ["7", "8", "9"],
 }
 versions = [[distro, version] for distro in versions for version in versions[distro]]
 
