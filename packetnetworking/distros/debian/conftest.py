@@ -13,6 +13,7 @@ versions = {
     "debian": ["10", "11"],
     "ubuntu": ["18.04", "20.04", "22.04"],
 }
+versions = [[distro, version] for distro in versions for version in versions[distro]]
 
 
 @pytest.fixture
