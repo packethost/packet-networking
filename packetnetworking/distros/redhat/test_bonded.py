@@ -2,19 +2,23 @@ from textwrap import dedent
 from ... import utils
 import os
 import pytest
+from .conftest import versions
 
 
 @pytest.fixture
-def rhel_8_bonded_network(generic_redhat_bonded_network):
-    def _builder(**kwargs):
-        return generic_redhat_bonded_network("redhatenterprise", "8", **kwargs)
+def bonded_network_builder(generic_redhat_bonded_network):
+    def _builder(distro, version, **kwargs):
+        return generic_redhat_bonded_network(distro, version, **kwargs)
 
     return _builder
 
 
-def test_rhel_8_public_bonded_task_etc_sysconfig_network(rhel_8_bonded_network):
+@pytest.mark.parametrize("distro,version", versions)
+def test_public_bonded_task_etc_sysconfig_network(
+    bonded_network_builder, distro, version
+):
     """Validates /etc/sysconfig/network for a public bond"""
-    builder = rhel_8_bonded_network(public=True)
+    builder = bonded_network_builder(distro, version, public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -28,9 +32,12 @@ def test_rhel_8_public_bonded_task_etc_sysconfig_network(rhel_8_bonded_network):
     assert tasks["etc/sysconfig/network"] == result
 
 
-def test_rhel_8_private_bonded_task_etc_sysconfig_network(rhel_8_bonded_network):
+@pytest.mark.parametrize("distro,version", versions)
+def test_private_bonded_task_etc_sysconfig_network(
+    bonded_network_builder, distro, version
+):
     """Validates /etc/sysconfig/network for a private only bond"""
-    builder = rhel_8_bonded_network(public=False)
+    builder = bonded_network_builder(distro, version, public=False)
     tasks = builder.render()
     result = dedent(
         """\
@@ -44,9 +51,10 @@ def test_rhel_8_private_bonded_task_etc_sysconfig_network(rhel_8_bonded_network)
     assert tasks["etc/sysconfig/network"] == result
 
 
-def test_rhel_8_bonded_task_etc_modprobe_d_bonding(rhel_8_bonded_network):
+@pytest.mark.parametrize("distro,version", versions)
+def test_bonded_task_etc_modprobe_d_bonding(bonded_network_builder, distro, version):
     """Validates /etc/modprobe.d/bonding.conf has correct bonding mode"""
-    builder = rhel_8_bonded_network()
+    builder = bonded_network_builder(distro, version)
     tasks = builder.render()
     result = dedent(
         """\
@@ -57,11 +65,12 @@ def test_rhel_8_bonded_task_etc_modprobe_d_bonding(rhel_8_bonded_network):
     assert tasks["etc/modprobe.d/bonding.conf"] == result
 
 
-def test_rhel_8_public_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
-    rhel_8_bonded_network,
+@pytest.mark.parametrize("distro,version", versions)
+def test_public_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
+    bonded_network_builder, distro, version
 ):
     """Validates /etc/sysconfig/network-scripts/ifcfg-bond0 for a public bond"""
-    builder = rhel_8_bonded_network(public=True)
+    builder = bonded_network_builder(distro, version, public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -92,14 +101,15 @@ def test_rhel_8_public_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
     assert tasks["etc/sysconfig/network-scripts/ifcfg-bond0"] == result
 
 
-def test_rhel_8_private_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
-    rhel_8_bonded_network,
+@pytest.mark.parametrize("distro,version", versions)
+def test_private_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
+    bonded_network_builder, distro, version
 ):
     """
     When no public ip is assigned, we should see the private ip details in the
     /etc/sysconfig/network-scripts/ifcfg-bond0 interface file.
     """
-    builder = rhel_8_bonded_network(public=False)
+    builder = bonded_network_builder(distro, version, public=False)
     tasks = builder.render()
     result = dedent(
         """\
@@ -126,15 +136,16 @@ def test_rhel_8_private_bonded_task_etc_sysconfig_network_scripts_ifcfg_bond0(
     assert tasks["etc/sysconfig/network-scripts/ifcfg-bond0"] == result
 
 
-def test_rhel_8_private_alias_task_etc_sysconfig_network_scripts_ifcfg_bond0_0(
-    rhel_8_bonded_network,
+@pytest.mark.parametrize("distro,version", versions)
+def test_private_alias_task_etc_sysconfig_network_scripts_ifcfg_bond0_0(
+    bonded_network_builder, distro, version
 ):
     """
     When a public ip is assigned, the private ip address should become an
     alias, this validates /etc/sysconfig/network-scripts/ifcfg-bond0:0 alias
     has been created for the private ip
     """
-    builder = rhel_8_bonded_network(public=True)
+    builder = bonded_network_builder(distro, version, public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -157,25 +168,29 @@ def test_rhel_8_private_alias_task_etc_sysconfig_network_scripts_ifcfg_bond0_0(
     assert tasks["etc/sysconfig/network-scripts/ifcfg-bond0:0"] == result
 
 
-def test_rhel_8_private_alias_task_missing_for_private_only_bond(rhel_8_bonded_network):
+@pytest.mark.parametrize("distro,version", versions)
+def test_private_alias_task_missing_for_private_only_bond(
+    bonded_network_builder, distro, version
+):
     """
     When no public ip is assigned, we should not see an alias created
     therefore /etc/sysconfig/network-scripts/ifcfg-bond0:0 should not exist.
     """
-    builder = rhel_8_bonded_network(public=False)
+    builder = bonded_network_builder(distro, version, public=False)
     tasks = builder.render()
     assert "etc/sysconfig/network-scripts/ifcfg-bond0:0" not in tasks
 
 
-def test_rhel_8_private_route_task_etc_sysconfig_network_scripts_route_bond0(
-    rhel_8_bonded_network,
+@pytest.mark.parametrize("distro,version", versions)
+def test_private_route_task_etc_sysconfig_network_scripts_route_bond0(
+    bonded_network_builder, distro, version
 ):
     """
     When using a public ip, the private ip is assigned as an alias, this
     validates the /etc/sysconfig/network-scripts/route-bond0 route is created
     for the private subnet.
     """
-    builder = rhel_8_bonded_network(public=True)
+    builder = bonded_network_builder(distro, version, public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -185,8 +200,9 @@ def test_rhel_8_private_route_task_etc_sysconfig_network_scripts_route_bond0(
     assert tasks["etc/sysconfig/network-scripts/route-bond0"] == result
 
 
-def test_rhel_8_private_route_task_etc_sysconfig_network_scripts_route_bond0_with_custom_private_subnets(
-    rhel_8_bonded_network,
+@pytest.mark.parametrize("distro,version", versions)
+def test_private_route_task_etc_sysconfig_network_scripts_route_bond0_with_custom_private_subnets(
+    bonded_network_builder, distro, version
 ):
     """
     When using a public ip, the private ip is assigned as an alias, this
@@ -194,7 +210,7 @@ def test_rhel_8_private_route_task_etc_sysconfig_network_scripts_route_bond0_wit
     for the private subnet.
     """
     subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
-    builder = rhel_8_bonded_network(public=True, metadata=subnets)
+    builder = bonded_network_builder(distro, version, public=True, metadata=subnets)
     tasks = builder.render()
     result = dedent(
         """\
@@ -205,22 +221,26 @@ def test_rhel_8_private_route_task_etc_sysconfig_network_scripts_route_bond0_wit
     assert tasks["etc/sysconfig/network-scripts/route-bond0"] == result
 
 
-def test_rhel_8_private_route_task_missing_for_private_only_bond(rhel_8_bonded_network):
+@pytest.mark.parametrize("distro,version", versions)
+def test_private_route_task_missing_for_private_only_bond(
+    bonded_network_builder, distro, version
+):
     """
     When no public ip is assigned, we should not see a route file created
     therefore /etc/sysconfig/network-scripts/route-bond0 should not exist.
     """
-    builder = rhel_8_bonded_network(public=False)
+    builder = bonded_network_builder(distro, version, public=False)
     tasks = builder.render()
     assert "etc/sysconfig/network-scripts/route-bond0" not in tasks
 
 
-def test_rhel_8_individual_interface_files_created(rhel_8_bonded_network):
+@pytest.mark.parametrize("distro,version", versions)
+def test_individual_interface_files_created(bonded_network_builder, distro, version):
     """
     For each interface, we should see the corresponding ifcfg file
     located at /etc/sysconfig/network-scripts/ifcfg-*
     """
-    builder = rhel_8_bonded_network(public=True)
+    builder = bonded_network_builder(distro, version, public=True)
     tasks = builder.render()
     for interface in builder.network.interfaces:
         result = dedent(
@@ -236,11 +256,12 @@ def test_rhel_8_individual_interface_files_created(rhel_8_bonded_network):
         assert tasks["etc/sysconfig/network-scripts/ifcfg-" + interface.name] == result
 
 
-def test_rhel_8_etc_resolvers_configured(rhel_8_bonded_network, fake):
+@pytest.mark.parametrize("distro,version", versions)
+def test_etc_resolvers_configured(bonded_network_builder, fake, distro, version):
     """
     Validates /etc/resolv.conf is configured correctly
     """
-    builder = rhel_8_bonded_network()
+    builder = bonded_network_builder(distro, version)
     resolver1 = fake.ipv4()
     resolver2 = fake.ipv4()
     builder.network.resolvers = (resolver1, resolver2)
@@ -254,11 +275,12 @@ def test_rhel_8_etc_resolvers_configured(rhel_8_bonded_network, fake):
     assert tasks["etc/resolv.conf"] == result
 
 
-def test_rhel_8_etc_hostname_configured(rhel_8_bonded_network):
+@pytest.mark.parametrize("distro,version", versions)
+def test_etc_hostname_configured(bonded_network_builder, distro, version):
     """
     Validates /etc/hostname is configured correctly
     """
-    builder = rhel_8_bonded_network()
+    builder = bonded_network_builder(distro, version)
     tasks = builder.render()
     result = dedent(
         """\
@@ -268,11 +290,12 @@ def test_rhel_8_etc_hostname_configured(rhel_8_bonded_network):
     assert tasks["etc/hostname"] == result
 
 
-def test_rhel_8_etc_hosts_configured(rhel_8_bonded_network):
+@pytest.mark.parametrize("distro,version", versions)
+def test_etc_hosts_configured(bonded_network_builder, distro, version):
     """
     Validates /etc/hosts is configured correctly
     """
-    builder = rhel_8_bonded_network()
+    builder = bonded_network_builder(distro, version)
     tasks = builder.render()
     result = dedent(
         """\
@@ -283,11 +306,12 @@ def test_rhel_8_etc_hosts_configured(rhel_8_bonded_network):
     assert tasks["etc/hosts"] == result
 
 
-def test_rhel_8_sbin_ifup_pre_local(rhel_8_bonded_network):
+@pytest.mark.parametrize("distro,version", versions)
+def test_sbin_ifup_pre_local(bonded_network_builder, distro, version):
     """
     Validates /sbin/ifup-pre-local is created correctly
     """
-    builder = rhel_8_bonded_network()
+    builder = bonded_network_builder(distro, version)
     tasks = builder.render()
     result = dedent(
         """\
@@ -310,27 +334,31 @@ def test_rhel_8_sbin_ifup_pre_local(rhel_8_bonded_network):
     assert tasks["sbin/ifup-pre-local"]["mode"] == 0o755
 
 
-def test_rhel_8_network_manager_is_disabled(rhel_8_bonded_network):
+@pytest.mark.parametrize("distro,version", versions)
+def test_network_manager_is_disabled(bonded_network_builder, distro, version):
     """
     When using certain operating systems, we want to disable Network Manager,
     here we make sure those distros remove the necessary files
     """
-    builder = rhel_8_bonded_network()
+    builder = bonded_network_builder(distro, version)
     tasks = builder.render()
     for service in (
         "dbus-org.freedesktop.NetworkManager",
         "dbus-org.freedesktop.nm-dispatcher",
         "multi-user.target.wants/NetworkManager",
     ):
-        assert os.path.join("etc/systemd/system", service + ".service") not in tasks
+        assert (
+            tasks.get(os.path.join("etc/systemd/system", service + ".service")) is None
+        )
 
 
-def test_rhel_8_persistent_interface_names(rhel_8_bonded_network):
+@pytest.mark.parametrize("distro,version", versions)
+def test_persistent_interface_names(bonded_network_builder, distro, version):
     """
     When using certain operating systems, we want to bypass driver interface name,
     here we make sure the /etc/udev/rules.d/70-persistent-net.rules is generated.
     """
-    builder = rhel_8_bonded_network()
+    builder = bonded_network_builder(distro, version)
     tasks = builder.render()
     result = dedent(
         """\
@@ -350,4 +378,8 @@ def test_rhel_8_persistent_interface_names(rhel_8_bonded_network):
         iface0=builder.network.interfaces[0],
         iface1=builder.network.interfaces[1],
     )
-    assert tasks["etc/udev/rules.d/70-persistent-net.rules"] == result
+    if distro == "centos":
+        # except for centos, we do not want a persistent-net.rules for centos
+        assert "etc/udev/rules.d/70-persistent-net.rules" not in tasks
+    else:
+        assert tasks["etc/udev/rules.d/70-persistent-net.rules"] == result

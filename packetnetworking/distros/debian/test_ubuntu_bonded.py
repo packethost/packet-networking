@@ -1,22 +1,26 @@
 from textwrap import dedent
 from ... import utils
+from .conftest import versions
 import pytest
+
+versions = versions["ubuntu"]
 
 
 @pytest.fixture
-def ubuntu_2004_bonded_network(generic_debian_bonded_network):
-    def _builder(**kwargs):
-        return generic_debian_bonded_network("ubuntu", "20.04", **kwargs)
+def bonded_network_builder(generic_debian_bonded_network):
+    def _builder(version, **kwargs):
+        return generic_debian_bonded_network("ubuntu", version, **kwargs)
 
     return _builder
 
 
-def test_ubuntu_2004_public_bonded_task_etc_network_interfaces(
-    ubuntu_2004_bonded_network,
+@pytest.mark.parametrize("version", versions)
+def test_ubuntu_public_bonded_task_etc_network_interfaces(
+    bonded_network_builder, version
 ):
     """Validates /etc/network/interfaces for a public bond"""
 
-    builder = ubuntu_2004_bonded_network(public=True)
+    builder = bonded_network_builder(version, public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -72,14 +76,15 @@ def test_ubuntu_2004_public_bonded_task_etc_network_interfaces(
     assert tasks["etc/network/interfaces"] == result
 
 
-def test_ubuntu_2004_private_bonded_task_etc_network_interfaces(
-    ubuntu_2004_bonded_network,
+@pytest.mark.parametrize("version", versions)
+def test_ubuntu_private_bonded_task_etc_network_interfaces(
+    bonded_network_builder, version
 ):
     """
     When no public ip is assigned, we should see the private ip details in the
     /etc/network/interfaces file.
     """
-    builder = ubuntu_2004_bonded_network(public=False)
+    builder = bonded_network_builder(version, public=False)
     tasks = builder.render()
     result = dedent(
         """\
@@ -121,12 +126,13 @@ def test_ubuntu_2004_private_bonded_task_etc_network_interfaces(
     assert tasks["etc/network/interfaces"] == result
 
 
-def test_ubuntu_2004_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
-    ubuntu_2004_bonded_network,
+@pytest.mark.parametrize("version", versions)
+def test_ubuntu_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
+    bonded_network_builder, version
 ):
     """Validates /etc/network/interfaces for a public bond"""
     subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
-    builder = ubuntu_2004_bonded_network(public=True, metadata=subnets)
+    builder = bonded_network_builder(version, public=True, metadata=subnets)
     tasks = builder.render()
     result = dedent(
         """\
@@ -184,15 +190,16 @@ def test_ubuntu_2004_public_bonded_task_etc_network_interfaces_with_custom_priva
     assert tasks["etc/network/interfaces"] == result
 
 
-def test_ubuntu_2004_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
-    ubuntu_2004_bonded_network,
+@pytest.mark.parametrize("version", versions)
+def test_ubuntu_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
+    bonded_network_builder, version
 ):
     """
     When no public ip is assigned, we should see the private ip details in the
     /etc/network/interfaces file.
     """
     subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
-    builder = ubuntu_2004_bonded_network(public=False, metadata=subnets)
+    builder = bonded_network_builder(version, public=False, metadata=subnets)
     tasks = builder.render()
     result = dedent(
         """\
@@ -234,9 +241,10 @@ def test_ubuntu_2004_private_bonded_task_etc_network_interfaces_with_custom_priv
     assert tasks["etc/network/interfaces"] == result
 
 
-def test_ubuntu_2004_task_etc_modules(ubuntu_2004_bonded_network):
+@pytest.mark.parametrize("version", versions)
+def test_ubuntu_task_etc_modules(bonded_network_builder, version):
     """Validates /etc/modules for a public bond"""
-    builder = ubuntu_2004_bonded_network(public=True)
+    builder = bonded_network_builder(version, public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -247,11 +255,12 @@ def test_ubuntu_2004_task_etc_modules(ubuntu_2004_bonded_network):
     assert tasks["etc/modules"]["content"] == result
 
 
-def test_ubuntu_2004_etc_systemd_resolved_configured(ubuntu_2004_bonded_network, fake):
+@pytest.mark.parametrize("version", versions)
+def test_ubuntu_etc_systemd_resolved_configured(bonded_network_builder, fake, version):
     """
     Validates /etc/systemd/resolved.conf is configured correctly
     """
-    builder = ubuntu_2004_bonded_network()
+    builder = bonded_network_builder(version)
     resolver1 = fake.ipv4()
     resolver2 = fake.ipv4()
     builder.network.resolvers = (resolver1, resolver2)
@@ -266,11 +275,12 @@ def test_ubuntu_2004_etc_systemd_resolved_configured(ubuntu_2004_bonded_network,
     assert "etc/resolv.conf" not in tasks
 
 
-def test_ubuntu_2004_etc_hostname_configured(ubuntu_2004_bonded_network):
+@pytest.mark.parametrize("version", versions)
+def test_ubuntu_etc_hostname_configured(bonded_network_builder, version):
     """
     Validates /etc/hostname is configured correctly
     """
-    builder = ubuntu_2004_bonded_network()
+    builder = bonded_network_builder(version)
     tasks = builder.render()
     result = dedent(
         """\
@@ -280,11 +290,12 @@ def test_ubuntu_2004_etc_hostname_configured(ubuntu_2004_bonded_network):
     assert tasks["etc/hostname"] == result
 
 
-def test_ubuntu_2004_etc_hosts_configured(ubuntu_2004_bonded_network):
+@pytest.mark.parametrize("version", versions)
+def test_ubuntu_etc_hosts_configured(bonded_network_builder, version):
     """
     Validates /etc/hosts is configured correctly
     """
-    builder = ubuntu_2004_bonded_network()
+    builder = bonded_network_builder(version)
     tasks = builder.render()
     result = dedent(
         """\
@@ -299,12 +310,13 @@ def test_ubuntu_2004_etc_hosts_configured(ubuntu_2004_bonded_network):
     assert tasks["etc/hosts"] == result
 
 
-def test_ubuntu_2004_persistent_interface_names(ubuntu_2004_bonded_network):
+@pytest.mark.parametrize("version", versions)
+def test_ubuntu_persistent_interface_names(bonded_network_builder, version):
     """
     When using certain operating systems, we want to bypass driver interface name,
     here we make sure the /etc/udev/rules.d/70-persistent-net.rules is generated.
     """
-    builder = ubuntu_2004_bonded_network()
+    builder = bonded_network_builder(version)
     tasks = builder.render()
     result = dedent(
         """\

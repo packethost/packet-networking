@@ -1,22 +1,26 @@
 from textwrap import dedent
 from ... import utils
+from .conftest import versions
 import pytest
+
+versions = versions["debian"]
 
 
 @pytest.fixture
-def ubuntu_2204_individual_network(generic_debian_individual_network):
-    def _builder(**kwargs):
-        return generic_debian_individual_network("ubuntu", "22.04", **kwargs)
+def individual_network_builder(generic_debian_individual_network):
+    def _builder(version, **kwargs):
+        return generic_debian_individual_network("debian", version, **kwargs)
 
     return _builder
 
 
-def test_ubuntu_2204_public_individual_task_etc_network_interfaces(
-    ubuntu_2204_individual_network,
+@pytest.mark.parametrize("version", versions)
+def test_debian_public_individual_task_etc_network_interfaces(
+    individual_network_builder, version
 ):
     """Validates /etc/network/interfaces for a public bond"""
 
-    builder = ubuntu_2204_individual_network(public=True)
+    builder = individual_network_builder(version, public=True)
     tasks = builder.render()
     result = dedent(
         """\
@@ -52,14 +56,15 @@ def test_ubuntu_2204_public_individual_task_etc_network_interfaces(
     assert tasks["etc/network/interfaces"] == result
 
 
-def test_ubuntu_2204_private_individual_task_etc_network_interfaces(
-    ubuntu_2204_individual_network,
+@pytest.mark.parametrize("version", versions)
+def test_debian_private_individual_task_etc_network_interfaces(
+    individual_network_builder, version
 ):
     """
     When no public ip is assigned, we should see the private ip details in the
     /etc/network/interfaces file.
     """
-    builder = ubuntu_2204_individual_network(public=False)
+    builder = individual_network_builder(version, public=False)
     tasks = builder.render()
     result = dedent(
         """\
@@ -81,12 +86,13 @@ def test_ubuntu_2204_private_individual_task_etc_network_interfaces(
     assert tasks["etc/network/interfaces"] == result
 
 
-def test_ubuntu_2204_public_individual_task_etc_network_interfaces_with_custom_private_ip_space(
-    ubuntu_2204_individual_network,
+@pytest.mark.parametrize("version", versions)
+def test_debian_public_individual_task_etc_network_interfaces_with_custom_private_ip_space(
+    individual_network_builder, version
 ):
     """Validates /etc/network/interfaces for a public bond"""
     subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
-    builder = ubuntu_2204_individual_network(public=True, metadata=subnets)
+    builder = individual_network_builder(version, public=True, metadata=subnets)
     tasks = builder.render()
     result = dedent(
         """\
@@ -124,15 +130,16 @@ def test_ubuntu_2204_public_individual_task_etc_network_interfaces_with_custom_p
     assert tasks["etc/network/interfaces"] == result
 
 
-def test_ubuntu_2204_private_individual_task_etc_network_interfaces_with_custom_private_ip_space(
-    ubuntu_2204_individual_network,
+@pytest.mark.parametrize("version", versions)
+def test_debian_private_individual_task_etc_network_interfaces_with_custom_private_ip_space(
+    individual_network_builder, version
 ):
     """
     When no public ip is assigned, we should see the private ip details in the
     /etc/network/interfaces file.
     """
     subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
-    builder = ubuntu_2204_individual_network(public=False, metadata=subnets)
+    builder = individual_network_builder(version, public=False, metadata=subnets)
     tasks = builder.render()
     result = dedent(
         """\
@@ -154,32 +161,31 @@ def test_ubuntu_2204_private_individual_task_etc_network_interfaces_with_custom_
     assert tasks["etc/network/interfaces"] == result
 
 
-def test_ubuntu_2204_etc_systemd_resolved_configured(
-    ubuntu_2204_individual_network, fake
-):
+@pytest.mark.parametrize("version", versions)
+def test_debian_etc_resolvers_configured(individual_network_builder, fake, version):
     """
-    Validates /etc/systemd/resolved.conf is configured correctly
+    Validates /etc/resolv.conf is configured correctly
     """
-    builder = ubuntu_2204_individual_network()
+    builder = individual_network_builder(version)
     resolver1 = fake.ipv4()
     resolver2 = fake.ipv4()
     builder.network.resolvers = (resolver1, resolver2)
     tasks = builder.render()
     result = dedent(
         """\
-        [Resolve]
-        DNS={resolver1} {resolver2}
+        nameserver {resolver1}
+        nameserver {resolver2}
     """
     ).format(resolver1=resolver1, resolver2=resolver2)
-    assert tasks["etc/systemd/resolved.conf"] == result
-    assert "etc/resolv.conf" not in tasks
+    assert tasks["etc/resolv.conf"] == result
 
 
-def test_ubuntu_2204_etc_hostname_configured(ubuntu_2204_individual_network):
+@pytest.mark.parametrize("version", versions)
+def test_debian_etc_hostname_configured(individual_network_builder, version):
     """
     Validates /etc/hostname is configured correctly
     """
-    builder = ubuntu_2204_individual_network()
+    builder = individual_network_builder(version)
     tasks = builder.render()
     result = dedent(
         """\
@@ -189,11 +195,12 @@ def test_ubuntu_2204_etc_hostname_configured(ubuntu_2204_individual_network):
     assert tasks["etc/hostname"] == result
 
 
-def test_ubuntu_2204_etc_hosts_configured(ubuntu_2204_individual_network):
+@pytest.mark.parametrize("version", versions)
+def test_debian_etc_hosts_configured(individual_network_builder, version):
     """
     Validates /etc/hosts is configured correctly
     """
-    builder = ubuntu_2204_individual_network()
+    builder = individual_network_builder(version)
     tasks = builder.render()
     result = dedent(
         """\
@@ -208,12 +215,13 @@ def test_ubuntu_2204_etc_hosts_configured(ubuntu_2204_individual_network):
     assert tasks["etc/hosts"] == result
 
 
-def test_ubuntu_2204_persistent_interface_names(ubuntu_2204_individual_network):
+@pytest.mark.parametrize("version", versions)
+def test_debian_persistent_interface_names(individual_network_builder, version):
     """
     When using certain operating systems, we want to bypass driver interface name,
     here we make sure the /etc/udev/rules.d/70-persistent-net.rules is generated.
     """
-    builder = ubuntu_2204_individual_network()
+    builder = individual_network_builder(version)
     tasks = builder.render()
     result = dedent(
         """\
@@ -236,15 +244,17 @@ def test_ubuntu_2204_persistent_interface_names(ubuntu_2204_individual_network):
     assert tasks["etc/udev/rules.d/70-persistent-net.rules"] == result
 
 
-def test_ubuntu_2204_public_individual_dhcp_task_etc_network_interfaces(
-    ubuntu_2204_individual_network,
+@pytest.mark.parametrize("version", versions)
+def test_debian_public_individual_dhcp_task_etc_network_interfaces(
+    individual_network_builder,
     make_interfaces_dhcp_metadata,
     expected_file_etc_network_interfaces_dhcp_2,
+    version,
 ):
     """Validates /etc/network/interfaces for a public dhcp interfaces"""
 
-    builder = ubuntu_2204_individual_network(
-        public=True, post_gen_metadata=make_interfaces_dhcp_metadata
+    builder = individual_network_builder(
+        version, public=True, post_gen_metadata=make_interfaces_dhcp_metadata
     )
     tasks = builder.render()
 
@@ -253,14 +263,15 @@ def test_ubuntu_2204_public_individual_dhcp_task_etc_network_interfaces(
     assert tasks["etc/network/interfaces"] == result
 
 
-def test_ubuntu_2204_etc_resolvers_dhcp(
-    ubuntu_2204_individual_network, make_interfaces_dhcp_metadata
+@pytest.mark.parametrize("version", versions)
+def test_debian_etc_resolvers_dhcp(
+    individual_network_builder, make_interfaces_dhcp_metadata, version
 ):
     """
     Validates /etc/resolv.conf is skipped
     """
-    builder = ubuntu_2204_individual_network(
-        post_gen_metadata=make_interfaces_dhcp_metadata
+    builder = individual_network_builder(
+        version, post_gen_metadata=make_interfaces_dhcp_metadata
     )
     tasks = builder.render()
     assert tasks["etc/resolv.conf"] is None
