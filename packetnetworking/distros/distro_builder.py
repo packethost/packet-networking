@@ -74,15 +74,15 @@ class DistroBuilder(utils.Tasks):
     def context(self):
         return {
             "hostname": self.metadata.hostname,
-            "interfaces": self.network.interfaces,
             "iface0": self.network.interfaces[0],
+            "interfaces": self.network.interfaces,
             "ip4priv": self.ipv4priv.first,
             "ip4pub": self.ipv4pub.first,
             "ip6pub": self.ipv6pub.first,
             "net": self.network,
             "osinfo": self.metadata.operating_system,
-            "resolvers": self.network.resolvers,
             "private_subnets": self.network.private_subnets,
+            "resolvers": self.network.resolvers,
         }
 
     @property

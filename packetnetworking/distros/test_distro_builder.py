@@ -176,8 +176,8 @@ def test_distro_builder_context_as_expected(fake_distro_builder_with_metadata):
     context = fake_distro.context()
     wanted_context = {
         "hostname": fake_distro.metadata.hostname,
-        "interfaces": fake_distro.network.interfaces,
         "iface0": fake_distro.network.interfaces[0],
+        "interfaces": fake_distro.network.interfaces,
         "ip4priv": fake_distro.ipv4priv.first,
         "ip4pub": fake_distro.ipv4pub.first,
         "ip6pub": fake_distro.ipv6pub.first,
