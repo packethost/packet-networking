@@ -28,20 +28,25 @@ def test_public_bonded_task_etc_network_interfaces(
     ipv4priv = builder.ipv4priv.first
     ipv4pub = builder.ipv4pub.first
     ipv6pub = builder.ipv6pub.first
+    partial = """\
+        auto lo
+        iface lo inet loopback
+        """
+    result = dedent(partial)
     if distro == "ubuntu":
-        result = f"""\
-        auto lo
-        iface lo inet loopback
+        partial = f"""
+            auto {iface0.name}
+            iface {iface0.name} inet manual
+                bond-master bond0
 
-        auto {iface0.name}
-        iface {iface0.name} inet manual
-            bond-master bond0
+            auto {iface1.name}
+            iface {iface1.name} inet manual
+                pre-up sleep 4
+                bond-master bond0
+            """
+        result += dedent(partial)
 
-        auto {iface1.name}
-        iface {iface1.name} inet manual
-            pre-up sleep 4
-            bond-master bond0
-
+    partial = f"""
         auto bond0
         iface bond0 inet static
             address {ipv4pub.address}
@@ -54,9 +59,12 @@ def test_public_bonded_task_etc_network_interfaces(
             bond-mode {bonding_mode}
             bond-updelay 200
             bond-xmit_hash_policy layer3+4
-            bond-lacp-rate 1
-            bond-slaves {iface0.name} {iface1.name}
-
+        """
+    result += dedent(partial)
+    if distro == "ubuntu":
+        result += "    bond-lacp-rate 1\n"
+    result += f"""    bond-slaves {iface0.name} {iface1.name}\n"""
+    partial = f"""
         iface bond0 inet6 static
             address {ipv6pub.address}
             netmask {ipv6pub.cidr}
@@ -69,39 +77,8 @@ def test_public_bonded_task_etc_network_interfaces(
             post-up route add -net 10.0.0.0/8 gw {ipv4priv.gateway}
             post-down route del -net 10.0.0.0/8 gw {ipv4priv.gateway}
         """
-    else:
-        result = f"""\
-        auto lo
-        iface lo inet loopback
-
-        auto bond0
-        iface bond0 inet static
-            address {ipv4pub.address}
-            netmask {ipv4pub.netmask}
-            gateway {ipv4pub.gateway}
-            dns-nameservers {dns1} {dns2}
-
-            bond-downdelay 200
-            bond-miimon 100
-            bond-mode {bonding_mode}
-            bond-updelay 200
-            bond-xmit_hash_policy layer3+4
-            bond-slaves {iface0.name} {iface1.name}
-
-        iface bond0 inet6 static
-            address {ipv6pub.address}
-            netmask {ipv6pub.cidr}
-            gateway {ipv6pub.gateway}
-
-        auto bond0:0
-        iface bond0:0 inet static
-            address {ipv4priv.address}
-            netmask {ipv4priv.netmask}
-            post-up route add -net 10.0.0.0/8 gw {ipv4priv.gateway}
-            post-down route del -net 10.0.0.0/8 gw {ipv4priv.gateway}
-        """
-
-    assert tasks["etc/network/interfaces"] == dedent(result)
+    result += dedent(partial)
+    assert tasks["etc/network/interfaces"] == result
 
 
 @pytest.mark.parametrize("distro,version", versions)
@@ -121,20 +98,25 @@ def test_private_bonded_task_etc_network_interfaces(
     iface0 = builder.network.interfaces[0]
     iface1 = builder.network.interfaces[1]
     ipv4priv = builder.ipv4priv.first
+    partial = """\
+        auto lo
+        iface lo inet loopback
+        """
+    result = dedent(partial)
     if distro == "ubuntu":
-        result = f"""\
-        auto lo
-        iface lo inet loopback
+        partial = f"""
+            auto {iface0.name}
+            iface {iface0.name} inet manual
+                bond-master bond0
 
-        auto {iface0.name}
-        iface {iface0.name} inet manual
-            bond-master bond0
+            auto {iface1.name}
+            iface {iface1.name} inet manual
+                pre-up sleep 4
+                bond-master bond0
+            """
+        result += dedent(partial)
 
-        auto {iface1.name}
-        iface {iface1.name} inet manual
-            pre-up sleep 4
-            bond-master bond0
-
+    partial = f"""
         auto bond0
         iface bond0 inet static
             address {ipv4priv.address}
@@ -147,29 +129,13 @@ def test_private_bonded_task_etc_network_interfaces(
             bond-mode {bonding_mode}
             bond-updelay 200
             bond-xmit_hash_policy layer3+4
-            bond-lacp-rate 1
-            bond-slaves {iface0.name} {iface1.name}
         """
-    else:
-        result = f"""\
-        auto lo
-        iface lo inet loopback
+    result += dedent(partial)
+    if distro == "ubuntu":
+        result += "    bond-lacp-rate 1\n"
+    result += f"    bond-slaves {iface0.name} {iface1.name}\n"
 
-        auto bond0
-        iface bond0 inet static
-            address {ipv4priv.address}
-            netmask {ipv4priv.netmask}
-            gateway {ipv4priv.gateway}
-            dns-nameservers {dns1} {dns2}
-
-            bond-downdelay 200
-            bond-miimon 100
-            bond-mode {bonding_mode}
-            bond-updelay 200
-            bond-xmit_hash_policy layer3+4
-            bond-slaves {iface0.name} {iface1.name}
-        """
-    assert tasks["etc/network/interfaces"] == dedent(result)
+    assert tasks["etc/network/interfaces"] == result
 
 
 @pytest.mark.parametrize("distro,version", versions)
@@ -189,20 +155,25 @@ def test_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
     ipv4priv = builder.ipv4priv.first
     ipv4pub = builder.ipv4pub.first
     ipv6pub = builder.ipv6pub.first
+    partial = """\
+        auto lo
+        iface lo inet loopback
+        """
+    result = dedent(partial)
     if distro == "ubuntu":
-        result = f"""\
-        auto lo
-        iface lo inet loopback
+        partial = f"""
+            auto {iface0.name}
+            iface {iface0.name} inet manual
+                bond-master bond0
 
-        auto {iface0.name}
-        iface {iface0.name} inet manual
-            bond-master bond0
+            auto {iface1.name}
+            iface {iface1.name} inet manual
+                pre-up sleep 4
+                bond-master bond0
+            """
+        result += dedent(partial)
 
-        auto {iface1.name}
-        iface {iface1.name} inet manual
-            pre-up sleep 4
-            bond-master bond0
-
+    partial = f"""
         auto bond0
         iface bond0 inet static
             address {ipv4pub.address}
@@ -215,9 +186,13 @@ def test_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
             bond-mode {bonding_mode}
             bond-updelay 200
             bond-xmit_hash_policy layer3+4
-            bond-lacp-rate 1
-            bond-slaves {iface0.name} {iface1.name}
+        """
+    result += dedent(partial)
+    if distro == "ubuntu":
+        result += "    bond-lacp-rate 1\n"
 
+    result += f"""    bond-slaves {iface0.name} {iface1.name}\n"""
+    partial = f"""
         iface bond0 inet6 static
             address {ipv6pub.address}
             netmask {ipv6pub.cidr}
@@ -232,40 +207,8 @@ def test_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
             post-up route add -net 172.16.0.0/12 gw {ipv4priv.gateway}
             post-down route del -net 172.16.0.0/12 gw {ipv4priv.gateway}
         """
-    else:
-        result = f"""\
-        auto lo
-        iface lo inet loopback
-
-        auto bond0
-        iface bond0 inet static
-            address {ipv4pub.address}
-            netmask {ipv4pub.netmask}
-            gateway {ipv4pub.gateway}
-            dns-nameservers {dns1} {dns2}
-
-            bond-downdelay 200
-            bond-miimon 100
-            bond-mode {bonding_mode}
-            bond-updelay 200
-            bond-xmit_hash_policy layer3+4
-            bond-slaves {iface0.name} {iface1.name}
-
-        iface bond0 inet6 static
-            address {ipv6pub.address}
-            netmask {ipv6pub.cidr}
-            gateway {ipv6pub.gateway}
-
-        auto bond0:0
-        iface bond0:0 inet static
-            address {ipv4priv.address}
-            netmask {ipv4priv.netmask}
-            post-up route add -net 192.168.5.0/24 gw {ipv4priv.gateway}
-            post-down route del -net 192.168.5.0/24 gw {ipv4priv.gateway}
-            post-up route add -net 172.16.0.0/12 gw {ipv4priv.gateway}
-            post-down route del -net 172.16.0.0/12 gw {ipv4priv.gateway}
-        """
-    assert tasks["etc/network/interfaces"] == dedent(result)
+    result += dedent(partial)
+    assert tasks["etc/network/interfaces"] == result
 
 
 @pytest.mark.parametrize("distro,version", versions)
@@ -286,11 +229,13 @@ def test_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space
     iface0 = builder.network.interfaces[0]
     iface1 = builder.network.interfaces[1]
     ipv4priv = builder.ipv4priv.first
+    partial = """\
+        auto lo
+        iface lo inet loopback
+        """
+    result = dedent(partial)
     if distro == "ubuntu":
-        result = f"""\
-            auto lo
-            iface lo inet loopback
-
+        partial = f"""
             auto {iface0.name}
             iface {iface0.name} inet manual
                 bond-master bond0
@@ -299,42 +244,29 @@ def test_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space
             iface {iface1.name} inet manual
                 pre-up sleep 4
                 bond-master bond0
-
-            auto bond0
-            iface bond0 inet static
-                address {ipv4priv.address}
-                netmask {ipv4priv.netmask}
-                gateway {ipv4priv.gateway}
-                dns-nameservers {dns1} {dns2}
-
-                bond-downdelay 200
-                bond-miimon 100
-                bond-mode {bonding_mode}
-                bond-updelay 200
-                bond-xmit_hash_policy layer3+4
-                bond-lacp-rate 1
-                bond-slaves {iface0.name} {iface1.name}
             """
-    else:
-        result = f"""\
-            auto lo
-            iface lo inet loopback
+        result += dedent(partial)
 
-            auto bond0
-            iface bond0 inet static
-                address {ipv4priv.address}
-                netmask {ipv4priv.netmask}
-                gateway {ipv4priv.gateway}
-                dns-nameservers {dns1} {dns2}
+    partial = f"""
+        auto bond0
+        iface bond0 inet static
+            address {ipv4priv.address}
+            netmask {ipv4priv.netmask}
+            gateway {ipv4priv.gateway}
+            dns-nameservers {dns1} {dns2}
 
-                bond-downdelay 200
-                bond-miimon 100
-                bond-mode {bonding_mode}
-                bond-updelay 200
-                bond-xmit_hash_policy layer3+4
-                bond-slaves {iface0.name} {iface1.name}
-            """
-    assert tasks["etc/network/interfaces"] == dedent(result)
+            bond-downdelay 200
+            bond-miimon 100
+            bond-mode {bonding_mode}
+            bond-updelay 200
+            bond-xmit_hash_policy layer3+4
+        """
+    result += dedent(partial)
+    if distro == "ubuntu":
+        result += "    bond-lacp-rate 1\n"
+
+    result += f"""    bond-slaves {iface0.name} {iface1.name}\n"""
+    assert tasks["etc/network/interfaces"] == result
 
 
 @pytest.mark.parametrize("distro,version", versions)
