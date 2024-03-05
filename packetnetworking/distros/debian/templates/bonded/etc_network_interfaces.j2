@@ -33,7 +33,7 @@ iface bond0 inet static
     {% if osinfo.distro == 'ubuntu' and net.bonding.mode == 4 %}
     bond-lacp-rate 1
     {% endif %}
-    bond-slaves {{ interfaces | map(attribute='name') | join(' ')}}
+    bond-slaves {{ interfaces | selectattr('bond', 'in', '["bond0"]') | map(attribute='name') | join(' ')}}
 {% if ip6pub %}
 
 iface bond0 inet6 static

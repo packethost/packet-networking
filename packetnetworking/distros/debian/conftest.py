@@ -34,19 +34,40 @@ def expected_file_etc_network_interfaces_dhcp_2():
     yield expected_file_etc_network_interfaces_dhcp_2
 
 
-@pytest.fixture
-def debianbuilder(mockit, fake, metadata, patch_dict):
+@pytest.fixture(
+    ids=[
+        "1bond2nics",
+        "1bond4nics",
+        "2bonds2nics",
+    ],
+    params=[
+        [
+            {"name": "eth0", "mac": "00:0c:29:51:53:a0", "bond": "bond0"},
+            {"name": "eth1", "mac": "00:0c:29:51:53:a1", "bond": "bond0"},
+        ],
+        [
+            {"name": "eth0", "mac": "00:0c:29:51:53:a0", "bond": "bond0"},
+            {"name": "eth1", "mac": "00:0c:29:51:53:a1", "bond": "bond0"},
+            {"name": "eth2", "mac": "00:0c:29:51:53:a2", "bond": "bond0"},
+            {"name": "eth3", "mac": "00:0c:29:51:53:a3", "bond": "bond0"},
+        ],
+        [
+            {"name": "eth0", "mac": "00:0c:29:51:53:a0", "bond": "bond0"},
+            {"name": "eth1", "mac": "00:0c:29:51:53:a1", "bond": "bond0"},
+            {"name": "eth2", "mac": "00:0c:29:51:53:a2", "bond": "bond1"},
+            {"name": "eth3", "mac": "00:0c:29:51:53:a3", "bond": "bond1"},
+        ],
+    ],
+)
+def debianbuilder(mockit, fake, metadata, patch_dict, request):
     gen_metadata = metadata
 
     def _builder(metadata=None, public=True, post_gen_metadata=None):
         resolvers = ("1.2.3.4", "2.3.4.5")
-        meta_interfaces = [
-            {"name": "eth0", "mac": "00:0c:29:51:53:a1", "bond": "bond0"},
-            {"name": "eth1", "mac": "00:0c:29:51:53:a2", "bond": "bond0"},
-        ]
+        meta_interfaces = request.param
         phys_interfaces = [
-            {"name": "enp0", "mac": "00:0c:29:51:53:a1"},
-            {"name": "enp1", "mac": "00:0c:29:51:53:a2"},
+            {"name": iface["name"].replace("eth", "enp"), "mac": iface["mac"]}
+            for iface in meta_interfaces
         ]
         _metadata = {"network": {"interfaces": meta_interfaces}}
         if metadata:
