@@ -6,6 +6,7 @@ from .bonded import RedhatBondedNetwork
 from .individual import RedhatIndividualNetwork
 
 versions = {
+    "almalinux": ["8", "9"],
     "centos": ["7"],
     "redhatenterpriseserver": ["7", "8", "9"],
 }

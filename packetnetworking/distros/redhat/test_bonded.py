@@ -378,7 +378,7 @@ def test_persistent_interface_names(bonded_network_builder, distro, version):
         iface0=builder.network.interfaces[0],
         iface1=builder.network.interfaces[1],
     )
-    if distro == "centos":
+    if distro in ("almalinux", "centos"):
         # except for centos, we do not want a persistent-net.rules for centos
         assert "etc/udev/rules.d/70-persistent-net.rules" not in tasks
     else:
