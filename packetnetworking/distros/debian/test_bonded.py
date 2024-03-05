@@ -64,7 +64,7 @@ def test_public_bonded_task_etc_network_interfaces(
     result += dedent(partial)
     if distro == "ubuntu":
         result += "    bond-lacp-rate 1\n"
-    result += f"""    bond-slaves {' '.join([iface.name for iface in builder.network.interfaces])}\n"""
+    result += f"""    bond-slaves {' '.join([iface.name for iface in builder.network.interfaces if iface.bond == "bond0"])}\n"""
     partial = f"""
         iface bond0 inet6 static
             address {ipv6pub.address}
@@ -135,7 +135,7 @@ def test_private_bonded_task_etc_network_interfaces(
     result += dedent(partial)
     if distro == "ubuntu":
         result += "    bond-lacp-rate 1\n"
-    result += f"    bond-slaves {' '.join([iface.name for iface in builder.network.interfaces])}\n"
+    result += f"""    bond-slaves {' '.join([iface.name for iface in builder.network.interfaces if iface.bond == "bond0"])}\n"""
 
     assert tasks["etc/network/interfaces"] == result
 
@@ -194,7 +194,7 @@ def test_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
     if distro == "ubuntu":
         result += "    bond-lacp-rate 1\n"
 
-    result += f"""    bond-slaves {' '.join([iface.name for iface in builder.network.interfaces])}\n"""
+    result += f"""    bond-slaves {' '.join([iface.name for iface in builder.network.interfaces if iface.bond == "bond0"])}\n"""
     partial = f"""
         iface bond0 inet6 static
             address {ipv6pub.address}
@@ -269,7 +269,7 @@ def test_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space
     if distro == "ubuntu":
         result += "    bond-lacp-rate 1\n"
 
-    result += f"""    bond-slaves {' '.join([iface.name for iface in builder.network.interfaces])}\n"""
+    result += f"""    bond-slaves {' '.join([iface.name for iface in builder.network.interfaces if iface.bond == "bond0"])}\n"""
     assert tasks["etc/network/interfaces"] == result
 
 
