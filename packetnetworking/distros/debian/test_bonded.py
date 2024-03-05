@@ -23,8 +23,6 @@ def test_public_bonded_task_etc_network_interfaces(
     bonding_mode = builder.network.bonding.mode
     dns1 = builder.network.resolvers[0]
     dns2 = builder.network.resolvers[1]
-    iface0 = builder.network.interfaces[0]
-    iface1 = builder.network.interfaces[1]
     ipv4priv = builder.ipv4priv.first
     ipv4pub = builder.ipv4pub.first
     ipv6pub = builder.ipv6pub.first
@@ -35,16 +33,19 @@ def test_public_bonded_task_etc_network_interfaces(
     result = dedent(partial)
     if distro == "ubuntu":
         partial = f"""
-            auto {iface0.name}
-            iface {iface0.name} inet manual
-                bond-master bond0
-
-            auto {iface1.name}
-            iface {iface1.name} inet manual
-                pre-up sleep 4
+            auto {builder.network.interfaces[0].name}
+            iface {builder.network.interfaces[0].name} inet manual
                 bond-master bond0
             """
         result += dedent(partial)
+        for iface in builder.network.interfaces[1:]:
+            partial = f"""
+                auto {iface.name}
+                iface {iface.name} inet manual
+                    pre-up sleep 4
+                    bond-master bond0
+                """
+            result += dedent(partial)
 
     partial = f"""
         auto bond0
@@ -63,7 +64,7 @@ def test_public_bonded_task_etc_network_interfaces(
     result += dedent(partial)
     if distro == "ubuntu":
         result += "    bond-lacp-rate 1\n"
-    result += f"""    bond-slaves {iface0.name} {iface1.name}\n"""
+    result += f"""    bond-slaves {' '.join([iface.name for iface in builder.network.interfaces])}\n"""
     partial = f"""
         iface bond0 inet6 static
             address {ipv6pub.address}
@@ -95,8 +96,6 @@ def test_private_bonded_task_etc_network_interfaces(
     bonding_mode = builder.network.bonding.mode
     dns1 = builder.network.resolvers[0]
     dns2 = builder.network.resolvers[1]
-    iface0 = builder.network.interfaces[0]
-    iface1 = builder.network.interfaces[1]
     ipv4priv = builder.ipv4priv.first
     partial = """\
         auto lo
@@ -105,16 +104,19 @@ def test_private_bonded_task_etc_network_interfaces(
     result = dedent(partial)
     if distro == "ubuntu":
         partial = f"""
-            auto {iface0.name}
-            iface {iface0.name} inet manual
-                bond-master bond0
-
-            auto {iface1.name}
-            iface {iface1.name} inet manual
-                pre-up sleep 4
+            auto {builder.network.interfaces[0].name}
+            iface {builder.network.interfaces[0].name} inet manual
                 bond-master bond0
             """
         result += dedent(partial)
+        for iface in builder.network.interfaces[1:]:
+            partial = f"""
+                auto {iface.name}
+                iface {iface.name} inet manual
+                    pre-up sleep 4
+                    bond-master bond0
+                """
+            result += dedent(partial)
 
     partial = f"""
         auto bond0
@@ -133,7 +135,7 @@ def test_private_bonded_task_etc_network_interfaces(
     result += dedent(partial)
     if distro == "ubuntu":
         result += "    bond-lacp-rate 1\n"
-    result += f"    bond-slaves {iface0.name} {iface1.name}\n"
+    result += f"    bond-slaves {' '.join([iface.name for iface in builder.network.interfaces])}\n"
 
     assert tasks["etc/network/interfaces"] == result
 
@@ -150,8 +152,6 @@ def test_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
     bonding_mode = builder.network.bonding.mode
     dns1 = builder.network.resolvers[0]
     dns2 = builder.network.resolvers[1]
-    iface0 = builder.network.interfaces[0]
-    iface1 = builder.network.interfaces[1]
     ipv4priv = builder.ipv4priv.first
     ipv4pub = builder.ipv4pub.first
     ipv6pub = builder.ipv6pub.first
@@ -162,16 +162,19 @@ def test_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
     result = dedent(partial)
     if distro == "ubuntu":
         partial = f"""
-            auto {iface0.name}
-            iface {iface0.name} inet manual
-                bond-master bond0
-
-            auto {iface1.name}
-            iface {iface1.name} inet manual
-                pre-up sleep 4
+            auto {builder.network.interfaces[0].name}
+            iface {builder.network.interfaces[0].name} inet manual
                 bond-master bond0
             """
         result += dedent(partial)
+        for iface in builder.network.interfaces[1:]:
+            partial = f"""
+                auto {iface.name}
+                iface {iface.name} inet manual
+                    pre-up sleep 4
+                    bond-master bond0
+                """
+            result += dedent(partial)
 
     partial = f"""
         auto bond0
@@ -191,7 +194,7 @@ def test_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
     if distro == "ubuntu":
         result += "    bond-lacp-rate 1\n"
 
-    result += f"""    bond-slaves {iface0.name} {iface1.name}\n"""
+    result += f"""    bond-slaves {' '.join([iface.name for iface in builder.network.interfaces])}\n"""
     partial = f"""
         iface bond0 inet6 static
             address {ipv6pub.address}
@@ -226,8 +229,6 @@ def test_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space
     bonding_mode = builder.network.bonding.mode
     dns1 = builder.network.resolvers[0]
     dns2 = builder.network.resolvers[1]
-    iface0 = builder.network.interfaces[0]
-    iface1 = builder.network.interfaces[1]
     ipv4priv = builder.ipv4priv.first
     partial = """\
         auto lo
@@ -236,16 +237,19 @@ def test_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space
     result = dedent(partial)
     if distro == "ubuntu":
         partial = f"""
-            auto {iface0.name}
-            iface {iface0.name} inet manual
-                bond-master bond0
-
-            auto {iface1.name}
-            iface {iface1.name} inet manual
-                pre-up sleep 4
+            auto {builder.network.interfaces[0].name}
+            iface {builder.network.interfaces[0].name} inet manual
                 bond-master bond0
             """
         result += dedent(partial)
+        for iface in builder.network.interfaces[1:]:
+            partial = f"""
+                auto {iface.name}
+                iface {iface.name} inet manual
+                    pre-up sleep 4
+                    bond-master bond0
+                """
+            result += dedent(partial)
 
     partial = f"""
         auto bond0
@@ -265,7 +269,7 @@ def test_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space
     if distro == "ubuntu":
         result += "    bond-lacp-rate 1\n"
 
-    result += f"""    bond-slaves {iface0.name} {iface1.name}\n"""
+    result += f"""    bond-slaves {' '.join([iface.name for iface in builder.network.interfaces])}\n"""
     assert tasks["etc/network/interfaces"] == result
 
 
@@ -347,19 +351,19 @@ def test_persistent_interface_names(bonded_network_builder, distro, version):
     builder = bonded_network_builder(distro, version)
     tasks = builder.render()
 
-    iface0 = builder.network.interfaces[0]
-    iface1 = builder.network.interfaces[1]
-    result = f"""\
+    result = """\
         # This file was automatically generated by the Equinix Metal installation environment.
         # See https://github.com/packethost/packet-networking for details.
         #
         # You can modify it, as long as you keep each rule on a single
         # line, and change only the value of the NAME= key.
-
-        # PCI device (custom name provided by external tool to mimic Predictable Network Interface Names)
-        SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{{address}}=="{iface0.mac}", ATTR{{dev_id}}=="0x0", ATTR{{type}}=="1", NAME="{iface0.name}"
-
-        # PCI device (custom name provided by external tool to mimic Predictable Network Interface Names)
-        SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{{address}}=="{iface1.mac}", ATTR{{dev_id}}=="0x0", ATTR{{type}}=="1", NAME="{iface1.name}"
         """
+    result = dedent(result)
+
+    for iface in builder.network.interfaces:
+        partial = f"""
+            # PCI device (custom name provided by external tool to mimic Predictable Network Interface Names)
+            SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{{address}}=="{iface.mac}", ATTR{{dev_id}}=="0x0", ATTR{{type}}=="1", NAME="{iface.name}"
+            """
+        result += dedent(partial)
     assert tasks["etc/udev/rules.d/70-persistent-net.rules"] == dedent(result)
