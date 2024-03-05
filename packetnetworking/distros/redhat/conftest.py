@@ -5,6 +5,14 @@ from .builder import RedhatBuilder
 from .bonded import RedhatBondedNetwork
 from .individual import RedhatIndividualNetwork
 
+versions = {
+    "almalinux": ["8", "9"],
+    "centos": ["7"],
+    "redhatenterpriseserver": ["7", "8", "9"],
+    "rocky": ["8", "9"],
+}
+versions = [[distro, version] for distro in versions for version in versions[distro]]
+
 
 @pytest.fixture
 def redhatbuilder(mockit, fake, metadata, patch_dict):

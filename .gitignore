@@ -2,3 +2,8 @@
 *.egg-info
 .tox
 .coverage
+
+# nix/devenv/direnv stuff
+.devenv/
+.direnv/
+.pre-commit-config.yaml

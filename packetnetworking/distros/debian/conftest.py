@@ -9,6 +9,13 @@ from .bonded import DebianBondedNetwork
 from .individual import DebianIndividualNetwork
 
 
+versions = {
+    "debian": ["10", "11", "12"],
+    "ubuntu": ["18.04", "20.04", "22.04"],
+}
+versions = [[distro, version] for distro in versions for version in versions[distro]]
+
+
 @pytest.fixture
 def expected_file_etc_network_interfaces_dhcp_2():
     expected_file_etc_network_interfaces_dhcp_2 = textwrap.dedent(
