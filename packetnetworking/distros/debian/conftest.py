@@ -37,11 +37,25 @@ def expected_file_etc_network_interfaces_dhcp_2():
 @pytest.fixture(
     ids=[
         "1bond2nics",
+        "1bond4nics",
+        "2bonds2nics",
     ],
     params=[
         [
             {"name": "eth0", "mac": "00:0c:29:51:53:a0", "bond": "bond0"},
             {"name": "eth1", "mac": "00:0c:29:51:53:a1", "bond": "bond0"},
+        ],
+        [
+            {"name": "eth0", "mac": "00:0c:29:51:53:a0", "bond": "bond0"},
+            {"name": "eth1", "mac": "00:0c:29:51:53:a1", "bond": "bond0"},
+            {"name": "eth2", "mac": "00:0c:29:51:53:a2", "bond": "bond0"},
+            {"name": "eth3", "mac": "00:0c:29:51:53:a3", "bond": "bond0"},
+        ],
+        [
+            {"name": "eth0", "mac": "00:0c:29:51:53:a0", "bond": "bond0"},
+            {"name": "eth1", "mac": "00:0c:29:51:53:a1", "bond": "bond0"},
+            {"name": "eth2", "mac": "00:0c:29:51:53:a2", "bond": "bond1"},
+            {"name": "eth3", "mac": "00:0c:29:51:53:a3", "bond": "bond1"},
         ],
     ],
 )
