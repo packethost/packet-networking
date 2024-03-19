@@ -80,6 +80,24 @@ def test_public_bonded_task_etc_network_interfaces(
             post-down route del -net 10.0.0.0/8 gw {ipv4priv.gateway}
         """
     result += dedent(partial)
+
+    for bond, members in builder.network.bonds.items():
+        if bond == "bond0":
+            continue
+
+        partial = f"""
+            auto {bond}
+            iface {bond} inet static
+                bond-downdelay 200
+                bond-miimon 100
+                bond-mode {bonding_mode}
+                bond-updelay 200
+                bond-xmit_hash_policy layer3+4
+            """
+        result += dedent(partial)
+        if distro == "ubuntu":
+            result += "    bond-lacp-rate 1\n"
+        result += f"    bond-slaves {' '.join(sorted(nic.name for nic in members))}\n"
     assert tasks["etc/network/interfaces"] == result
 
 
@@ -138,6 +156,23 @@ def test_private_bonded_task_etc_network_interfaces(
         result += "    bond-lacp-rate 1\n"
     result += f"    bond-slaves {' '.join(sorted(nic.name for nic in builder.network.bonds['bond0']))}\n"
 
+    for bond, members in builder.network.bonds.items():
+        if bond == "bond0":
+            continue
+
+        partial = f"""
+            auto {bond}
+            iface {bond} inet static
+                bond-downdelay 200
+                bond-miimon 100
+                bond-mode {bonding_mode}
+                bond-updelay 200
+                bond-xmit_hash_policy layer3+4
+            """
+        result += dedent(partial)
+        if distro == "ubuntu":
+            result += "    bond-lacp-rate 1\n"
+        result += f"    bond-slaves {' '.join(sorted(nic.name for nic in members))}\n"
     assert tasks["etc/network/interfaces"] == result
 
 
@@ -212,6 +247,24 @@ def test_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
             post-down route del -net 172.16.0.0/12 gw {ipv4priv.gateway}
         """
     result += dedent(partial)
+
+    for bond, members in builder.network.bonds.items():
+        if bond == "bond0":
+            continue
+
+        partial = f"""
+            auto {bond}
+            iface {bond} inet static
+                bond-downdelay 200
+                bond-miimon 100
+                bond-mode {bonding_mode}
+                bond-updelay 200
+                bond-xmit_hash_policy layer3+4
+            """
+        result += dedent(partial)
+        if distro == "ubuntu":
+            result += "    bond-lacp-rate 1\n"
+        result += f"    bond-slaves {' '.join(sorted(nic.name for nic in members))}\n"
     assert tasks["etc/network/interfaces"] == result
 
 
@@ -271,6 +324,24 @@ def test_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space
         result += "    bond-lacp-rate 1\n"
 
     result += f"""    bond-slaves {' '.join(sorted(nic.name for nic in builder.network.bonds["bond0"]))}\n"""
+
+    for bond, members in builder.network.bonds.items():
+        if bond == "bond0":
+            continue
+
+        partial = f"""
+            auto {bond}
+            iface {bond} inet static
+                bond-downdelay 200
+                bond-miimon 100
+                bond-mode {bonding_mode}
+                bond-updelay 200
+                bond-xmit_hash_policy layer3+4
+            """
+        result += dedent(partial)
+        if distro == "ubuntu":
+            result += "    bond-lacp-rate 1\n"
+        result += f"    bond-slaves {' '.join(sorted(nic.name for nic in members))}\n"
     assert tasks["etc/network/interfaces"] == result
 
 
