@@ -3,17 +3,21 @@ iface lo inet loopback
 
 {% if osinfo.distro == 'ubuntu' %}
 {% for iface in interfaces %}
+
 auto {{ iface.name }}
 iface {{ iface.name }} inet manual
 {% if iface.name != interfaces[0].name %}
     pre-up sleep 4
 {% endif %}
     bond-master bond0
-
 {% endfor %}
 {% endif %}
-auto bond0
-iface bond0 inet static
+
+{% for bond in bonds %}
+
+auto {{ bond }}
+iface {{ bond }} inet static
+    {% if bond == "bond0" %}
     {% if ip4pub %}
     address {{ ip4pub.address }}
     netmask {{ ip4pub.netmask }}
@@ -25,6 +29,7 @@ iface bond0 inet static
     {% endif %}
     dns-nameservers {{ resolvers | join(" ") }}
 
+    {% endif %}
     bond-downdelay 200
     bond-miimon 100
     bond-mode {{ net.bonding.mode }}
@@ -33,7 +38,8 @@ iface bond0 inet static
     {% if osinfo.distro == 'ubuntu' and net.bonding.mode == 4 %}
     bond-lacp-rate 1
     {% endif %}
-    bond-slaves {{ interfaces | selectattr('bond', 'in', '["bond0"]') | map(attribute='name') | join(' ')}}
+    bond-slaves {{ bonds[bond] | map(attribute='name') | sort | join(' ') }}
+{% if bond == "bond0" %}
 {% if ip6pub %}
 
 iface bond0 inet6 static
@@ -52,3 +58,5 @@ iface bond0:0 inet static
     post-down route del -net {{ subnet }} gw {{ ip4priv.gateway }}
     {% endfor %}
 {% endif %}
+{% endif %}
+{% endfor %}

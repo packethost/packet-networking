@@ -96,7 +96,6 @@ class NetworkData(object):
         )
 
     def build_interfaces(self):
-        self.interfaces = utils.WhereList()
         physical_ifaces = utils.get_interfaces()
         matched_ifaces = utils.get_matched_interfaces(
             self.nw_metadata.interfaces, physical_ifaces
@@ -110,7 +109,7 @@ class NetworkData(object):
 
     def build_bonds(self):
         self.bonds = utils.RecursiveDictAttributes({})
-        for iface in self.nw_metadata.interfaces:
+        for iface in self.interfaces:
             if "bond" in iface and iface.bond:
                 if iface.bond not in self.bonds:
                     self.bonds[iface.bond] = [iface]
