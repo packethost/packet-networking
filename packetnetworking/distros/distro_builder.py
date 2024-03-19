@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import logging
 import json
@@ -154,14 +155,17 @@ class DistroBuilder(utils.Tasks):
             tmpl.environment.globals.update(generated_header=utils.generated_header)
 
             try:
+                content = tmpl.render(context)
+                # replace multiple empty lines with just one
+                content = re.sub(r"\n+(?=\n)", "\n", content)
                 if file_mode or mode:
                     rendered_tasks[path] = {
                         "file_mode": file_mode,
                         "mode": mode,
-                        "content": tmpl.render(context),
+                        "content": content,
                     }
                 else:
-                    rendered_tasks[path] = tmpl.render(context)
+                    rendered_tasks[path] = content
             except UndefinedError:
                 # having to use print as log.* isn't printing out the json
                 print(
