@@ -96,7 +96,6 @@ class NetworkData(object):
         )
 
     def build_interfaces(self):
-        self.interfaces = utils.WhereList()
         physical_ifaces = utils.get_interfaces()
         matched_ifaces = utils.get_matched_interfaces(
             self.nw_metadata.interfaces, physical_ifaces
