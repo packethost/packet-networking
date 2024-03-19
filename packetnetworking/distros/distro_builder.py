@@ -73,6 +73,7 @@ class DistroBuilder(utils.Tasks):
 
     def context(self):
         return {
+            "bonds": self.network.bonds,
             "hostname": self.metadata.hostname,
             "iface0": self.network.interfaces[0],
             "interfaces": self.network.interfaces,
