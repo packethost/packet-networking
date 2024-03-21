@@ -87,7 +87,7 @@ def test_public_bonded_task_etc_network_interfaces(
 
         partial = f"""
             auto {bond}
-            iface {bond} inet static
+            iface {bond} inet manual
                 bond-downdelay 200
                 bond-miimon 100
                 bond-mode {bonding_mode}
@@ -162,7 +162,7 @@ def test_private_bonded_task_etc_network_interfaces(
 
         partial = f"""
             auto {bond}
-            iface {bond} inet static
+            iface {bond} inet manual
                 bond-downdelay 200
                 bond-miimon 100
                 bond-mode {bonding_mode}
@@ -254,7 +254,7 @@ def test_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
 
         partial = f"""
             auto {bond}
-            iface {bond} inet static
+            iface {bond} inet manual
                 bond-downdelay 200
                 bond-miimon 100
                 bond-mode {bonding_mode}
@@ -331,7 +331,7 @@ def test_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space
 
         partial = f"""
             auto {bond}
-            iface {bond} inet static
+            iface {bond} inet manual
                 bond-downdelay 200
                 bond-miimon 100
                 bond-mode {bonding_mode}
