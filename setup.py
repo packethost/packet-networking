@@ -30,7 +30,7 @@ setup(
     author_email="manny@packet.com, mason@packet.com",
     url="https://github.com/packethost/packet-networking/",
     packages=find_packages(),
-    install_requires=["click", "jinja2", "requests"],
+    install_requires=["click", "jinja2>=3.0", "requests"],
     package_data={"packetnetworking": find_templates()},
     extras_require={"test": test_reqs},
     tests_require=test_reqs,
