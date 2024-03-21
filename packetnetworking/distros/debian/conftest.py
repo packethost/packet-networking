@@ -39,6 +39,7 @@ def expected_file_etc_network_interfaces_dhcp_2():
         "1bond2nics",
         "1bond4nics",
         "2bonds2nics",
+        "2bonds2nics_unsorted",
     ],
     params=[
         [
@@ -57,13 +58,19 @@ def expected_file_etc_network_interfaces_dhcp_2():
             {"name": "eth2", "mac": "00:0c:29:51:53:a2", "bond": "bond1"},
             {"name": "eth3", "mac": "00:0c:29:51:53:a3", "bond": "bond1"},
         ],
+        [
+            {"name": "eth2", "mac": "00:0c:29:51:53:a2", "bond": "bond1"},
+            {"name": "eth3", "mac": "00:0c:29:51:53:a3", "bond": "bond1"},
+            {"name": "eth0", "mac": "00:0c:29:51:53:a0", "bond": "bond0"},
+            {"name": "eth1", "mac": "00:0c:29:51:53:a1", "bond": "bond0"},
+        ],
     ],
 )
 def debianbuilder(mockit, fake, metadata, patch_dict, request):
     gen_metadata = metadata
 
     def _builder(metadata=None, public=True, post_gen_metadata=None):
-        resolvers = ("1.2.3.4", "2.3.4.5")
+        resolvers = reversed([fake.ipv4(), fake.ipv4()])
         meta_interfaces = request.param
         phys_interfaces = [
             {"name": iface["name"].replace("eth", "enp"), "mac": iface["mac"]}

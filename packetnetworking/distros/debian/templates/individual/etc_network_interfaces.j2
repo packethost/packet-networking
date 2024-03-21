@@ -12,7 +12,7 @@ iface {{ iface0.name }} inet static
     netmask {{ ip4priv.netmask }}
     gateway {{ ip4priv.gateway }}
     {% endif %}
-    dns-nameservers {{ resolvers | join(" ") }}
+    dns-nameservers {{ resolvers | sort | join(" ") }}
 {% if ip6pub %}
 
 iface {{ iface0.name }} inet6 static
@@ -26,7 +26,7 @@ auto {{ iface0.name }}:0
 iface {{ iface0.name }}:0 inet static
     address {{ ip4priv.address }}
     netmask {{ ip4priv.netmask }}
-    {% for subnet in private_subnets %}
+    {% for subnet in private_subnets | sort %}
     post-up route add -net {{ subnet }} gw {{ ip4priv.gateway }}
     post-down route del -net {{ subnet }} gw {{ ip4priv.gateway }}
     {% endfor %}

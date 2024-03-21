@@ -2,7 +2,7 @@ auto lo
 iface lo inet loopback
 
 {% if osinfo.distro == 'ubuntu' %}
-{% for iface in interfaces %}
+{% for iface in interfaces | sort(attribute="name") %}
 
 auto {{ iface.name }}
 iface {{ iface.name }} inet manual
@@ -13,7 +13,7 @@ iface {{ iface.name }} inet manual
 {% endfor %}
 {% endif %}
 
-{% for bond in bonds %}
+{% for bond in bonds | sort %}
 
 auto {{ bond }}
 iface {{ bond }} inet {% if bond == "bond0" %}static{% else %}manual{% endif +%}
@@ -27,7 +27,7 @@ iface {{ bond }} inet {% if bond == "bond0" %}static{% else %}manual{% endif +%}
     netmask {{ ip4priv.netmask }}
     gateway {{ ip4priv.gateway }}
     {% endif %}
-    dns-nameservers {{ resolvers | join(" ") }}
+    dns-nameservers {{ resolvers | sort | join(" ") }}
 
     {% endif %}
     bond-downdelay 200
@@ -53,7 +53,7 @@ auto bond0:0
 iface bond0:0 inet static
     address {{ ip4priv.address }}
     netmask {{ ip4priv.netmask }}
-    {% for subnet in private_subnets %}
+    {% for subnet in private_subnets | sort %}
     post-up route add -net {{ subnet }} gw {{ ip4priv.gateway }}
     post-down route del -net {{ subnet }} gw {{ ip4priv.gateway }}
     {% endfor %}

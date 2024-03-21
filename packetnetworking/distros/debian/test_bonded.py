@@ -21,8 +21,6 @@ def test_public_bonded_task_etc_network_interfaces(
     tasks = builder.render()
 
     bonding_mode = builder.network.bonding.mode
-    dns1 = builder.network.resolvers[0]
-    dns2 = builder.network.resolvers[1]
     ipv4priv = builder.ipv4priv.first
     ipv4pub = builder.ipv4pub.first
     ipv6pub = builder.ipv6pub.first
@@ -32,28 +30,28 @@ def test_public_bonded_task_etc_network_interfaces(
         """
     result = dedent(partial)
     if distro == "ubuntu":
-        partial = f"""
-            auto {builder.network.interfaces[0].name}
-            iface {builder.network.interfaces[0].name} inet manual
-                bond-master bond0
-            """
-        result += dedent(partial)
-        for iface in builder.network.interfaces[1:]:
-            partial = f"""
-                auto {iface.name}
-                iface {iface.name} inet manual
-                    pre-up sleep 4
-                    bond-master bond0
-                """
+        for iface in sorted(builder.network.interfaces, key=lambda iface: iface.name):
+            if iface.name != builder.network.interfaces[0].name:
+                partial = f"""
+                    auto {iface.name}
+                    iface {iface.name} inet manual
+                        pre-up sleep 4
+                        bond-master bond0
+                    """
+            else:
+                partial = f"""
+                    auto {iface.name}
+                    iface {iface.name} inet manual
+                        bond-master bond0
+                    """
             result += dedent(partial)
-
     partial = f"""
         auto bond0
         iface bond0 inet static
             address {ipv4pub.address}
             netmask {ipv4pub.netmask}
             gateway {ipv4pub.gateway}
-            dns-nameservers {dns1} {dns2}
+            dns-nameservers {" ".join(sorted(builder.network.resolvers))}
 
             bond-downdelay 200
             bond-miimon 100
@@ -113,8 +111,6 @@ def test_private_bonded_task_etc_network_interfaces(
     tasks = builder.render()
 
     bonding_mode = builder.network.bonding.mode
-    dns1 = builder.network.resolvers[0]
-    dns2 = builder.network.resolvers[1]
     ipv4priv = builder.ipv4priv.first
     partial = """\
         auto lo
@@ -122,28 +118,28 @@ def test_private_bonded_task_etc_network_interfaces(
         """
     result = dedent(partial)
     if distro == "ubuntu":
-        partial = f"""
-            auto {builder.network.interfaces[0].name}
-            iface {builder.network.interfaces[0].name} inet manual
-                bond-master bond0
-            """
-        result += dedent(partial)
-        for iface in builder.network.interfaces[1:]:
-            partial = f"""
-                auto {iface.name}
-                iface {iface.name} inet manual
-                    pre-up sleep 4
-                    bond-master bond0
-                """
+        for iface in sorted(builder.network.interfaces, key=lambda iface: iface.name):
+            if iface.name != builder.network.interfaces[0].name:
+                partial = f"""
+                    auto {iface.name}
+                    iface {iface.name} inet manual
+                        pre-up sleep 4
+                        bond-master bond0
+                    """
+            else:
+                partial = f"""
+                    auto {iface.name}
+                    iface {iface.name} inet manual
+                        bond-master bond0
+                    """
             result += dedent(partial)
-
     partial = f"""
         auto bond0
         iface bond0 inet static
             address {ipv4priv.address}
             netmask {ipv4priv.netmask}
             gateway {ipv4priv.gateway}
-            dns-nameservers {dns1} {dns2}
+            dns-nameservers {" ".join(sorted(builder.network.resolvers))}
 
             bond-downdelay 200
             bond-miimon 100
@@ -181,13 +177,11 @@ def test_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
     bonded_network_builder, distro, version
 ):
     """Validates /etc/network/interfaces for a public bond"""
-    subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
+    subnets = {"private_subnets": reversed(["192.168.5.0/24", "172.16.0.0/12"])}
     builder = bonded_network_builder(distro, version, public=True, metadata=subnets)
     tasks = builder.render()
 
     bonding_mode = builder.network.bonding.mode
-    dns1 = builder.network.resolvers[0]
-    dns2 = builder.network.resolvers[1]
     ipv4priv = builder.ipv4priv.first
     ipv4pub = builder.ipv4pub.first
     ipv6pub = builder.ipv6pub.first
@@ -197,28 +191,28 @@ def test_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
         """
     result = dedent(partial)
     if distro == "ubuntu":
-        partial = f"""
-            auto {builder.network.interfaces[0].name}
-            iface {builder.network.interfaces[0].name} inet manual
-                bond-master bond0
-            """
-        result += dedent(partial)
-        for iface in builder.network.interfaces[1:]:
-            partial = f"""
-                auto {iface.name}
-                iface {iface.name} inet manual
-                    pre-up sleep 4
-                    bond-master bond0
-                """
+        for iface in sorted(builder.network.interfaces, key=lambda iface: iface.name):
+            if iface.name != builder.network.interfaces[0].name:
+                partial = f"""
+                    auto {iface.name}
+                    iface {iface.name} inet manual
+                        pre-up sleep 4
+                        bond-master bond0
+                    """
+            else:
+                partial = f"""
+                    auto {iface.name}
+                    iface {iface.name} inet manual
+                        bond-master bond0
+                    """
             result += dedent(partial)
-
     partial = f"""
         auto bond0
         iface bond0 inet static
             address {ipv4pub.address}
             netmask {ipv4pub.netmask}
             gateway {ipv4pub.gateway}
-            dns-nameservers {dns1} {dns2}
+            dns-nameservers {" ".join(sorted(builder.network.resolvers))}
 
             bond-downdelay 200
             bond-miimon 100
@@ -241,10 +235,10 @@ def test_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
         iface bond0:0 inet static
             address {ipv4priv.address}
             netmask {ipv4priv.netmask}
-            post-up route add -net 192.168.5.0/24 gw {ipv4priv.gateway}
-            post-down route del -net 192.168.5.0/24 gw {ipv4priv.gateway}
             post-up route add -net 172.16.0.0/12 gw {ipv4priv.gateway}
             post-down route del -net 172.16.0.0/12 gw {ipv4priv.gateway}
+            post-up route add -net 192.168.5.0/24 gw {ipv4priv.gateway}
+            post-down route del -net 192.168.5.0/24 gw {ipv4priv.gateway}
         """
     result += dedent(partial)
 
@@ -276,13 +270,10 @@ def test_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space
     When no public ip is assigned, we should see the private ip details in the
     /etc/network/interfaces file.
     """
-    subnets = {"private_subnets": ["192.168.5.0/24", "172.16.0.0/12"]}
-    builder = bonded_network_builder(distro, version, public=False, metadata=subnets)
+    builder = bonded_network_builder(distro, version, public=False)
     tasks = builder.render()
 
     bonding_mode = builder.network.bonding.mode
-    dns1 = builder.network.resolvers[0]
-    dns2 = builder.network.resolvers[1]
     ipv4priv = builder.ipv4priv.first
     partial = """\
         auto lo
@@ -290,28 +281,28 @@ def test_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space
         """
     result = dedent(partial)
     if distro == "ubuntu":
-        partial = f"""
-            auto {builder.network.interfaces[0].name}
-            iface {builder.network.interfaces[0].name} inet manual
-                bond-master bond0
-            """
-        result += dedent(partial)
-        for iface in builder.network.interfaces[1:]:
-            partial = f"""
-                auto {iface.name}
-                iface {iface.name} inet manual
-                    pre-up sleep 4
-                    bond-master bond0
-                """
+        for iface in sorted(builder.network.interfaces, key=lambda iface: iface.name):
+            if iface.name != builder.network.interfaces[0].name:
+                partial = f"""
+                    auto {iface.name}
+                    iface {iface.name} inet manual
+                        pre-up sleep 4
+                        bond-master bond0
+                    """
+            else:
+                partial = f"""
+                    auto {iface.name}
+                    iface {iface.name} inet manual
+                        bond-master bond0
+                    """
             result += dedent(partial)
-
     partial = f"""
         auto bond0
         iface bond0 inet static
             address {ipv4priv.address}
             netmask {ipv4priv.netmask}
             gateway {ipv4priv.gateway}
-            dns-nameservers {dns1} {dns2}
+            dns-nameservers {" ".join(sorted(builder.network.resolvers))}
 
             bond-downdelay 200
             bond-miimon 100
