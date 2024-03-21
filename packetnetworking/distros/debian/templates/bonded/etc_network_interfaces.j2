@@ -16,7 +16,8 @@ iface {{ iface.name }} inet manual
 {% for bond in bonds | sort %}
 
 auto {{ bond }}
-iface {{ bond }} inet {% if bond == "bond0" %}static{% else %}manual{% endif +%}
+iface {{ bond }} inet {% if bond == "bond0" %}static{% else %}manual{% endif %}
+
     {% if bond == "bond0" %}
     {% if ip4pub %}
     address {{ ip4pub.address }}
