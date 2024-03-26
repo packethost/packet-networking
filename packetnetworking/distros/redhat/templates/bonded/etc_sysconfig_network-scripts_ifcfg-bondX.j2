@@ -5,6 +5,7 @@ NAME={{bond}}
 IPADDR={{ ip4pub.address }}
 NETMASK={{ ip4pub.netmask }}
 GATEWAY={{ ip4pub.gateway }}
+DEFROUTE=yes
 {% else %}
 IPADDR={{ ip4priv.address }}
 NETMASK={{ ip4priv.netmask }}
