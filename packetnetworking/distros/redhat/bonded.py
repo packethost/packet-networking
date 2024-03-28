@@ -13,9 +13,9 @@ class RedhatBondedNetwork(NetworkBuilder):
 
     def build_tasks(self):
         self.task_template("etc/sysconfig/network", "bonded/etc_sysconfig_network.j2")
-        self.task_template(
-            "etc/modprobe.d/bonding.conf", "bonded/etc_modprobe.d_bonding.conf.j2"
-        )
+        # self.task_template(
+        #     "etc/modprobe.d/bonding.conf", "bonded/etc_modprobe.d_bonding.conf.j2"
+        # )
 
         for bond in self.network.bonds:
             self.task_template(
