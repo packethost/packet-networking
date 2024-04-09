@@ -29,22 +29,21 @@ def test_public_bonded_task_etc_network_interfaces(
         iface lo inet loopback
         """
     result = dedent(partial)
-    if distro == "ubuntu":
-        for iface in sorted(builder.network.interfaces, key=lambda iface: iface.name):
-            if iface.name != builder.network.interfaces[0].name:
-                partial = f"""
-                    auto {iface.name}
-                    iface {iface.name} inet manual
-                        pre-up sleep 4
-                        bond-master bond0
-                    """
-            else:
-                partial = f"""
-                    auto {iface.name}
-                    iface {iface.name} inet manual
-                        bond-master bond0
-                    """
-            result += dedent(partial)
+    for iface in sorted(builder.network.interfaces, key=lambda iface: iface.name):
+        if iface.name != builder.network.interfaces[0].name:
+            partial = f"""
+                auto {iface.name}
+                iface {iface.name} inet manual
+                    pre-up sleep 4
+                    bond-master bond0
+                """
+        else:
+            partial = f"""
+                auto {iface.name}
+                iface {iface.name} inet manual
+                    bond-master bond0
+                """
+        result += dedent(partial)
     partial = f"""
         auto bond0
         iface bond0 inet static
@@ -60,8 +59,7 @@ def test_public_bonded_task_etc_network_interfaces(
             bond-xmit_hash_policy layer3+4
         """
     result += dedent(partial)
-    if distro == "ubuntu":
-        result += "    bond-lacp-rate 1\n"
+    result += "    bond-lacp-rate 1\n"
     result += f"""    bond-slaves {' '.join(sorted(nic.name for nic in builder.network.bonds["bond0"]))}\n"""
 
     partial = f"""
@@ -93,8 +91,7 @@ def test_public_bonded_task_etc_network_interfaces(
                 bond-xmit_hash_policy layer3+4
             """
         result += dedent(partial)
-        if distro == "ubuntu":
-            result += "    bond-lacp-rate 1\n"
+        result += "    bond-lacp-rate 1\n"
         result += f"    bond-slaves {' '.join(sorted(nic.name for nic in members))}\n"
     assert tasks["etc/network/interfaces"] == result
 
@@ -117,22 +114,21 @@ def test_private_bonded_task_etc_network_interfaces(
         iface lo inet loopback
         """
     result = dedent(partial)
-    if distro == "ubuntu":
-        for iface in sorted(builder.network.interfaces, key=lambda iface: iface.name):
-            if iface.name != builder.network.interfaces[0].name:
-                partial = f"""
-                    auto {iface.name}
-                    iface {iface.name} inet manual
-                        pre-up sleep 4
-                        bond-master bond0
-                    """
-            else:
-                partial = f"""
-                    auto {iface.name}
-                    iface {iface.name} inet manual
-                        bond-master bond0
-                    """
-            result += dedent(partial)
+    for iface in sorted(builder.network.interfaces, key=lambda iface: iface.name):
+        if iface.name != builder.network.interfaces[0].name:
+            partial = f"""
+                auto {iface.name}
+                iface {iface.name} inet manual
+                    pre-up sleep 4
+                    bond-master bond0
+                """
+        else:
+            partial = f"""
+                auto {iface.name}
+                iface {iface.name} inet manual
+                    bond-master bond0
+                """
+        result += dedent(partial)
     partial = f"""
         auto bond0
         iface bond0 inet static
@@ -148,8 +144,7 @@ def test_private_bonded_task_etc_network_interfaces(
             bond-xmit_hash_policy layer3+4
         """
     result += dedent(partial)
-    if distro == "ubuntu":
-        result += "    bond-lacp-rate 1\n"
+    result += "    bond-lacp-rate 1\n"
     result += f"    bond-slaves {' '.join(sorted(nic.name for nic in builder.network.bonds['bond0']))}\n"
 
     for bond, members in builder.network.bonds.items():
@@ -166,8 +161,7 @@ def test_private_bonded_task_etc_network_interfaces(
                 bond-xmit_hash_policy layer3+4
             """
         result += dedent(partial)
-        if distro == "ubuntu":
-            result += "    bond-lacp-rate 1\n"
+        result += "    bond-lacp-rate 1\n"
         result += f"    bond-slaves {' '.join(sorted(nic.name for nic in members))}\n"
     assert tasks["etc/network/interfaces"] == result
 
@@ -190,22 +184,21 @@ def test_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
         iface lo inet loopback
         """
     result = dedent(partial)
-    if distro == "ubuntu":
-        for iface in sorted(builder.network.interfaces, key=lambda iface: iface.name):
-            if iface.name != builder.network.interfaces[0].name:
-                partial = f"""
-                    auto {iface.name}
-                    iface {iface.name} inet manual
-                        pre-up sleep 4
-                        bond-master bond0
-                    """
-            else:
-                partial = f"""
-                    auto {iface.name}
-                    iface {iface.name} inet manual
-                        bond-master bond0
-                    """
-            result += dedent(partial)
+    for iface in sorted(builder.network.interfaces, key=lambda iface: iface.name):
+        if iface.name != builder.network.interfaces[0].name:
+            partial = f"""
+                auto {iface.name}
+                iface {iface.name} inet manual
+                    pre-up sleep 4
+                    bond-master bond0
+                """
+        else:
+            partial = f"""
+                auto {iface.name}
+                iface {iface.name} inet manual
+                    bond-master bond0
+                """
+        result += dedent(partial)
     partial = f"""
         auto bond0
         iface bond0 inet static
@@ -221,9 +214,7 @@ def test_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
             bond-xmit_hash_policy layer3+4
         """
     result += dedent(partial)
-    if distro == "ubuntu":
-        result += "    bond-lacp-rate 1\n"
-
+    result += "    bond-lacp-rate 1\n"
     result += f"""    bond-slaves {' '.join(sorted(nic.name for nic in builder.network.bonds["bond0"]))}\n"""
     partial = f"""
         iface bond0 inet6 static
@@ -256,8 +247,7 @@ def test_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
                 bond-xmit_hash_policy layer3+4
             """
         result += dedent(partial)
-        if distro == "ubuntu":
-            result += "    bond-lacp-rate 1\n"
+        result += "    bond-lacp-rate 1\n"
         result += f"    bond-slaves {' '.join(sorted(nic.name for nic in members))}\n"
     assert tasks["etc/network/interfaces"] == result
 
@@ -280,22 +270,21 @@ def test_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space
         iface lo inet loopback
         """
     result = dedent(partial)
-    if distro == "ubuntu":
-        for iface in sorted(builder.network.interfaces, key=lambda iface: iface.name):
-            if iface.name != builder.network.interfaces[0].name:
-                partial = f"""
-                    auto {iface.name}
-                    iface {iface.name} inet manual
-                        pre-up sleep 4
-                        bond-master bond0
-                    """
-            else:
-                partial = f"""
-                    auto {iface.name}
-                    iface {iface.name} inet manual
-                        bond-master bond0
-                    """
-            result += dedent(partial)
+    for iface in sorted(builder.network.interfaces, key=lambda iface: iface.name):
+        if iface.name != builder.network.interfaces[0].name:
+            partial = f"""
+                auto {iface.name}
+                iface {iface.name} inet manual
+                    pre-up sleep 4
+                    bond-master bond0
+                """
+        else:
+            partial = f"""
+                auto {iface.name}
+                iface {iface.name} inet manual
+                    bond-master bond0
+                """
+        result += dedent(partial)
     partial = f"""
         auto bond0
         iface bond0 inet static
@@ -311,9 +300,7 @@ def test_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space
             bond-xmit_hash_policy layer3+4
         """
     result += dedent(partial)
-    if distro == "ubuntu":
-        result += "    bond-lacp-rate 1\n"
-
+    result += "    bond-lacp-rate 1\n"
     result += f"""    bond-slaves {' '.join(sorted(nic.name for nic in builder.network.bonds["bond0"]))}\n"""
 
     for bond, members in builder.network.bonds.items():
@@ -330,8 +317,7 @@ def test_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space
                 bond-xmit_hash_policy layer3+4
             """
         result += dedent(partial)
-        if distro == "ubuntu":
-            result += "    bond-lacp-rate 1\n"
+        result += "    bond-lacp-rate 1\n"
         result += f"    bond-slaves {' '.join(sorted(nic.name for nic in members))}\n"
     assert tasks["etc/network/interfaces"] == result
 
