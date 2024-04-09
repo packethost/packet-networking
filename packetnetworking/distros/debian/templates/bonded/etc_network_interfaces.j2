@@ -1,7 +1,6 @@
 auto lo
 iface lo inet loopback
 
-{% if osinfo.distro == 'ubuntu' %}
 {% for iface in interfaces | sort(attribute="name") %}
 
 auto {{ iface.name }}
@@ -11,7 +10,6 @@ iface {{ iface.name }} inet manual
 {% endif %}
     bond-master bond0
 {% endfor %}
-{% endif %}
 
 {% for bond in bonds | sort %}
 
@@ -36,7 +34,7 @@ iface {{ bond }} inet {% if bond == "bond0" %}static{% else %}manual{% endif %}
     bond-mode {{ net.bonding.mode }}
     bond-updelay 200
     bond-xmit_hash_policy layer3+4
-    {% if osinfo.distro == 'ubuntu' and net.bonding.mode == 4 %}
+    {% if net.bonding.mode == 4 %}
     bond-lacp-rate 1
     {% endif %}
     bond-slaves {{ bonds[bond] | map(attribute='name') | sort | join(' ') }}
