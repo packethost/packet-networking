@@ -26,6 +26,7 @@ iface {{ bond }} inet {% if bond == "bond0" %}static{% else %}manual{% endif %}
     netmask {{ ip4priv.netmask }}
     gateway {{ ip4priv.gateway }}
     {% endif %}
+    hwaddress {{ interfaces[0].mac }}
     dns-nameservers {{ resolvers | sort | join(" ") }}
 
     {% endif %}
