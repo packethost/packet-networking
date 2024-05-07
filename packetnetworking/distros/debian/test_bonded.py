@@ -50,6 +50,7 @@ def test_public_bonded_task_etc_network_interfaces(
             address {ipv4pub.address}
             netmask {ipv4pub.netmask}
             gateway {ipv4pub.gateway}
+            hwaddress {builder.network.interfaces[0].mac}
             dns-nameservers {" ".join(sorted(builder.network.resolvers))}
 
             bond-downdelay 200
@@ -135,6 +136,7 @@ def test_private_bonded_task_etc_network_interfaces(
             address {ipv4priv.address}
             netmask {ipv4priv.netmask}
             gateway {ipv4priv.gateway}
+            hwaddress {builder.network.interfaces[0].mac}
             dns-nameservers {" ".join(sorted(builder.network.resolvers))}
 
             bond-downdelay 200
@@ -205,6 +207,7 @@ def test_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
             address {ipv4pub.address}
             netmask {ipv4pub.netmask}
             gateway {ipv4pub.gateway}
+            hwaddress {builder.network.interfaces[0].mac}
             dns-nameservers {" ".join(sorted(builder.network.resolvers))}
 
             bond-downdelay 200
@@ -291,6 +294,7 @@ def test_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space
             address {ipv4priv.address}
             netmask {ipv4priv.netmask}
             gateway {ipv4priv.gateway}
+            hwaddress {builder.network.interfaces[0].mac}
             dns-nameservers {" ".join(sorted(builder.network.resolvers))}
 
             bond-downdelay 200
