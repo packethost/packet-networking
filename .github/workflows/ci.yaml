@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@v10
-      - uses: DeterminateSystems/magic-nix-cache-action@v4
+      - uses: DeterminateSystems/magic-nix-cache-action@v6
       - run: nix develop --impure --command pre-commit run --all
       - run: nix develop --impure --command pylama packetnetworking setup.py
   pytests:
