@@ -35,13 +35,13 @@ def test_public_bonded_task_etc_network_interfaces(
                 auto {iface.name}
                 iface {iface.name} inet manual
                     pre-up sleep 4
-                    bond-master bond0
+                    bond-master {iface.bond}
                 """
         else:
             partial = f"""
                 auto {iface.name}
                 iface {iface.name} inet manual
-                    bond-master bond0
+                    bond-master {iface.bond}
                 """
         result += dedent(partial)
     partial = f"""
@@ -121,13 +121,13 @@ def test_private_bonded_task_etc_network_interfaces(
                 auto {iface.name}
                 iface {iface.name} inet manual
                     pre-up sleep 4
-                    bond-master bond0
+                    bond-master {iface.bond}
                 """
         else:
             partial = f"""
                 auto {iface.name}
                 iface {iface.name} inet manual
-                    bond-master bond0
+                    bond-master {iface.bond}
                 """
         result += dedent(partial)
     partial = f"""
@@ -192,13 +192,13 @@ def test_public_bonded_task_etc_network_interfaces_with_custom_private_ip_space(
                 auto {iface.name}
                 iface {iface.name} inet manual
                     pre-up sleep 4
-                    bond-master bond0
+                    bond-master {iface.bond}
                 """
         else:
             partial = f"""
                 auto {iface.name}
                 iface {iface.name} inet manual
-                    bond-master bond0
+                    bond-master {iface.bond}
                 """
         result += dedent(partial)
     partial = f"""
@@ -279,13 +279,13 @@ def test_private_bonded_task_etc_network_interfaces_with_custom_private_ip_space
                 auto {iface.name}
                 iface {iface.name} inet manual
                     pre-up sleep 4
-                    bond-master bond0
+                    bond-master {iface.bond}
                 """
         else:
             partial = f"""
                 auto {iface.name}
                 iface {iface.name} inet manual
-                    bond-master bond0
+                    bond-master {iface.bond}
                 """
         result += dedent(partial)
     partial = f"""

@@ -8,7 +8,7 @@ iface {{ iface.name }} inet manual
 {% if iface.name != interfaces[0].name %}
     pre-up sleep 4
 {% endif %}
-    bond-master bond0
+    bond-master {{ iface.bond }}
 {% endfor %}
 
 {% for bond in bonds | sort %}
