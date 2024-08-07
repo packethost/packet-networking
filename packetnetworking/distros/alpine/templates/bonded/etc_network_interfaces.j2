@@ -1,8 +1,22 @@
 auto lo
 iface lo inet loopback
 
-auto bond0
-iface bond0 inet static
+{% for iface in interfaces | sort(attribute="meta_name") %}
+
+auto {{ iface.meta_name }}
+iface {{ iface.meta_name }} inet manual
+{% if iface.meta_name != interfaces[0].meta_name %}
+    pre-up sleep 4
+{% endif %}
+    bond-master {{ iface.bond }}
+{% endfor %}
+
+{% for bond in bonds | sort %}
+
+auto {{ bond }}
+iface {{ bond }} inet {% if bond == "bond0" %}static{% else %}manual{% endif %}
+
+    {% if bond == "bond0" %}
     {% if ip4pub %}
     address {{ ip4pub.address }}
     netmask {{ ip4pub.netmask }}
@@ -12,16 +26,20 @@ iface bond0 inet static
     netmask {{ ip4priv.netmask }}
     gateway {{ ip4priv.gateway }}
     {% endif %}
-    dns-nameservers {{ resolvers | join(" ") }}
+    hwaddress {{ interfaces[0].mac }}
+    dns-nameservers {{ resolvers | sort | join(" ") }}
 
-    use bond
-    requires {{ interfaces | map(attribute="meta_name") | join(" ") }}
-    bond-members {{ interfaces | map(attribute="meta_name") | join(" ") }}
-    bond-mode {{ net.bonding.mode }}
+    {% endif %}
     bond-downdelay 200
     bond-miimon 100
+    bond-mode {{ net.bonding.mode }}
     bond-updelay 200
     bond-xmit_hash_policy layer3+4
+    {% if net.bonding.mode == 4 %}
+    bond-lacp-rate 1
+    {% endif %}
+    bond-slaves {{ bonds[bond] | map(attribute='meta_name') | sort | join(' ') }}
+{% if bond == "bond0" %}
 {% if ip6pub %}
 
 iface bond0 inet6 static
@@ -35,8 +53,10 @@ auto bond0:0
 iface bond0:0 inet static
     address {{ ip4priv.address }}
     netmask {{ ip4priv.netmask }}
-    {% for subnet in private_subnets %}
+    {% for subnet in private_subnets | sort %}
     post-up route add -net {{ subnet }} gw {{ ip4priv.gateway }}
     post-down route del -net {{ subnet }} gw {{ ip4priv.gateway }}
     {% endfor %}
 {% endif %}
+{% endif %}
+{% endfor %}
