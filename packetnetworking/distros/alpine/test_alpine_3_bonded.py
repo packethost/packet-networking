@@ -21,21 +21,30 @@ def test_alpine_3_public_bonded_task_etc_network_interfaces(alpine_3_bonded_netw
         auto lo
         iface lo inet loopback
 
+        auto eth0
+        iface eth0 inet manual
+            bond-master bond0
+
+        auto eth1
+        iface eth1 inet manual
+            pre-up sleep 4
+            bond-master bond0
+
         auto bond0
         iface bond0 inet static
             address {ipv4pub.address}
             netmask {ipv4pub.netmask}
             gateway {ipv4pub.gateway}
+            hwaddress 00:0c:29:51:53:a1
             dns-nameservers {dns1} {dns2}
 
-            use bond
-            requires {iface0.meta_name} {iface1.meta_name}
-            bond-members {iface0.meta_name} {iface1.meta_name}
-            bond-mode {bonding_mode}
             bond-downdelay 200
             bond-miimon 100
+            bond-mode {bonding_mode}
             bond-updelay 200
             bond-xmit_hash_policy layer3+4
+            bond-lacp-rate 1
+            bond-slaves eth0 eth1
 
         iface bond0 inet6 static
             address {ipv6pub.address}
@@ -74,21 +83,30 @@ def test_alpine_3_private_bonded_task_etc_network_interfaces(alpine_3_bonded_net
         auto lo
         iface lo inet loopback
 
+        auto eth0
+        iface eth0 inet manual
+            bond-master bond0
+
+        auto eth1
+        iface eth1 inet manual
+            pre-up sleep 4
+            bond-master bond0
+
         auto bond0
         iface bond0 inet static
             address {ipv4priv.address}
             netmask {ipv4priv.netmask}
             gateway {ipv4priv.gateway}
+            hwaddress 00:0c:29:51:53:a1
             dns-nameservers {dns1} {dns2}
 
-            use bond
-            requires {iface0.meta_name} {iface1.meta_name}
-            bond-members {iface0.meta_name} {iface1.meta_name}
-            bond-mode {bonding_mode}
             bond-downdelay 200
             bond-miimon 100
+            bond-mode {bonding_mode}
             bond-updelay 200
             bond-xmit_hash_policy layer3+4
+            bond-lacp-rate 1
+            bond-slaves eth0 eth1
     """
     ).format(
         ipv4priv=builder.ipv4priv.first,
@@ -113,21 +131,30 @@ def test_alpine_3_public_bonded_task_etc_network_interfaces_with_custom_private_
         auto lo
         iface lo inet loopback
 
+        auto eth0
+        iface eth0 inet manual
+            bond-master bond0
+
+        auto eth1
+        iface eth1 inet manual
+            pre-up sleep 4
+            bond-master bond0
+
         auto bond0
         iface bond0 inet static
             address {ipv4pub.address}
             netmask {ipv4pub.netmask}
             gateway {ipv4pub.gateway}
+            hwaddress 00:0c:29:51:53:a1
             dns-nameservers {dns1} {dns2}
 
-            use bond
-            requires {iface0.meta_name} {iface1.meta_name}
-            bond-members {iface0.meta_name} {iface1.meta_name}
-            bond-mode {bonding_mode}
             bond-downdelay 200
             bond-miimon 100
+            bond-mode {bonding_mode}
             bond-updelay 200
             bond-xmit_hash_policy layer3+4
+            bond-lacp-rate 1
+            bond-slaves eth0 eth1
 
         iface bond0 inet6 static
             address {ipv6pub.address}
@@ -138,10 +165,10 @@ def test_alpine_3_public_bonded_task_etc_network_interfaces_with_custom_private_
         iface bond0:0 inet static
             address {ipv4priv.address}
             netmask {ipv4priv.netmask}
-            post-up route add -net 192.168.5.0/24 gw {ipv4priv.gateway}
-            post-down route del -net 192.168.5.0/24 gw {ipv4priv.gateway}
             post-up route add -net 172.16.0.0/12 gw {ipv4priv.gateway}
             post-down route del -net 172.16.0.0/12 gw {ipv4priv.gateway}
+            post-up route add -net 192.168.5.0/24 gw {ipv4priv.gateway}
+            post-down route del -net 192.168.5.0/24 gw {ipv4priv.gateway}
     """
     ).format(
         ipv4pub=builder.ipv4pub.first,
@@ -171,21 +198,30 @@ def test_alpine_3_private_bonded_task_etc_network_interfaces_with_custom_private
         auto lo
         iface lo inet loopback
 
+        auto eth0
+        iface eth0 inet manual
+            bond-master bond0
+
+        auto eth1
+        iface eth1 inet manual
+            pre-up sleep 4
+            bond-master bond0
+
         auto bond0
         iface bond0 inet static
             address {ipv4priv.address}
             netmask {ipv4priv.netmask}
             gateway {ipv4priv.gateway}
+            hwaddress 00:0c:29:51:53:a1
             dns-nameservers {dns1} {dns2}
 
-            use bond
-            requires {iface0.meta_name} {iface1.meta_name}
-            bond-members {iface0.meta_name} {iface1.meta_name}
-            bond-mode {bonding_mode}
             bond-downdelay 200
             bond-miimon 100
+            bond-mode {bonding_mode}
             bond-updelay 200
             bond-xmit_hash_policy layer3+4
+            bond-lacp-rate 1
+            bond-slaves eth0 eth1
     """
     ).format(
         ipv4priv=builder.ipv4priv.first,
