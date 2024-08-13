@@ -8,7 +8,6 @@ iface {{ iface.meta_name }} inet manual
 {% if iface.meta_name != interfaces[0].meta_name %}
     pre-up sleep 4
 {% endif %}
-    bond-master {{ iface.bond }}
 {% endfor %}
 
 {% for bond in bonds | sort %}

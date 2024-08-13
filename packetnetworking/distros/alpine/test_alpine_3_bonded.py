@@ -23,12 +23,10 @@ def test_alpine_3_public_bonded_task_etc_network_interfaces(alpine_3_bonded_netw
 
         auto eth0
         iface eth0 inet manual
-            bond-master bond0
 
         auto eth1
         iface eth1 inet manual
             pre-up sleep 4
-            bond-master bond0
 
         auto bond0
         iface bond0 inet static
@@ -85,12 +83,10 @@ def test_alpine_3_private_bonded_task_etc_network_interfaces(alpine_3_bonded_net
 
         auto eth0
         iface eth0 inet manual
-            bond-master bond0
 
         auto eth1
         iface eth1 inet manual
             pre-up sleep 4
-            bond-master bond0
 
         auto bond0
         iface bond0 inet static
@@ -133,12 +129,10 @@ def test_alpine_3_public_bonded_task_etc_network_interfaces_with_custom_private_
 
         auto eth0
         iface eth0 inet manual
-            bond-master bond0
 
         auto eth1
         iface eth1 inet manual
             pre-up sleep 4
-            bond-master bond0
 
         auto bond0
         iface bond0 inet static
@@ -200,12 +194,10 @@ def test_alpine_3_private_bonded_task_etc_network_interfaces_with_custom_private
 
         auto eth0
         iface eth0 inet manual
-            bond-master bond0
 
         auto eth1
         iface eth1 inet manual
             pre-up sleep 4
-            bond-master bond0
 
         auto bond0
         iface bond0 inet static
@@ -258,22 +250,18 @@ def test_alpine_3_public_bonded_task_etc_network_interfaces_with_two_bonds(
 
         auto eth0
         iface eth0 inet manual
-            bond-master bond0
 
         auto eth1
         iface eth1 inet manual
             pre-up sleep 4
-            bond-master bond0
 
         auto eth2
         iface eth2 inet manual
             pre-up sleep 4
-            bond-master bond1
 
         auto eth3
         iface eth3 inet manual
             pre-up sleep 4
-            bond-master bond1
 
         auto bond0
         iface bond0 inet static
